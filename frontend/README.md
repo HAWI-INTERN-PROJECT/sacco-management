@@ -1,16 +1,83 @@
-# React + Vite
+# SACCO Management System — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React (Vite) client for the SACCO Management System. It provides the interfaces for Members, SACCO Administrators, and the Platform Superadmin.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Node.js** (LTS version recommended)
+- **npm**
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1.  **Clone the repository** (this project lives inside the `frontend/` folder of the monorepo):
+    ```bash
+    git clone https://github.com/Bini-A10/sacco-management.git
+    cd sacco-management/frontend
+    ```
 
-## Expanding the ESLint configuration
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3.  **Create your environment file:**
+    Create a `.env` file in the `frontend/` folder with the backend API URL:
+    ```
+    VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+    ```
+    Adjust the URL if your backend is running somewhere else (e.g. `http://localhost` if using Docker).
+
+4.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+    The app will be available at `http://localhost:5173`.
+
+Make sure the backend (see `../backend/README.md`) is running at the same time — the frontend depends on it for all data.
+
+## Available Scripts
+
+- `npm run dev` — start the local development server with hot reload
+- `npm run build` — build the app for production
+- `npm run lint` — run ESLint to check code quality
+
+## Project Structure
+
+```
+frontend/
+├── public/           Static assets
+├── src/
+│   ├── assets/        Images, icons, etc.
+│   ├── App.jsx         Root component
+│   └── main.jsx        Application entry point
+├── index.html
+├── vite.config.js
+└── package.json
+```
+
+As the project grows, organize `src/` by feature, for example:
+
+```
+src/
+├── components/       Shared/reusable UI components
+├── pages/            Page-level components (per route)
+├── services/         API call functions (e.g. api/loans.js, api/members.js)
+├── hooks/            Custom React hooks
+├── context/          Auth/session context
+└── routes/           React Router setup
+```
+
+## Coding Conventions
+
+- **Components**: `PascalCase` — e.g. `LoanApplicationForm.jsx`
+- **Functions/variables**: `camelCase` — e.g. `fetchMemberSavings()`
+- **Files**: match the component name they export
+- Keep API calls out of components — put them in a `services/` folder and import them, so the same request logic can be reused and tested.
+
+## Branching and Commits
+
+Follow the same conventions used across the whole project (see the root [`README.md`](../README.md) and [`backend/README.md`](../backend/README.md)):
+
+- Branch from `develop`: `feature/your-feature-name`
+- Commit messages: `feat: add loan application form`, `fix: correct savings balance display`
+- Open pull requests into `develop`, not `main`
