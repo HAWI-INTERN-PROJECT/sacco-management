@@ -1,6 +1,8 @@
-# Inventory Management System
+# SACCO Management System — Backend
 
-This is an inventory management system built with the Laravel framework. It provides a robust platform for managing inventory, products, and transactions.
+This is the Laravel REST API for the SACCO Management System, a multi-tenant platform where SACCOs (Savings and Credit Cooperative Organizations) manage their own members, savings, loans, share capital, and dividends.
+
+This backend is built on a Laravel starter kit that already provides authentication (register, login, logout, email verification, password reset) via Laravel Sanctum, and a versioned API structure (`/api/v1/...`). SACCO-specific features (members, savings, loans, share capital, dividends, and platform/tenant management) are built on top of this foundation.
 
 ## Table of Contents
 
@@ -30,15 +32,15 @@ This is the recommended way to run the project for development.
 
 ### Installation and Running with Docker
 
-1.  **Clone the repository:**
+1.  **Clone the repository** (this project lives inside the `backend/` folder of the monorepo):
     ```bash
-    git clone https://github.com:kalidyasin/laravel-api-kit.git
-    cd laravel-api-kit
+    git clone https://github.com/Bini-A10/sacco-management.git
+    cd sacco-management/backend
     ```
 
 2.  **Create Environment File And Create compose override:**
     Copy the example environment file. The default values are configured for Docker.
-    Copy the example compose override file. and modify it according to your needs.
+    Copy the example compose override file, and modify it according to your needs.
     ```bash
     cp .env.example .env
     cp compose.override.yaml.example compose.override.yaml
@@ -55,7 +57,7 @@ This is the recommended way to run the project for development.
     docker compose run --rm composer install
     ```
 
-5.  **Install Frontend Dependencies:**
+5.  **Install Frontend Build Dependencies (Laravel asset tooling only, not the React app):**
     ```bash
     docker compose run --rm npm install
     ```
@@ -75,7 +77,6 @@ This is the recommended way to run the project for development.
     docker compose run --rm artisan db:seed
     ```
 
-
 ### Available Services
 
 The `compose.override.yaml` file defines the following services:
@@ -93,10 +94,9 @@ The `compose.override.yaml` file defines the following services:
 | `mailpit`  | `8025:8025`     | Email testing tool (web interface)        |
 | `adminer`  | `8080:8080`     | Database management tool (web interface)  |
 
-- **Application**: [http://localhost](http://localhost)
-- **Mailpit**: [http://localhost:8025](http://localhost:8025)
-- **Adminer**: [http://localhost:8080](http://localhost:8080)
-
+- **Application**: http://localhost
+- **Mailpit**: http://localhost:8025
+- **Adminer**: http://localhost:8080
 
 ## Local Development (Without Docker)
 
@@ -113,8 +113,8 @@ Follow these steps to get your development environment set up:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Hawi-Software-Solutions/E-Student-Backend.git
-    cd E-Student-Backend
+    git clone https://github.com/Bini-A10/sacco-management.git
+    cd sacco-management/backend
     ```
 
 2.  **Install PHP Dependencies:**
@@ -122,7 +122,7 @@ Follow these steps to get your development environment set up:
     composer install
     ```
 
-3.  **Install Frontend Dependencies:**
+3.  **Install Frontend Build Dependencies:**
     ```bash
     npm install
     ```
@@ -134,7 +134,6 @@ Follow these steps to get your development environment set up:
     ```
 
 5.  **Generate Application Key:**
-    This key is used for encryption and is essential for your application to run securely.
     ```bash
     php artisan key:generate
     ```
@@ -143,120 +142,84 @@ Follow these steps to get your development environment set up:
     Open the `.env` file and set up your database connection details (`DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
 
 7.  **Run Database Migrations:**
-    This will create all the necessary tables in your database.
     ```bash
     php artisan migrate
     ```
 
 8.  **(Optional) Seed the Database:**
-    If you want to populate your database with initial data, run the seeders.
     ```bash
     php artisan db:seed
     ```
 
 ### Running the Application Locally
 
-To run the application, you need to start both the Laravel development server and the Vite server for frontend assets.
-
 1.  **Start the Laravel Server:**
     ```bash
     php artisan serve
     ```
-    Your application will be available at `http://127.0.0.1:8000`.
+    Available at `http://127.0.0.1:8000`.
 
-2.  **Start the Vite Server:**
-    Open a new terminal window and run the following command to compile frontend assets and enable hot-reloading.
+2.  **Start the Vite Server** (in a new terminal):
     ```bash
     npm run dev
     ```
 
 ## Coding Conventions
 
-To maintain consistency and readability across the codebase, please adhere to the following conventions.
-
 ### 1. Naming Conventions
 
--   **Variables**: `camelCase`
-    -   *Example*: `$studentList`, `$totalFees`
-
--   **Functions & Methods**: `camelCase`
-    -   *Example*: `function calculateTotalScore()`, `public function getUserProfile()`
-
--   **Classes**: `PascalCase` (or `StudlyCaps`)
-    -   *Example*: `class StudentController`, `class FeePaymentService`
-
--   **Route URIs**: `kebab-case`
-    -   *Example*: `Route::get('/user/profile-picture', ...);`
-    -   *Example*: `Route::post('/student-admissions', ...);`
-
--   **Migrations**: `snake_case` (plural)
-    -   *Example*: `create_students_table.php`, `create_academic_years_table.php`
-
--   **Database Tables**: `snake_case` (plural)
-    -   *Example*: `students`, `academic_years`
-    **Note**: Pivot tables `snake_case` (singular) in alphabetical order are used to store many-to-many relationships between tables.
-    -   *Example*: `role_user`, `campus_user`
-
--   **Database Columns**: `snake_case`
-    -   *Example*: `first_name`, `is_active`, `student_id`
-
+-   **Variables**: `camelCase` — e.g. `$loanAmount`, `$totalSavings`
+-   **Functions & Methods**: `camelCase` — e.g. `function calculateDividend()`, `public function getMemberProfile()`
+-   **Classes**: `PascalCase` — e.g. `class LoanController`, `class SavingsService`
+-   **Route URIs**: `kebab-case` — e.g. `Route::get('/loan-applications', ...)`
+-   **Migrations**: `snake_case` (plural) — e.g. `create_loans_table.php`
+-   **Database Tables**: `snake_case` (plural) — e.g. `members`, `saccos`, `loan_repayments`
+    **Note**: Pivot tables use `snake_case` (singular) in alphabetical order, e.g. `role_user`.
+-   **Database Columns**: `snake_case` — e.g. `first_name`, `is_approved`, `sacco_id`
 -   **Files**: `PascalCase` for classes, `snake_case` for other files.
-    -   *Example*: `StudentController.php`, `api_routes.php`
 
 ### 2. General Guidelines
 
--   **Indentation**: Use 4 spaces for indentation, not tabs.
--   **Line Endings**: Use Unix-style line endings (LF).
--   **Comments**: Add comments to explain complex logic. Do not comment on obvious code.
--   **Single Responsibility**: Each class and method should have a single, well-defined responsibility.
+-   **Indentation**: 4 spaces, not tabs.
+-   **Line Endings**: Unix-style (LF).
+-   **Comments**: Explain complex logic; avoid commenting on obvious code.
+-   **Single Responsibility**: Each class and method should have one well-defined responsibility.
+-   **Multi-tenancy**: Every model and query that belongs to a SACCO must be scoped by `sacco_id`. Never return or expose data across SACCOs.
 
+## Branch Naming Guidelines
 
-### Branch Naming Guidelines
+- `fix/bug_name` — bug fixes
+- `hotfix/bug_name` — urgent bug fixes
+- `feature/feature_name` or `feat/feature_name` — new features
+- `refactor/refactor_name` — refactoring existing code
+- `chore/name` — maintenance tasks
+- `docs/name` — documentation updates
+- `release/version_name` — releases
 
-Use descriptive and meaningful branch names that reflect the purpose or feature being worked on.
+## Commit Message Guidelines
 
-### Branch Naming Conventions
+- `fix: bug name`
+- `hotfix: bug name`
+- `feature: feature name` or `feat: feature name`
+- `chore: name`
+- `refactor: name`
+- `docs: name`
 
-Use the following conventions for branch names:
-- `fix/bug_name`: For bug fixes.
-- `hotfix/bug_name`: For urgent bug fixes.
-- `feature/feature_name` or `feat/feature_name`: For new features.
-- `refactor/refactor_name`: For refactoring existing code.
-- `chore/name`: For maintenance tasks (e.g., dependency updates, code formatting ...).
-- `docs/name`: For documentation updates.
-- `release/version_name`: For releases (e.g., v1.0.0).
-
-### Commit Message Guidelines
-
-Write clear and descriptive commit messages that explain the changes made in each commit.
-
-### Commit Message Conventions
-
-Use the following conventions for commit messages:
-- `fix: bug name`: For bug fixes.
-- `hotfix: bug name`: For urgent bug fixes.
-- `feature: feature name` or `feat: feature name`: For new features.
-- `chore: name`: For maintenance tasks.
-- `refactor: name`: For refactoring existing code.
-- `docs: name`: For documentation updates.
-
-### Pull Request Guidelines
+## Pull Request Guidelines
 
 - Provide a clear and concise description of the changes.
 - Include screenshots or examples if applicable.
 - Ensure all tests pass before submitting.
 - Request reviews from relevant team members.
+- Target the `develop` branch, not `main`.
 
-### Contributing
+## Contributing
 
-We welcome contributions from everyone! Here’s how you can get started:
-1. **Fork the Repository**: Create your own fork of the project.
-2. **Create a Branch**: Follow the branch naming conventions (e.g., `feature/your-feature`).
-3. **Make Your Changes**: Adhere to the coding conventions and commit message guidelines.
-4. **Submit a Pull Request**: Follow the pull request guidelines.
-5. **Wait for Review**: Your PR will be reviewed by the maintainers.
+1. **Branch from `develop`**: `git checkout develop && git pull && git checkout -b feature/your-feature`
+2. **Make Your Changes**: Follow the coding conventions and commit message guidelines above.
+3. **Submit a Pull Request** into `develop`, following the PR guidelines above.
+4. **Wait for Review**: Your PR will be reviewed before merging.
 
----
 ## FAQ
 
 ### Common Issues and Solutions
