@@ -3,11 +3,10 @@
 namespace App\Http\Resources\V1;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\NewAccessToken;
 
-class AuthResource extends JsonResource
+class AuthResource extends ApiResponseResource
 {
     /**
      * Transform the resource into an array.
@@ -25,7 +24,7 @@ class AuthResource extends JsonResource
         $this->setTokenExpiration($newToken, $remember);
 
         return [
-            "user" => UserResource::make($this->resource),
+            'user' => UserResource::make($this->resource),
             'access_token' => $newToken->plainTextToken,
             'token_type' => 'Bearer',
             'expires_at' => $newToken->accessToken->expires_at->toDateTimeString(),
@@ -33,13 +32,6 @@ class AuthResource extends JsonResource
         ];
     }
 
-    /**
-     * Set token expiration helper function
-     *
-     * @param NewAccessToken $newToken
-     * @param bool $rememberMe
-     * @return void
-     */
     protected function setTokenExpiration(NewAccessToken $newToken, bool $rememberMe = false): void
     {
         $expires = $rememberMe

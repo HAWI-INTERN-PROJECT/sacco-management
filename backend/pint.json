@@ -1,0 +1,11 @@
+{
+    "$schema": "https://laravel.com/schema/pint.json",
+    "preset": "laravel",
+    "rules": {
+        "concat_space": false,
+        "trailing_comma_in_multiline": false,
+        "no_superfluous_phpdoc_tags": false,
+        "new_with_parentheses": false,
+        "unary_operator_spaces": false
+    }
+}

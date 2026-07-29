@@ -1,0 +1,67 @@
+{
+  "common": {
+    "appName": "SACCO Management System",
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት",
+    "success": "ተሳክቷል",
+    "save": "አስቀምጥ",
+    "cancel": "ይቅር",
+    "delete": "ሰርዝ",
+    "edit": "አርም",
+    "create": "ፍጠር",
+    "search": "ፈልግ",
+    "noData": "መረጃ የለም",
+    "confirm": "አረጋግጥ",
+    "back": "ተመለስ",
+    "next": "ቀጥል",
+    "submit": "አስገባ"
+  },
+  "auth": {
+    "login": "ግባ",
+    "register": "ተመዝገብ",
+    "logout": "ውጣ",
+    "email": "ኢሜይል",
+    "username": "የተጠቃሚ ስም",
+    "password": "የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃል አረጋግጥ",
+    "currentPassword": "የአሁኑ የይለፍ ቃል",
+    "newPassword": "አዲስ የይለፍ ቃል",
+    "forgotPassword": "የይለፍ ቃል ረሱ?",
+    "resetPassword": "የይለፍ ቃል ዳግም ያስጀምሩ",
+    "noAccount": "መለያ የለዎትም?",
+    "hasAccount": "መለያ አለዎት?",
+    "loginTitle": "እንኳን ደህና መጡ",
+    "loginSubtitle": "ወደ መለያዎ ይግቡ",
+    "registerTitle": "መለያ ይፍጠሩ",
+    "registerSubtitle": "ለመጀመር ዝርዝሮችዎን ያስገቡ",
+    "loginButton": "ግባ",
+    "registerButton": "ተመዝገብ",
+    "orContinueWith": "ወይም በሚከተለው ይቀጥሉ",
+    "emailOrUsername": "ኢሜይል ወይም የተጠቃሚ ስም",
+    "rememberMe": "አስታውሰኝ",
+    "emailRequired": "ኢሜይል ወይም የተጠቃሚ ስም ያስፈልጋል",
+    "passwordRequired": "የይለፍ ቃል ያስፈልጋል",
+    "passwordMin": "የይለፍ ቃል ቢያንስ 8 ፊደላት ሊኖረው ይገባል",
+    "passwordMatch": "የይለፍ ቃላት አይመሳሰሉም",
+    "nameRequired": "ስም ያስፈልጋል"
+  },
+  "dashboard": {
+    "title": "ዳሽቦርድ",
+    "welcome": "እንኳን ደህና መጡ፣ {{name}}",
+    "description": "የቁጠባና ብድር ማህበር አስተዳደር ዳሽቦርድ",
+    "profile": "መገለጫ",
+    "settings": "ቅንብሮች"
+  },
+  "errors": {
+    "notFound": "ገጽ አልተገኘም",
+    "notFoundDescription": "የሚፈልጉት ገጽ የለም ወይም ተወግዷል።",
+    "goHome": "ወደ መነሻ ይመለሱ",
+    "somethingWrong": "ችግር ተፈጥሯል",
+    "errorMessage": "ያልተጠበቀ ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።",
+    "tryAgain": "እንደገና ይሞክሩ"
+  },
+  "language": {
+    "en": "English",
+    "am": "አማርኛ"
+  }
+}

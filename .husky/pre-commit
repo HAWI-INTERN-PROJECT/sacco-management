@@ -1,0 +1,10 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Frontend linting
+echo "Running frontend lint-staged..."
+cd Frontend && npx lint-staged
+
+# Backend linting
+echo "Running backend pint..."
+cd ../Backend && vendor/bin/pint --test

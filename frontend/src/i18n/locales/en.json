@@ -1,0 +1,67 @@
+{
+  "common": {
+    "appName": "SACCO Management System",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "noData": "No data available",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Logout",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to your account",
+    "registerTitle": "Create an account",
+    "registerSubtitle": "Enter your details to get started",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "orContinueWith": "Or continue with",
+    "emailOrUsername": "Email or username",
+    "rememberMe": "Remember me",
+    "emailRequired": "Email or username is required",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 8 characters",
+    "passwordMatch": "Passwords do not match",
+    "nameRequired": "Name is required"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{name}}",
+    "description": "Your SACCO management dashboard",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "errors": {
+    "notFound": "Page Not Found",
+    "notFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Go Home",
+    "somethingWrong": "Something Went Wrong",
+    "errorMessage": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try Again"
+  },
+  "language": {
+    "en": "English",
+    "am": "Amharic"
+  }
+}

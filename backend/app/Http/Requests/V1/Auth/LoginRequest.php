@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V1\Auth;
 
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,7 +23,7 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -52,7 +53,7 @@ class LoginRequest extends FormRequest
 
         $loginType = filter_var($this->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (!Auth::attempt([$loginType => $this->login, 'password' => $this->password], $this->remember_me)) {
+        if (! Auth::attempt([$loginType => $this->login, 'password' => $this->password], $this->remember_me)) {
 
             RateLimiter::hit($this->throttleKey());
 
@@ -69,7 +70,7 @@ class LoginRequest extends FormRequest
      */
     private function ensureIsNotRateLimited(): void
     {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -85,8 +86,6 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the rate limiting throttle key for the request.
-     *
-     * @return string
      */
     private function throttleKey(): string
     {

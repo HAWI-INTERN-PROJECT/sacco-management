@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Health check
+Route::get('health', fn () => response()->json([
+    'status' => 'healthy',
+    'timestamp' => now()->toDateTimeString(),
+]))->name('api.v1.health');
+
 // Public routes with auth rate limiter (5/min - brute force protection)
 Route::middleware('throttle:auth')->group(function (): void {
     Route::post('register', [AuthController::class, 'register'])->name('api.v1.register');

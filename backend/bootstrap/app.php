@@ -18,6 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Exceptions are rendered as JSON by default
         $exceptions->shouldRenderJsonWhen(
-            fn(Request $request) => $request->is('api/*') || $request->expectsJson()
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson()
         );
     })->create();

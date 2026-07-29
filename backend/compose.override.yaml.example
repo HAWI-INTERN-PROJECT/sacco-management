@@ -118,15 +118,4 @@ services:
     networks:
       - laravel
 
-  npm:
-    image: node:current-alpine
-    volumes:
-      - .:/var/www/html
-    ports:
-      - "3000:3000"
-      - "3001:3001"
-      - "5173:5173"
-    working_dir: /var/www/html
-    entrypoint: [ 'npm' ]
-    networks:
-      - laravel
+

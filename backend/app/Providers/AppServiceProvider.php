@@ -24,19 +24,20 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
     }
+
     /**
      * Configure the rate limiters for the application.
      */
     private function configureRateLimiting(): void
     {
         // Default API rate limiter - 60 requests per minute
-        RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
 
         // Auth endpoints - more restrictive (prevent brute force)
-        RateLimiter::for('auth', fn(Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
 
         // Authenticated user requests - higher limit
-        RateLimiter::for('authenticated', fn(Request $request) => $request->user()
+        RateLimiter::for('authenticated', fn (Request $request) => $request->user()
             ? Limit::perMinute(120)->by($request->user()->id)
             : Limit::perMinute(60)->by($request->ip()));
     }

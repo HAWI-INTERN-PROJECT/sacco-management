@@ -1,16 +1,63 @@
-# React + Vite
+# SACCO Management System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React SPA for the SACCO Management System backend API.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Tool | Purpose |
+|---|---|
+| React 19 | UI library |
+| TypeScript | Type safety |
+| Vite 8 | Build tool + dev server |
+| Tailwind CSS 4 | Styling |
+| shadcn/ui | UI components |
+| Zustand | State management |
+| React Query | Server state |
+| React Router | Routing |
+| React Hook Form | Forms |
+| Zod | Validation |
+| Axios | HTTP client |
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Open http://localhost:5173
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Commands
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Dev server with HMR |
+| `npm run build` | Type check + production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Lint with oxlint |
+
+## Documentation
+
+- [Architecture](./docs/architecture.md)
+- [Project Structure](./docs/project-structure.md)
+- [Components](./docs/components.md)
+- [State Management](./docs/state-management.md)
+- [API Integration](./docs/api-integration.md)
+- [Forms & Validation](./docs/forms-validation.md)
+- [Routing](./docs/routing.md)
+- [Styling](./docs/styling.md)
+- [Testing](./docs/testing.md)
+
+## Project Structure
+
+```
+src/
+├── components/ui/    # shadcn/ui components
+├── lib/              # Utilities (api client, cn)
+├── pages/            # Route pages
+├── stores/           # Zustand stores
+├── types/            # TypeScript types
+├── App.tsx           # Routes + providers
+├── index.css         # Tailwind + theme
+└── main.tsx          # Entry point
+```

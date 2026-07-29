@@ -2,8 +2,8 @@
 
 namespace App\Notifications\V1;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -18,17 +18,18 @@ class ResetPasswordNotification extends Notification
         $this->token = $token;
     }
 
-    public function via($notifiable): array
+    /**
+     * @return list<string>
+     */
+    public function via(User $notifiable): array
     {
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail(User $notifiable): MailMessage
     {
         // Frontend reset URL
-        $frontendUrl = config('app.frontend_url') . '/reset-password?token='
-            . $this->token
-            . '&email=' . urlencode($notifiable->email);
+        $frontendUrl = config('app.frontend_url') . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->email);
 
         return (new MailMessage)
             ->subject('Reset Your Password')

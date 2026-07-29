@@ -22,5 +22,6 @@ return [
     'logout' => 'You have been logged out of the application.',
     'user_not_found' => 'User not found.',
     'invalid_verification_link' => 'Invalid verification link.',
+    'register_error' => 'Unable to register. Please try again later.',
 
 ];
