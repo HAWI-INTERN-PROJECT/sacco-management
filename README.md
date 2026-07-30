@@ -1,4 +1,4 @@
-# SACCO Management System
+# SACCO Management System 
 
 A multi-tenant platform where SACCOs (Savings and Credit Cooperative Organizations) manage their own members, savings, loans, share capital, and dividends.
 
