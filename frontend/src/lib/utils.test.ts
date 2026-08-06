@@ -8,7 +8,8 @@ describe('cn', () => {
   })
 
   it('handles conditional classes', () => {
-    const result = cn('p-4', false && 'bg-red-500', 'text-white')
+    const condition = false
+    const result = cn('p-4', condition && 'bg-red-500', 'text-white')
     expect(result).toBe('p-4 text-white')
   })
 
