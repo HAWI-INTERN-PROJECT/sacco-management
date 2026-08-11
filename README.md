@@ -107,6 +107,7 @@ This kit ships with a generic, tested `User` model and full auth flow — nothin
 
 ```bash
 Gemechu Alemu
+Begonet Debebe
 ```
 
 test
