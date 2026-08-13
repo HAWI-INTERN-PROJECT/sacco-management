@@ -26,6 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'username',
         'password',
+        'num_shares',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'num_shares' => 'integer',
         ];
     }
 
@@ -64,7 +66,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the SACCO the user belongs to.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
      */
     public function sacco(): \Illuminate\Database\Eloquent\Relations\BelongsTo

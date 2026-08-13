@@ -18,8 +18,8 @@ class MemberController extends Controller
 
     /**
      * Get a query builder scoped to members of the admin's SACCO.
-     * 
-     * @param Request $request
+     *
+     * @param  Request  $request
      * @return \Illuminate\Database\Eloquent\Builder<\App\Models\User>
      */
     private function getScopedMemberQuery(Request $request): \Illuminate\Database\Eloquent\Builder
@@ -31,7 +31,7 @@ class MemberController extends Controller
     /**
      * List all members in the SACCO.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -44,7 +44,7 @@ class MemberController extends Controller
     /**
      * Create a new member in the SACCO.
      *
-     * @param StoreMemberRequest $request
+     * @param  StoreMemberRequest  $request
      * @return JsonResponse
      */
     public function store(StoreMemberRequest $request): JsonResponse
@@ -67,8 +67,8 @@ class MemberController extends Controller
     /**
      * View a specific member.
      *
-     * @param Request $request
-     * @param User $member
+     * @param  Request  $request
+     * @param  User  $member
      * @return JsonResponse|UserResource
      */
     public function show(Request $request, User $member)
@@ -84,8 +84,8 @@ class MemberController extends Controller
     /**
      * Update a specific member.
      *
-     * @param UpdateMemberRequest $request
-     * @param User $member
+     * @param  UpdateMemberRequest  $request
+     * @param  User  $member
      * @return JsonResponse
      */
     public function update(UpdateMemberRequest $request, User $member): JsonResponse
@@ -96,7 +96,7 @@ class MemberController extends Controller
         }
 
         $data = $request->validated();
-        
+
         // Hash password if provided
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -113,8 +113,8 @@ class MemberController extends Controller
     /**
      * Delete a specific member.
      *
-     * @param Request $request
-     * @param User $member
+     * @param  Request  $request
+     * @param  User  $member
      * @return JsonResponse
      */
     public function destroy(Request $request, User $member): JsonResponse

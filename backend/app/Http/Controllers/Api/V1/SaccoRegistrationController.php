@@ -8,10 +8,10 @@ use App\Http\Resources\V1\AuthResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Sacco;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 
 class SaccoRegistrationController extends Controller
 {
@@ -22,10 +22,10 @@ class SaccoRegistrationController extends Controller
      *
      * @unauthenticated
      *
-     * @param SaccoRegistrationRequest $request
+     * @param  SaccoRegistrationRequest  $request
      * @return JsonResponse
      */
-    public function register(SaccoRegistrationRequest $request): AuthResource | JsonResponse
+    public function register(SaccoRegistrationRequest $request): AuthResource|JsonResponse
     {
         try {
             return DB::transaction(function () use ($request) {
