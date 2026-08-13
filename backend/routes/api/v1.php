@@ -64,3 +64,10 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
         Route::patch('saccos/{sacco}/reject', [\App\Http\Controllers\Api\V1\AdminSaccoController::class, 'reject'])->name('api.v1.admin.saccos.reject');
     });
 
+// ─── SACCO Admin Routes ──────────────────────────────────────────────
+// Protected by auth + role:admin middleware
+Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
+    ->group(function (): void {
+        Route::apiResource('members', \App\Http\Controllers\Api\V1\MemberController::class)->names('api.v1.members');
+    });
+
