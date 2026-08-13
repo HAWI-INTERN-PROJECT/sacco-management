@@ -25,7 +25,7 @@ class SaccoRegistrationRequest extends FormRequest
             // SACCO Fields
             'sacco_name' => ['required', 'string', 'max:255'],
             'registration_number' => ['required', 'string', 'max:255', 'unique:saccos,registration_number'],
-            
+
             // Admin User Fields
             'admin_name' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
