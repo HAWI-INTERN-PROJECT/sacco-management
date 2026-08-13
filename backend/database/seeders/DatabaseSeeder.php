@@ -48,5 +48,20 @@ class DatabaseSeeder extends Seeder
             'role' => 'member',
             'sacco_id' => $sacco->id,
         ]);
+
+        // 5. A Pending SACCO (waiting for superadmin approval)
+        $pendingSacco = \App\Models\Sacco::create([
+            'name' => 'New Pending SACCO',
+            'registration_number' => 'REG-PENDING-001',
+            'status' => 'pending',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Pending Admin',
+            'username' => 'pendingadmin',
+            'email' => 'pending@sacco.com',
+            'role' => 'admin',
+            'sacco_id' => $pendingSacco->id,
+        ]);
     }
 }
