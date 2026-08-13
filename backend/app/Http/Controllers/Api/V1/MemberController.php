@@ -18,8 +18,11 @@ class MemberController extends Controller
 
     /**
      * Get a query builder scoped to members of the admin's SACCO.
+     * 
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder<\App\Models\User>
      */
-    private function getScopedMemberQuery(Request $request)
+    private function getScopedMemberQuery(Request $request): \Illuminate\Database\Eloquent\Builder
     {
         return User::where('sacco_id', $request->user()->sacco_id)
             ->where('role', 'member');
