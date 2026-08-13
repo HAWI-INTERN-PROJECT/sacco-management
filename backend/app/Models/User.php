@@ -26,6 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'username',
         'password',
+        'num_shares',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'num_shares' => 'integer',
         ];
     }
 
@@ -64,12 +66,22 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the SACCO the user belongs to.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
      */
     public function sacco(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Sacco::class);
+    }
+
+    /**
+     * Get the dividends for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
+     */
+    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Dividend::class);
     }
 
     /**
