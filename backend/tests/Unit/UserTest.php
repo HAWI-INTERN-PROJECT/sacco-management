@@ -18,7 +18,7 @@ class UserTest extends TestCase
         $user = new User();
 
         $this->assertEquals(
-            ['role', 'sacco_id', 'name', 'email', 'username', 'password'],
+            ['role', 'sacco_id', 'name', 'email', 'username', 'password', 'num_shares'],
             $user->getFillable()
         );
     }

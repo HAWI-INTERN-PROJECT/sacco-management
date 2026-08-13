@@ -19,7 +19,7 @@ class AdminSaccoController extends Controller
      * Returns a paginated list of all SACCOs on the platform.
      * Optionally filter by status (pending, approved, rejected).
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -41,7 +41,7 @@ class AdminSaccoController extends Controller
      *
      * Returns detailed information about a specific SACCO including its members.
      *
-     * @param Sacco $sacco
+     * @param  Sacco  $sacco
      * @return SaccoResource
      */
     public function show(Sacco $sacco): SaccoResource
@@ -57,7 +57,7 @@ class AdminSaccoController extends Controller
      * Changes the SACCO status from "pending" to "approved",
      * allowing its admin and members to fully operate on the platform.
      *
-     * @param Sacco $sacco
+     * @param  Sacco  $sacco
      * @return JsonResponse
      */
     public function approve(Sacco $sacco): JsonResponse
@@ -82,7 +82,7 @@ class AdminSaccoController extends Controller
      *
      * Changes the SACCO status from "pending" to "rejected".
      *
-     * @param Sacco $sacco
+     * @param  Sacco  $sacco
      * @return JsonResponse
      */
     public function reject(Sacco $sacco): JsonResponse
