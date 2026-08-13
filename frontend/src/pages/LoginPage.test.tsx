@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import LoginPage from './LoginPage'
 
-vi.mock('@/stores/auth', () => ({
+vi.mock('../stores/auth', () => ({
   useAuthStore: vi.fn(() => ({
     login: vi.fn(),
     isLoading: false,
@@ -61,7 +61,7 @@ describe('LoginPage', () => {
     const user = userEvent.setup()
     const mockLogin = vi.fn().mockResolvedValue(undefined)
 
-    const { useAuthStore } = await import('@/stores/auth')
+    const { useAuthStore } = await import('../stores/auth')
     vi.mocked(useAuthStore).mockReturnValue({
       login: mockLogin,
       isLoading: false,
@@ -91,7 +91,7 @@ describe('LoginPage', () => {
   })
 
   it('shows loading state', async () => {
-    const { useAuthStore } = await import('@/stores/auth')
+    const { useAuthStore } = await import('../stores/auth')
     vi.mocked(useAuthStore).mockReturnValue({
       login: vi.fn(),
       isLoading: true,

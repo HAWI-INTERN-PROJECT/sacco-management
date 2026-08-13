@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import RegisterPage from './RegisterPage'
 
-vi.mock('@/stores/auth', () => ({
+vi.mock('../stores/auth', () => ({
   useAuthStore: vi.fn(() => ({
     register: vi.fn(),
     isLoading: false,
@@ -114,7 +114,7 @@ describe('RegisterPage', () => {
     const user = userEvent.setup()
     const mockRegister = vi.fn().mockResolvedValue(undefined)
 
-    const { useAuthStore } = await import('@/stores/auth')
+    const { useAuthStore } = await import('../stores/auth')
     vi.mocked(useAuthStore).mockReturnValue({
       register: mockRegister,
       isLoading: false,
