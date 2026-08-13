@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
-import { useAuthStore } from '@/stores/auth'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import LoginPage from '@/pages/LoginPage'
-import RegisterPage from '@/pages/RegisterPage'
-import DashboardPage from '@/pages/DashboardPage'
-import NotFoundPage from '@/pages/NotFoundPage'
+import { useAuthStore } from './stores/auth'
+import ErrorBoundary from './components/ErrorBoundary'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import DashboardPage from './pages/DashboardPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 const queryClient = new QueryClient()
 
