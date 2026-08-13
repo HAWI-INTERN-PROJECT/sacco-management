@@ -24,6 +24,7 @@ Route::get('health', fn () => response()->json([
 Route::middleware('throttle:auth')->group(function (): void {
     Route::post('register', [AuthController::class, 'register'])->name('api.v1.register');
     Route::post('login', [AuthController::class, 'login'])->name('api.v1.login');
+    Route::post('saccos/register', [\App\Http\Controllers\Api\V1\SaccoRegistrationController::class, 'register'])->name('api.v1.saccos.register');
 });
 
 // Email verification
@@ -51,3 +52,15 @@ Route::middleware('throttle:6,1')->group(function (): void {
     Route::post('reset-password', [AuthController::class, 'resetPassword'])
         ->name('password.reset');
 });
+
+// ─── Superadmin Routes ───────────────────────────────────────────────
+// Protected by auth + role:superadmin middleware
+Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
+    ->prefix('admin')
+    ->group(function (): void {
+        Route::get('saccos', [\App\Http\Controllers\Api\V1\AdminSaccoController::class, 'index'])->name('api.v1.admin.saccos.index');
+        Route::get('saccos/{sacco}', [\App\Http\Controllers\Api\V1\AdminSaccoController::class, 'show'])->name('api.v1.admin.saccos.show');
+        Route::patch('saccos/{sacco}/approve', [\App\Http\Controllers\Api\V1\AdminSaccoController::class, 'approve'])->name('api.v1.admin.saccos.approve');
+        Route::patch('saccos/{sacco}/reject', [\App\Http\Controllers\Api\V1\AdminSaccoController::class, 'reject'])->name('api.v1.admin.saccos.reject');
+    });
+
