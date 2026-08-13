@@ -24,6 +24,7 @@ Route::get('health', fn () => response()->json([
 Route::middleware('throttle:auth')->group(function (): void {
     Route::post('register', [AuthController::class, 'register'])->name('api.v1.register');
     Route::post('login', [AuthController::class, 'login'])->name('api.v1.login');
+    Route::post('saccos/register', [\App\Http\Controllers\Api\V1\SaccoRegistrationController::class, 'register'])->name('api.v1.saccos.register');
 });
 
 // Email verification
