@@ -73,5 +73,8 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
     ->group(function (): void {
         Route::post('dividends/calculate', [\App\Http\Controllers\Api\V1\DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
         Route::post('dividends/distribute', [\App\Http\Controllers\Api\V1\DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
+        Route::get('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'show'])->name('api.v1.settings.show');
+        Route::put('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'update'])->name('api.v1.settings.update');
+        Route::patch('members/{member}/shares', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'update'])->name('api.v1.members.shares.update');
         Route::apiResource('members', \App\Http\Controllers\Api\V1\MemberController::class)->names('api.v1.members');
     });
