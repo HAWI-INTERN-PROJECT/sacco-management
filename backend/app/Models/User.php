@@ -75,6 +75,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the loans for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     */
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    /**
+     * Get the repayments for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Repayment, $this>
+     */
+    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Repayment::class);
      * Get the dividends for the user.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
