@@ -10,7 +10,21 @@ class Sacco extends Model
         'name',
         'registration_number',
         'status',
+        'share_value',
+        'currency',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'share_value' => 'decimal:2',
+        ];
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\User, $this>
