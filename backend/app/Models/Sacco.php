@@ -19,4 +19,12 @@ class Sacco extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     */
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Loan::class);
+    }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\LoanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,3 +72,19 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
         Route::apiResource('members', \App\Http\Controllers\Api\V1\MemberController::class)->names('api.v1.members');
     });
 
+// ─── Loan Endpoints ──────────────────────────────────────────────────
+Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_admin'])->group(function (): void {
+    Route::get('loans', [LoanController::class, 'index'])->name('api.v1.loans.index');
+    Route::patch('loans/{loan}/approve', [LoanController::class, 'approve'])->name('api.v1.loans.approve');
+    Route::patch('loans/{loan}/reject', [LoanController::class, 'reject'])->name('api.v1.loans.reject');
+    Route::patch('loans/{loan}/disburse', [LoanController::class, 'disburse'])->name('api.v1.loans.disburse');
+});
+
+Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:member'])->group(function (): void {
+    Route::post('loans', [LoanController::class, 'store'])->name('api.v1.loans.store');
+    Route::get('me/loans', [LoanController::class, 'myLoans'])->name('api.v1.me.loans');
+});
+
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
+    Route::get('loans/{loan}', [LoanController::class, 'show'])->name('api.v1.loans.show');
+});
