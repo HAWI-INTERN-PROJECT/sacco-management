@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Members\DepositSavingsRequest;
+use App\Http\Requests\V1\Members\ShowOwnSavingsRequest;
 use App\Http\Requests\V1\Members\ShowSavingsRequest;
+use App\Http\Requests\V1\Members\WithdrawSavingsRequest;
+use App\Http\Resources\V1\MemberSavingsActionResource;
 use App\Http\Resources\V1\MemberSavingsResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\SavingsTransaction;
@@ -11,6 +15,8 @@ use App\Models\User;
 use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class MemberSavingsController extends Controller
 {
@@ -23,6 +29,96 @@ class MemberSavingsController extends Controller
         ActivityLogger::log('view_savings', "Viewed savings for member {$member->id}", $request, ['member_id' => $member->id]);
 
         return MemberSavingsResource::make($payload)->additional([]);
+    }
+
+    public function showOwn(ShowOwnSavingsRequest $request): MemberSavingsResource|JsonResponse
+    {
+        $member = $request->user();
+
+        $payload = $this->buildSavingsPayload($member);
+
+        ActivityLogger::log('view_own_savings', 'Viewed own savings balance', $request, ['member_id' => $member->id]);
+
+        return MemberSavingsResource::make($payload)->additional([]);
+    }
+
+    public function deposit(DepositSavingsRequest $request, int $id): MemberSavingsActionResource|JsonResponse
+    {
+        $member = User::find($id);
+
+        if (! $member) {
+            return $this->notFound(__('auth.user_not_found'));
+        }
+
+        $currentBalance = $this->calculateBalance($member->id);
+        $newBalance = round((float) $currentBalance + (float) $request->amount, 2);
+
+        $transaction = DB::transaction(function () use ($member, $request, $newBalance) {
+            $transaction = SavingsTransaction::create([
+                'user_id' => $member->id,
+                'type' => 'credit',
+                'amount' => $request->amount,
+                'balance_after' => $newBalance,
+                'description' => $request->description,
+            ]);
+
+            ActivityLogger::log('savings_deposit', "Deposit recorded for member {$member->id}", $request, [
+                'member_id' => $member->id,
+                'transaction_id' => $transaction->id,
+                'amount' => $request->amount,
+                'balance_after' => $newBalance,
+            ]);
+
+            return $transaction;
+        });
+
+        return MemberSavingsActionResource::make((object) [
+            'transaction' => $transaction,
+            'new_balance' => $newBalance,
+        ])->response()->setStatusCode(201);
+    }
+
+    public function withdraw(WithdrawSavingsRequest $request, int $id): MemberSavingsActionResource|JsonResponse
+    {
+        $member = User::find($id);
+
+        if (! $member) {
+            return $this->notFound(__('auth.user_not_found'));
+        }
+
+        $currentBalance = $this->calculateBalance($member->id);
+
+        if ((float) $request->amount > (float) $currentBalance) {
+            throw ValidationException::withMessages([
+                'amount' => ['The withdrawal amount exceeds the current savings balance.'],
+            ]);
+        }
+
+        $newBalance = round((float) $currentBalance - (float) $request->amount, 2);
+
+        $transaction = DB::transaction(function () use ($member, $request, $newBalance) {
+            $transaction = SavingsTransaction::create([
+                'user_id' => $member->id,
+                'type' => 'debit',
+                'amount' => $request->amount,
+                'balance_after' => $newBalance,
+                'description' => $request->description,
+            ]);
+
+            ActivityLogger::log('savings_withdrawal', "Withdrawal recorded for member {$member->id}", $request, [
+                'member_id' => $member->id,
+                'transaction_id' => $transaction->id,
+                'amount' => $request->amount,
+                'balance_after' => $newBalance,
+            ]);
+
+            return $transaction;
+        });
+
+        return MemberSavingsActionResource::make((object) [
+            'transaction' => $transaction,
+            'new_balance' => $newBalance,
+        ])->response()->setStatusCode(201);
     }
 
     protected function buildSavingsPayload(User $member): object

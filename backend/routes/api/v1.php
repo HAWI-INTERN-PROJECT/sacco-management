@@ -43,6 +43,15 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
     // Member savings
     Route::get('members/{member}/savings', [MemberSavingsController::class, 'show'])
         ->name('api.v1.members.savings.show');
+    // Member viewing their own savings
+    Route::get('me/savings', [MemberSavingsController::class, 'showOwn'])
+        ->name('api.v1.me.savings.show');
+    // Member savings diposit
+    Route::post('members/{id}/savings/deposit', [MemberSavingsController::class, 'deposit'])
+        ->name('api.v1.members.savings.deposit');
+    // Member savings withdrawal
+    Route::post('members/{id}/savings/withdraw', [MemberSavingsController::class, 'withdraw'])
+        ->name('api.v1.members.savings.withdraw');
 
     // Change password
     Route::put('change-password', [AuthController::class, 'changePassword'])->name('api.v1.change-password');
