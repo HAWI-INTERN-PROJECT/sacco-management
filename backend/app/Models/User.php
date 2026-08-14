@@ -75,6 +75,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the dividends for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
+     */
+    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Dividend::class);
+    }
+
+    /**
      * Check if user is a superadmin.
      */
     public function isSuperAdmin(): bool

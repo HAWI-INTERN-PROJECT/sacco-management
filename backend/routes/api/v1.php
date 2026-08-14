@@ -43,6 +43,9 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
     Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
+
+    // Member dividends history
+    Route::get('me/dividends', [\App\Http\Controllers\Api\V1\DividendController::class, 'memberHistory'])->name('api.v1.me.dividends');
 });
 
 // Password reset routes (public with rate limiting)
@@ -68,6 +71,8 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
 // Protected by auth + role:admin middleware
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
     ->group(function (): void {
+        Route::post('dividends/calculate', [\App\Http\Controllers\Api\V1\DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
+        Route::post('dividends/distribute', [\App\Http\Controllers\Api\V1\DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
         Route::get('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'show'])->name('api.v1.settings.show');
         Route::put('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'update'])->name('api.v1.settings.update');
         Route::patch('members/{member}/shares', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'update'])->name('api.v1.members.shares.update');
