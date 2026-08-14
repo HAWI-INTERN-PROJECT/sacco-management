@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Notifications\V1\ResetPasswordNotification;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -64,10 +66,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the SACCO the user belongs to.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
+     *
+     * @return BelongsTo<Sacco, $this>
      */
-    public function sacco(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function sacco(): BelongsTo
     {
         return $this->belongsTo(Sacco::class);
     }
