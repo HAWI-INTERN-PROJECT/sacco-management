@@ -35,6 +35,11 @@ class Sacco extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     */
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Loan::class);
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
      */
     public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
