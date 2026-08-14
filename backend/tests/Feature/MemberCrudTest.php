@@ -12,11 +12,15 @@ class MemberCrudTest extends TestCase
     use RefreshDatabase;
 
     private User $myAdmin;
+
     private User $myMember;
+
     private Sacco $mySacco;
 
     private User $otherAdmin;
+
     private User $otherMember;
+
     private Sacco $otherSacco;
 
     protected function setUp(): void
