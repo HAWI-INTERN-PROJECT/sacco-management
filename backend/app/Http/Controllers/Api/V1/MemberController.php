@@ -23,6 +23,7 @@ class MemberController extends Controller
      *
      * @param  Request  $request
      * @return Builder<User>
+     * @return \Illuminate\Database\Eloquent\Builder<\App\Models\User>
      */
     private function getScopedMemberQuery(Request $request): Builder
     {
@@ -35,6 +36,7 @@ class MemberController extends Controller
      *
      * @param  Request  $request
      * @return AnonymousResourceCollection
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request): AnonymousResourceCollection
     {
