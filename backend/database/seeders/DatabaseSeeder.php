@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Sacco;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,6 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
         // 1. Superadmin
         User::factory()->create([
             'name' => 'Platform Superadmin',
@@ -25,7 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. A Test SACCO
-        $sacco = \App\Models\Sacco::create([
+        $sacco = Sacco::create([
             'name' => 'Demo SACCO Ltd',
             'registration_number' => 'REG-123456',
             'status' => 'approved',
@@ -50,7 +52,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 5. A Pending SACCO (waiting for superadmin approval)
-        $pendingSacco = \App\Models\Sacco::create([
+        $pendingSacco = Sacco::create([
             'name' => 'New Pending SACCO',
             'registration_number' => 'REG-PENDING-001',
             'status' => 'pending',
@@ -62,6 +64,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'pending@sacco.com',
             'role' => 'admin',
             'sacco_id' => $pendingSacco->id,
+        ]);
+        $this->call([
+            SavingsTransactionSeeder::class,
         ]);
     }
 }
