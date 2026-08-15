@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sacco extends Model
 {
@@ -15,6 +16,7 @@ class Sacco extends Model
     ];
 
     /**
+     * @return HasMany<User, $this>
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -29,7 +31,7 @@ class Sacco extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\User, $this>
      */
-    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }

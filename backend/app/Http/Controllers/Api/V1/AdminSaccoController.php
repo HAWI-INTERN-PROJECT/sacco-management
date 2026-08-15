@@ -8,6 +8,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\Sacco;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AdminSaccoController extends Controller
 {
@@ -20,9 +21,10 @@ class AdminSaccoController extends Controller
      * Optionally filter by status (pending, approved, rejected).
      *
      * @param  Request  $request
+     * @return AnonymousResourceCollection
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Sacco::withCount('users');
 
