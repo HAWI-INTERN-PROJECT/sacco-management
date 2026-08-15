@@ -15,11 +15,12 @@ class SavingsTransaction extends Model
     protected $table = 'savings_transactions';
 
     protected $fillable = [
-        'user_id',
+        'member_id',
         'type',
         'amount',
         'balance_after',
         'description',
+        'transaction_date',
     ];
 
     protected $casts = [

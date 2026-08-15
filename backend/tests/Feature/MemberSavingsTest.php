@@ -20,8 +20,8 @@ class MemberSavingsTest extends TestCase
         $this->assertInstanceOf(User::class, $member);
 
         SavingsTransaction::create([
-            'user_id' => $member->id,
-            'type' => 'credit',
+            'member_id' => $member->id,
+            'type' => 'deposit',
             'amount' => 100.00,
             'balance_after' => 100.00,
             'description' => 'Initial deposit',
@@ -50,8 +50,8 @@ class MemberSavingsTest extends TestCase
         $this->assertInstanceOf(User::class, $memberB);
 
         SavingsTransaction::create([
-            'user_id' => $memberA->id,
-            'type' => 'credit',
+            'member_id' => $memberA->id,
+            'type' => 'deposit',
             'amount' => 50.00,
             'balance_after' => 50.00,
             'description' => 'Deposit',
@@ -82,8 +82,8 @@ class MemberSavingsTest extends TestCase
         $this->assertInstanceOf(User::class, $member);
 
         SavingsTransaction::create([
-            'user_id' => $member->id,
-            'type' => 'credit',
+            'member_id' => $member->id,
+            'type' => 'deposit',
             'amount' => 100.00,
             'balance_after' => 100.00,
             'description' => 'Initial deposit',
@@ -129,8 +129,8 @@ class MemberSavingsTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('savings_transactions', [
-            'user_id' => $member->id,
-            'type' => 'credit',
+            'member_id' => $member->id,
+            'type' => 'deposit',
             'amount' => '125.50',
             'description' => 'Monthly contribution',
         ]);
@@ -145,8 +145,8 @@ class MemberSavingsTest extends TestCase
         $this->assertInstanceOf(User::class, $member);
 
         SavingsTransaction::create([
-            'user_id' => $member->id,
-            'type' => 'credit',
+            'member_id' => $member->id,
+            'type' => 'deposit',
             'amount' => 40.00,
             'balance_after' => 40.00,
             'description' => 'Initial deposit',

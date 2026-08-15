@@ -13,6 +13,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\SavingsTransaction;
 use App\Models\User;
 use App\Services\ActivityLogger;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -52,14 +53,18 @@ class MemberSavingsController extends Controller
 
         $currentBalance = $this->calculateBalance($member->id);
         $newBalance = round((float) $currentBalance + (float) $request->amount, 2);
+        $transactionDate = $request->transaction_date
+            ? Carbon::parse($request->transaction_date)->toDateString()
+            : now()->toDateString();
 
-        $transaction = DB::transaction(function () use ($member, $request, $newBalance) {
+        $transaction = DB::transaction(function () use ($member, $request, $newBalance, $transactionDate) {
             $transaction = SavingsTransaction::create([
-                'user_id' => $member->id,
-                'type' => 'credit',
+                'member_id' => $member->id,
+                'type' => 'deposit',
                 'amount' => $request->amount,
                 'balance_after' => $newBalance,
                 'description' => $request->description,
+                'transaction_date' => $transactionDate,
             ]);
 
             ActivityLogger::log('savings_deposit', "Deposit recorded for member {$member->id}", $request, [
@@ -95,14 +100,18 @@ class MemberSavingsController extends Controller
         }
 
         $newBalance = round((float) $currentBalance - (float) $request->amount, 2);
+        $transactionDate = $request->transaction_date
+            ? Carbon::parse($request->transaction_date)->toDateString()
+            : now()->toDateString();
 
-        $transaction = DB::transaction(function () use ($member, $request, $newBalance) {
+        $transaction = DB::transaction(function () use ($member, $request, $newBalance, $transactionDate) {
             $transaction = SavingsTransaction::create([
-                'user_id' => $member->id,
-                'type' => 'debit',
+                'member_id' => $member->id,
+                'type' => 'withdraw',
                 'amount' => $request->amount,
                 'balance_after' => $newBalance,
                 'description' => $request->description,
+                'transaction_date' => $transactionDate,
             ]);
 
             ActivityLogger::log('savings_withdrawal', "Withdrawal recorded for member {$member->id}", $request, [
@@ -123,7 +132,7 @@ class MemberSavingsController extends Controller
 
     protected function buildSavingsPayload(User $member): object
     {
-        $transactions = SavingsTransaction::where('user_id', $member->id)
+        $transactions = SavingsTransaction::where('member_id', $member->id)
             ->orderByDesc('created_at')
             ->limit(50)
             ->get();
@@ -143,7 +152,7 @@ class MemberSavingsController extends Controller
      */
     protected function calculateBalance(int $memberId, ?Collection $transactions = null): float
     {
-        $transactions = $transactions ?? SavingsTransaction::where('user_id', $memberId)
+        $transactions = $transactions ?? SavingsTransaction::where('member_id', $memberId)
             ->orderByDesc('created_at')
             ->limit(50)
             ->get();
@@ -154,9 +163,9 @@ class MemberSavingsController extends Controller
             return (float) $latest->balance_after;
         }
 
-        $credits = (float) $transactions->where('type', 'credit')->sum('amount');
-        $debits = (float) $transactions->where('type', 'debit')->sum('amount');
+        $deposits = (float) $transactions->where('type', 'deposit')->sum('amount');
+        $withdrawals = (float) $transactions->where('type', 'withdraw')->sum('amount');
 
-        return round($credits - $debits, 2);
+        return round($deposits - $withdrawals, 2);
     }
 }

@@ -13,19 +13,21 @@ class SavingsTransactionSeeder extends Seeder
         $member = User::where('username', 'member')->first();
 
         SavingsTransaction::create([
-            'user_id' => $member->id,
-            'type' => 'credit',
+            'member_id' => $member->id,
+            'type' => 'deposit',
             'amount' => 500.00,
             'balance_after' => 500.00,
             'description' => 'Initial deposit',
+            'transaction_date' => now()->toDateString(),
         ]);
 
         SavingsTransaction::create([
-            'user_id' => $member->id,
-            'type' => 'debit',
+            'member_id' => $member->id,
+            'type' => 'withdraw',
             'amount' => 200.00,
             'balance_after' => 300.00,
             'description' => 'Withdrawal for emergency',
+            'transaction_date' => now()->toDateString(),
         ]);
     }
 }
