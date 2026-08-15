@@ -21,11 +21,12 @@ class SavingsTransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'type' => fake()->randomElement(['credit', 'debit']),
+            'member_id' => User::factory(),
+            'type' => fake()->randomElement(['deposit', 'withdraw']),
             'amount' => fake()->randomFloat(2, 1, 1000),
             'balance_after' => null,
             'description' => fake()->sentence(),
+            'transaction_date' => fake()->date(),
             'created_at' => now(),
         ];
     }

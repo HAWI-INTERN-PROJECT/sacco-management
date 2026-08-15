@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('savings_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('type', ['credit', 'debit']);
+            $table->foreignId('member_id')->constrained('users')->cascadeOnDelete();
+            $table->enum('type', ['deposit', 'withdraw']);
             $table->decimal('amount', 15, 2);
             $table->decimal('balance_after', 15, 2)->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
+            $table->date('transaction_date')->nullable();
             $table->timestamps();
         });
     }
