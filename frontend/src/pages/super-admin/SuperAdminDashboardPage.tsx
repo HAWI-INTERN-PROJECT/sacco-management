@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Building2,
@@ -9,53 +9,92 @@ import {
   FileText,
   X,
   Check,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react'
 import { MetricCard } from '../../components/super-admin/MetricCard'
 import { toast } from 'sonner'
-
-interface PendingSacco {
-  id: string
-  name: string
-  regNo: string
-  dateSubmitted: string
-}
+import { adminSaccoService } from '../../services/adminSaccoService'
+import type { Sacco } from '../../types'
 
 export const SuperAdminDashboardPage: React.FC = () => {
-  const [pendingList, setPendingList] = useState<PendingSacco[]>([
-    {
-      id: '1',
-      name: 'Unity SACCO',
-      regNo: 'REG-2024-001',
-      dateSubmitted: 'Submitted Oct 24, 2023',
-    },
-    {
-      id: '2',
-      name: 'Forward Credit Union',
-      regNo: 'REG-2024-002',
-      dateSubmitted: 'Submitted Oct 25, 2023',
-    },
-    {
-      id: '3',
-      name: 'Harambee Savings',
-      regNo: 'REG-2024-003',
-      dateSubmitted: 'Submitted Oct 26, 2023',
-    },
-    {
-      id: '4',
-      name: 'Apex Cooperative',
-      regNo: 'REG-2024-004',
-      dateSubmitted: 'Submitted Oct 27, 2023',
-    },
-  ])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [pendingList, setPendingList] = useState<Sacco[]>([])
 
-  const handleApprove = (name: string, id: string) => {
-    setPendingList((prev) => prev.filter((item) => item.id !== id))
-    toast.success(`${name} has been approved successfully.`)
+  const [totalCount, setTotalCount] = useState<number | string>('-')
+  const [approvedCount, setApprovedCount] = useState<number | string>('-')
+  const [pendingCount, setPendingCount] = useState<number | string>('-')
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
+
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      // Fetch total count, approved count, and pending list in parallel
+      const [allRes, approvedRes, pendingRes] = await Promise.all([
+        adminSaccoService.getSaccos().catch(() => null),
+        adminSaccoService.getSaccos({ status: 'approved' }).catch(() => null),
+        adminSaccoService.getSaccos({ status: 'pending' }).catch(() => null),
+      ])
+
+      if (allRes?.meta) {
+        setTotalCount(allRes.meta.total)
+      } else if (allRes?.data) {
+        setTotalCount(allRes.data.length)
+      }
+
+      if (approvedRes?.meta) {
+        setApprovedCount(approvedRes.meta.total)
+      } else if (approvedRes?.data) {
+        setApprovedCount(approvedRes.data.length)
+      }
+
+      if (pendingRes) {
+        setPendingList(pendingRes.data || [])
+        setPendingCount(pendingRes.meta?.total ?? pendingRes.data?.length ?? 0)
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load dashboard data.'
+      setError(msg)
+      toast.error(msg)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [fetchDashboardData])
+
+  const handleApprove = async (sacco: Sacco) => {
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.approveSacco(sacco.id)
+      toast.success(`${sacco.name} has been approved successfully.`)
+      // Refresh counts & pending list
+      fetchDashboardData()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to approve SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
   }
 
-  const handleReject = (name: string, id: string) => {
-    setPendingList((prev) => prev.filter((item) => item.id !== id))
-    toast.error(`${name} request has been rejected.`)
+  const handleReject = async (sacco: Sacco) => {
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.rejectSacco(sacco.id)
+      toast.error(`${sacco.name} application has been rejected.`)
+      // Refresh counts & pending list
+      fetchDashboardData()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to reject SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
   }
 
   return (
@@ -64,38 +103,38 @@ export const SuperAdminDashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <MetricCard
           title="TOTAL SACCOS"
-          value="28"
+          value={loading ? '...' : totalCount}
           icon={Building2}
           accentColor="black"
         />
         <MetricCard
           title="APPROVED SACCOS"
-          value="22"
+          value={loading ? '...' : approvedCount}
           icon={CheckCircle2}
           accentColor="green"
         />
         <MetricCard
           title="PENDING APPROVAL"
-          value="4"
+          value={loading ? '...' : pendingCount}
           icon={Clock}
           accentColor="amber"
           bgHighlight={true}
         />
         <MetricCard
           title="TOTAL MEMBERS"
-          value="3,450"
+          value="N/A"
           icon={Users}
           accentColor="blue"
         />
         <MetricCard
           title="TOTAL SAVINGS"
-          value="ETB 45,200,000"
+          value="N/A"
           icon={Wallet}
           accentColor="green"
         />
         <MetricCard
           title="TOTAL ACTIVE LOANS"
-          value="892"
+          value="N/A"
           icon={FileText}
           accentColor="purple"
         />
@@ -107,18 +146,43 @@ export const SuperAdminDashboardPage: React.FC = () => {
           <h2 className="text-base font-bold text-slate-900 tracking-tight">
             Pending SACCO Approvals
           </h2>
-          <Link
-            to="/super-admin/saccos"
-            className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            View All
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="p-1 rounded text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-50"
+              title="Refresh data"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <Link
+              to="/super-admin/saccos?status=pending"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              View All
+            </Link>
+          </div>
         </div>
 
         <div className="divide-y divide-slate-100">
-          {pendingList.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-sm text-slate-500 flex items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+              <span>Loading pending SACCO approvals...</span>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center text-sm text-rose-500 flex flex-col items-center justify-center gap-2">
+              <span>{error}</span>
+              <button
+                onClick={fetchDashboardData}
+                className="mt-1 px-3 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold rounded-md transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : pendingList.length === 0 ? (
             <div className="p-8 text-center text-sm text-slate-500">
-              No pending approvals at this time.
+              No pending SACCO approvals at this time.
             </div>
           ) : (
             pendingList.map((sacco) => (
@@ -132,15 +196,18 @@ export const SuperAdminDashboardPage: React.FC = () => {
                     <Building2 className="w-5 h-5 text-slate-600" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                    <Link
+                      to={`/super-admin/saccos/${sacco.id}`}
+                      className="text-sm font-bold text-slate-900 leading-snug hover:text-amber-700 transition-colors"
+                    >
                       {sacco.name}
-                    </h3>
+                    </Link>
                     <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
                       <span className="px-2 py-0.5 rounded bg-slate-100/90 font-mono text-[11px] font-semibold text-slate-700 border border-slate-200/60">
-                        {sacco.regNo}
+                        {sacco.registration_number}
                       </span>
                       <span className="text-slate-400">•</span>
-                      <span>{sacco.dateSubmitted}</span>
+                      <span>Submitted {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}</span>
                     </div>
                   </div>
                 </div>
@@ -148,17 +215,27 @@ export const SuperAdminDashboardPage: React.FC = () => {
                 {/* Actions */}
                 <div className="flex items-center gap-3 w-full sm:w-auto justify-end shrink-0">
                   <button
-                    onClick={() => handleReject(sacco.name, sacco.id)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors"
+                    disabled={actionLoadingId === sacco.id}
+                    onClick={() => handleReject(sacco)}
+                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors disabled:opacity-50"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    {actionLoadingId === sacco.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <X className="w-3.5 h-3.5" />
+                    )}
                     <span>Reject</span>
                   </button>
                   <button
-                    onClick={() => handleApprove(sacco.name, sacco.id)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#10B981] hover:bg-emerald-600 text-white text-xs font-semibold transition-colors shadow-2xs"
+                    disabled={actionLoadingId === sacco.id}
+                    onClick={() => handleApprove(sacco)}
+                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#10B981] hover:bg-emerald-600 text-white text-xs font-semibold transition-colors shadow-2xs disabled:opacity-50"
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    {actionLoadingId === sacco.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Check className="w-3.5 h-3.5" />
+                    )}
                     <span>Approve</span>
                   </button>
                 </div>
@@ -170,4 +247,5 @@ export const SuperAdminDashboardPage: React.FC = () => {
     </div>
   )
 }
+
 

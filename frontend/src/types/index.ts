@@ -41,3 +41,37 @@ export interface ApiError {
   message: string
   errors?: Record<string, string[]>
 }
+
+export interface Sacco {
+  id: number
+  name: string
+  registration_number: string
+  status: 'pending' | 'approved' | 'rejected'
+  members_count?: number
+  created_at: string
+  updated_at: string
+}
+
+export interface PaginationMeta {
+  current_page: number
+  from: number | null
+  last_page: number
+  path: string
+  per_page: number
+  to: number | null
+  total: number
+}
+
+export interface PaginationLinks {
+  first: string | null
+  last: string | null
+  prev: string | null
+  next: string | null
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  links?: PaginationLinks
+  meta?: PaginationMeta
+}
+
