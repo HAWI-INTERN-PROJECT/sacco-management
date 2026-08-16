@@ -8,6 +8,11 @@ import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+import { SuperAdminLayout } from './layouts/super-admin/SuperAdminLayout'
+import { SuperAdminDashboardPage } from './pages/super-admin/SuperAdminDashboardPage'
+import { ManageSaccosPage } from './pages/super-admin/ManageSaccosPage'
+import { SaccoDetailsPage } from './pages/super-admin/SaccoDetailsPage'
+
 const queryClient = new QueryClient()
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -32,6 +37,14 @@ export default function App() {
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+
+            {/* Super Admin Routes */}
+            <Route path="/super-admin" element={<SuperAdminLayout />}>
+              <Route index element={<SuperAdminDashboardPage />} />
+              <Route path="saccos" element={<ManageSaccosPage />} />
+              <Route path="saccos/:id" element={<SaccoDetailsPage />} />
+            </Route>
+
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
