@@ -21,7 +21,7 @@ const fadeInUp: any = {
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full bg-white dark:bg-slate-900 transition-colors duration-300">
 
       {/* HERO SECTION */}
       <section className="relative bg-gradient-to-br from-[#0B6B3A] via-[#065F46] to-[#064E3B] pt-20 pb-24 overflow-hidden">
@@ -71,33 +71,33 @@ export default function LandingPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
-              <div className="relative w-full max-w-md aspect-square rounded-3xl flex items-center justify-center">
+              <div className="relative w-full max-w-md aspect-square bg-gradient-to-tr from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 border border-green-100 dark:border-slate-700 shadow-2xl flex items-center justify-center overflow-hidden group">
                 {/* Background Glows */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-[#F59E0B]/20 rounded-[3rem] blur-3xl mix-blend-screen"></div>
                 
                 {/* Main Dashboard Card */}
                 <motion.div 
-                  className="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
+                  className="relative z-10 w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden"
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="bg-slate-50 border-b border-slate-100 px-5 py-4 flex items-center justify-between">
+                  <div className="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                       <ShieldCheck className="w-5 h-5 text-[#0B6B3A]" />
-                       <span className="font-bold text-slate-700 text-sm">Awash SACCO Overview</span>
+                       <ShieldCheck className="w-5 h-5 text-[#0B6B3A] dark:text-emerald-400" />
+                       <span className="font-bold text-slate-700 dark:text-slate-200 text-sm">Awash SACCO Overview</span>
                     </div>
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600"></div>
                     </div>
                   </div>
                   
                   <div className="p-5 space-y-4">
                     {/* Stat Box 1 */}
-                    <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100 flex items-center justify-between">
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-between">
                        <div>
-                         <p className="text-emerald-800 text-xs font-semibold mb-1 uppercase tracking-wider">Total Members</p>
-                         <p className="text-2xl font-bold text-[#0B6B3A]">2,450</p>
+                         <p className="text-emerald-800 dark:text-emerald-400 text-xs font-semibold mb-1 uppercase tracking-wider">Total Members</p>
+                         <p className="text-2xl font-bold text-[#0B6B3A]">128</p>
                        </div>
                        <div className="w-10 h-10 rounded-full bg-emerald-200/50 flex items-center justify-center">
                          <Users className="w-5 h-5 text-[#0B6B3A]" />
@@ -105,10 +105,10 @@ export default function LandingPage() {
                     </div>
                     
                     {/* Stat Box 2 */}
-                    <div className="bg-amber-50 rounded-xl p-4 border border-amber-100 flex items-center justify-between">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-100 dark:border-amber-800/50 flex items-center justify-between">
                        <div>
-                         <p className="text-amber-800 text-xs font-semibold mb-1 uppercase tracking-wider">Total Savings</p>
-                         <p className="text-2xl font-bold text-amber-600">14.2M <span className="text-sm font-medium">ETB</span></p>
+                         <p className="text-amber-800 dark:text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wider">Total Savings</p>
+                         <p className="text-2xl font-bold text-amber-600">1.8M <span className="text-sm font-medium">ETB</span></p>
                        </div>
                        <div className="w-10 h-10 rounded-full bg-amber-200/50 flex items-center justify-center">
                          <Wallet className="w-5 h-5 text-amber-600" />
@@ -135,30 +135,30 @@ export default function LandingPage() {
 
                 {/* Floating Element 1 */}
                 <motion.div 
-                  className="absolute -right-6 top-12 bg-white p-3 rounded-xl shadow-xl border border-slate-100 z-20 flex items-center gap-3"
+                  className="absolute -right-6 top-12 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20 flex items-center gap-3"
                   animate={{ y: [0, 15, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700">Loan Approved</p>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Loan Approved</p>
                     <p className="text-[10px] text-slate-400">Just now</p>
                   </div>
                 </motion.div>
 
                 {/* Floating Element 2 */}
                 <motion.div 
-                  className="absolute -left-8 bottom-20 bg-white p-3 rounded-xl shadow-xl border border-slate-100 z-20 flex items-center gap-3"
+                  className="absolute -left-8 bottom-20 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 z-20 flex items-center gap-3"
                   animate={{ y: [0, -12, 0] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                    <Banknote className="w-4 h-4 text-[#0B6B3A]" />
+                  <div className="w-8 h-8 rounded-full bg-green-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <Banknote className="w-4 h-4 text-[#0B6B3A] dark:text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700">Dividend Sent</p>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Dividend Sent</p>
                     <p className="text-[10px] text-green-600 font-medium">+450 ETB</p>
                   </div>
                 </motion.div>
@@ -171,20 +171,20 @@ export default function LandingPage() {
       </section>
 
       {/* STATS BAR */}
-      <section className="bg-white border-b border-slate-100 py-12">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: 500, suffix: '+', label: 'SACCOs Registered' },
-              { value: 50000, suffix: '+', label: 'Active Members' },
-              { value: 2, suffix: 'B+', label: 'Birr Managed' },
+              { value: 12, suffix: '+', label: 'SACCOs Registered' },
+              { value: 850, suffix: '+', label: 'Active Members' },
+              { value: 4, suffix: 'M+', label: 'Birr Managed' },
               { value: 99, suffix: '.9%', label: 'Uptime SLA' },
             ].map((stat, i) => (
               <div key={i}>
-                <p className="text-3xl md:text-4xl font-bold text-[#0B6B3A]">
+                <p className="text-3xl md:text-4xl font-bold text-[#0B6B3A] dark:text-emerald-500">
                   <AnimatedCounter end={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="text-slate-500 text-sm mt-1">{stat.label}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -192,14 +192,14 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES SECTION */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-slate-50 dark:bg-slate-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] dark:text-white mb-4">
                 Everything You Need to Run a SACCO
               </h2>
-              <p className="text-slate-500 text-lg">
+              <p className="text-slate-500 dark:text-slate-400 text-lg">
                 Our platform provides comprehensive tools for every aspect of cooperative management.
               </p>
             </div>
@@ -221,13 +221,13 @@ export default function LandingPage() {
               <motion.div
                 key={i}
                 variants={fadeInUp}
-                className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg dark:hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-300 group"
               >
-                <div className={`w-12 h-12 rounded-xl bg-${feature.color}-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className={`w-6 h-6 text-${feature.color}-600`} />
+                <div className={`w-12 h-12 rounded-xl bg-${feature.color}-50 dark:bg-${feature.color}-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className={`w-6 h-6 text-${feature.color}-600 dark:text-${feature.color}-400`} />
                 </div>
-                <h3 className="text-xl font-bold text-[#1E293B] mb-3">{feature.title}</h3>
-                <p className="text-slate-500 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-bold text-[#1E293B] dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -235,12 +235,12 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] mb-4">How It Works</h2>
-              <p className="text-slate-500 text-lg">Get your SACCO digitized in three simple steps.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] dark:text-white mb-4">How It Works</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-lg">Get your SACCO digitized in three simple steps.</p>
             </div>
           </ScrollReveal>
 
@@ -255,11 +255,11 @@ export default function LandingPage() {
               { step: '03', title: 'Start Managing', desc: 'Process savings, approve loans, track dividends, and generate reports.' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeInUp} className="text-center p-8">
-                <div className="w-16 h-16 mx-auto rounded-full bg-[#0B6B3A] text-white flex items-center justify-center text-2xl font-bold mb-6">
+                <div className="w-16 h-16 mx-auto rounded-full bg-[#0B6B3A] dark:bg-emerald-500/20 text-white dark:text-emerald-400 flex items-center justify-center text-2xl font-bold mb-6">
                   {item.step}
                 </div>
-                <h3 className="text-xl font-bold text-[#1E293B] mb-3">{item.title}</h3>
-                <p className="text-slate-500">{item.desc}</p>
+                <h3 className="text-xl font-bold text-[#1E293B] dark:text-white mb-3">{item.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400">{item.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -267,12 +267,12 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-slate-50 dark:bg-slate-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] mb-4">Trusted by Cooperatives</h2>
-              <p className="text-slate-500 text-lg">Hear what our partner SACCOs have to say.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#1E293B] dark:text-white mb-4">Trusted by Cooperatives</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-lg">Hear what our partner SACCOs have to say.</p>
             </div>
           </ScrollReveal>
 
@@ -286,17 +286,17 @@ export default function LandingPage() {
               { name: 'Tigist Hailu', role: 'Treasurer, Unity SACCO', quote: 'The dividend calculation feature alone saved us weeks of work each quarter.' },
               { name: 'Dawit Mengistu', role: 'Manager, Progress SACCO', quote: 'Our members love the transparency. They can see their savings grow in real-time.' },
             ].map((t, i) => (
-              <motion.div key={i} variants={fadeInUp} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
+              <motion.div key={i} variants={fadeInUp} className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 h-full flex flex-col">
                 <div className="flex-grow">
                   <div className="text-[#F59E0B] text-2xl mb-4">★★★★★</div>
-                  <p className="text-slate-600 italic mb-6">"{t.quote}"</p>
+                  <p className="text-slate-600 dark:text-slate-300 italic mb-6">"{t.quote}"</p>
                 </div>
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <div className="w-10 h-10 rounded-full bg-[#0B6B3A] flex items-center justify-center text-white font-bold text-sm">
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                  <div className="w-10 h-10 rounded-full bg-[#0B6B3A] dark:bg-emerald-500/20 flex items-center justify-center text-white dark:text-emerald-400 font-bold text-sm">
                     {t.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold text-[#1E293B] text-sm">{t.name}</p>
+                    <p className="font-semibold text-[#1E293B] dark:text-white text-sm">{t.name}</p>
                     <p className="text-slate-400 text-xs">{t.role}</p>
                   </div>
                 </div>

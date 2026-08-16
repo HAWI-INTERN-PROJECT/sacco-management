@@ -13,7 +13,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full bg-white dark:bg-slate-900 transition-colors duration-300">
       
       {/* HERO BANNER */}
       <section className="bg-[#0B6B3A] pt-24 pb-20 relative overflow-hidden">
@@ -26,79 +26,78 @@ export default function ContactPage() {
         >
            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Contact Us</h1>
            <p className="text-green-100 text-lg max-w-2xl mx-auto">
-             We're here to help you manage your financial future. Reach out to our dedicated support team in Addis Ababa.
+             We're here to help you manage your financial future. Reach out to our dedicated support team in Adama.
            </p>
         </motion.div>
       </section>
 
       {/* MAIN CONTENT */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex flex-col lg:flex-row gap-12">
               
               {/* LEFT COLUMN: Info */}
               <ScrollReveal direction="left" className="w-full lg:w-1/3 space-y-6">
                 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-700 flex items-start gap-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
                     <MapPin className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#1E293B] mb-1">Our Office</h3>
-                    <p className="text-slate-500 text-sm">Bole Road, Building 4B<br/>Addis Ababa, Ethiopia</p>
+                    <h3 className="font-bold text-[#1E293B] dark:text-white mb-1">Our Office</h3>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Hawi Software Solutions<br/>Adama, Ethiopia</p>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-700 flex items-start gap-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                     <Phone className="w-5 h-5 text-[#0B6B3A]" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#1E293B] mb-1">Call Us</h3>
-                    <p className="text-slate-500 text-sm">+251 911 123 456<br/>Mon-Fri, 8:00 AM - 5:00 PM</p>
+                    <h3 className="font-bold text-[#1E293B] dark:text-white mb-1">Call Us</h3>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">+251 911 123 456<br/>Mon-Fri, 8:00 AM - 5:00 PM</p>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-700 flex items-start gap-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
                     <Mail className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#1E293B] mb-1">Email Support</h3>
-                    <a href="mailto:support@saccomanager.com" className="text-[#0B6B3A] text-sm font-medium hover:underline">
+                    <h3 className="font-bold text-[#1E293B] dark:text-white mb-1">Email Support</h3>
+                    <a href="mailto:support@saccomanager.com" className="text-[#0B6B3A] dark:text-emerald-400 text-sm font-medium hover:underline">
                       support@saccomanager.com
                     </a>
                   </div>
                 </div>
 
-                {/* Map Placeholder */}
-                <div className="w-full h-64 bg-slate-200 rounded-2xl overflow-hidden relative shadow-sm border border-slate-100 mt-8">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-slate-400 text-center">
-                      <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <span className="text-sm font-medium">Google Maps Integration</span>
-                    </div>
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                     <div className="w-6 h-6 bg-[#0B6B3A] rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                     </div>
-                  </div>
+                {/* Google Maps Embed */}
+                <div className="w-full h-64 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700 mt-8">
+                  <iframe
+                    title="Hawi Software Solutions Location"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3945.676!2d39.2686!3d8.5400!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b1f4c4f4b5b5b%3A0x0!2sHawi+Software+Solutions!5e0!3m2!1sen!2set!4v1700000000000!5m2!1sen!2set"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
                 </div>
 
               </ScrollReveal>
 
               {/* RIGHT COLUMN: Form */}
               <ScrollReveal direction="right" className="w-full lg:w-2/3">
-                <div className="bg-white p-8 md:p-12 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
-                  <h2 className="text-3xl font-bold text-[#1E293B] mb-2">Send us a Message</h2>
-                  <p className="text-slate-500 mb-8">Fill out the form below and our team will get back to you within 24 hours.</p>
+                <div className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700">
+                  <h2 className="text-3xl font-bold text-[#1E293B] dark:text-white mb-2">Send us a Message</h2>
+                  <p className="text-slate-500 dark:text-slate-400 mb-8">Fill out the form below and our team will get back to you within 24 hours.</p>
 
                   {isSubmitted && (
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mb-8 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center gap-3"
+                      className="mb-8 p-4 bg-green-50 dark:bg-emerald-900/30 border border-green-200 dark:border-emerald-800 text-green-700 dark:text-emerald-400 rounded-lg flex items-center gap-3"
                     >
                        <CheckCircle2 className="w-5 h-5" />
                        <p className="font-medium">Message sent successfully! We'll get back to you soon.</p>
@@ -108,30 +107,30 @@ export default function ContactPage() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Full Name</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
                         <input 
                           type="text" 
                           required
                           placeholder="Abebe Bikila"
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Email Address</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
                         <input 
                           type="email" 
                           required
                           placeholder="abebe@example.com"
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Subject</label>
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Subject</label>
                       <select 
                         required
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors appearance-none bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors appearance-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         defaultValue=""
                       >
                         <option value="" disabled>Select an inquiry type</option>
@@ -143,12 +142,12 @@ export default function ContactPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Message</label>
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Message</label>
                       <textarea 
                         required
                         rows={5}
                         placeholder="How can we help you today?"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors resize-none"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors resize-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       ></textarea>
                     </div>
 
