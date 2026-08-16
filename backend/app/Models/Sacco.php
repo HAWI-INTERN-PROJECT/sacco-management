@@ -16,7 +16,6 @@ class Sacco extends Model
     ];
 
     /**
-     * @return HasMany<User, $this>
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -42,6 +41,9 @@ class Sacco extends Model
     public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Loan::class);
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
      */
     public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
