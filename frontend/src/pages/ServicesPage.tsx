@@ -14,10 +14,10 @@ const fadeInUp: any = {
 
 export default function ServicesPage() {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full bg-white dark:bg-slate-900 transition-colors duration-300">
       
       {/* HERO BANNER */}
-      <section className="bg-gradient-to-br from-[#10B981] to-[#0B6B3A] pt-24 pb-20 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#10B981] to-[#0B6B3A] dark:from-emerald-900 dark:to-emerald-950 pt-24 pb-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff15_1px,transparent_1px),linear-gradient(to_bottom,#ffffff15_1px,transparent_1px)] bg-[size:3rem_3rem]"></div>
         <motion.div 
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center"
@@ -33,13 +33,13 @@ export default function ServicesPage() {
       </section>
 
       {/* CORE CAPABILITIES */}
-      <section className="py-24 bg-slate-50 relative -mt-6">
+      <section className="py-24 bg-slate-50 dark:bg-slate-900 relative -mt-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            
            <ScrollReveal>
              <div className="text-center mb-16">
-               <h2 className="text-3xl font-bold text-[#1E293B] mb-4">Core Capabilities</h2>
-               <p className="text-slate-500">A unified platform to manage members, finances, and operations seamlessly.</p>
+               <h2 className="text-3xl font-bold text-[#1E293B] dark:text-white mb-4">Core Capabilities</h2>
+               <p className="text-slate-500 dark:text-slate-400">A unified platform to manage members, finances, and operations seamlessly.</p>
              </div>
            </ScrollReveal>
 
@@ -59,13 +59,13 @@ export default function ServicesPage() {
                 <motion.div
                   key={idx}
                   variants={fadeInUp}
-                  className="bg-white p-8 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1 transition-transform group"
+                  className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform group"
                 >
-                  <div className={`w-12 h-12 rounded-full bg-${service.color}-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <service.icon className={`w-6 h-6 text-${service.color === 'green' ? '[#0B6B3A]' : service.color === 'emerald' ? '[#10B981]' : service.color + '-600'}`} />
+                  <div className={`w-12 h-12 rounded-full bg-${service.color}-50 dark:bg-${service.color}-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                    <service.icon className={`w-6 h-6 text-${service.color === 'green' ? '[#0B6B3A] dark:text-emerald-400' : service.color === 'emerald' ? '[#10B981] dark:text-emerald-400' : service.color + '-600 dark:text-' + service.color + '-400'}`} />
                   </div>
-                  <h3 className="text-xl font-bold text-[#1E293B] mb-3">{service.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{service.desc}</p>
+                  <h3 className="text-xl font-bold text-[#1E293B] dark:text-white mb-3">{service.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{service.desc}</p>
                 </motion.div>
               ))}
            </motion.div>
@@ -74,9 +74,9 @@ export default function ServicesPage() {
 
       {/* CTA SECTION */}
       <ScrollReveal>
-        <section className="py-24 bg-slate-100 text-center">
-          <h2 className="text-3xl font-bold text-[#1E293B] mb-4">Ready to Transform Your SACCO?</h2>
-          <p className="text-slate-500 text-lg mb-10 max-w-2xl mx-auto">
+        <section className="py-24 bg-slate-100 dark:bg-slate-800/50 text-center">
+          <h2 className="text-3xl font-bold text-[#1E293B] dark:text-white mb-4">Ready to Transform Your SACCO?</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
             Join hundreds of Ethiopian cooperatives leveraging our platform to drive efficiency, transparency, and growth.
           </p>
           <Link 
