@@ -26,3 +26,11 @@ compose.override.yaml
 **/caddy
 frankenphp
 frankenphp-worker.php
+# Laravel generated/runtime files
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
