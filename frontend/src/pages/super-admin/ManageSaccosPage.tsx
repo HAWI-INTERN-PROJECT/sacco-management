@@ -1,103 +1,158 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState, useCallback } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { SaccoStatusBadge } from '../../components/super-admin/SaccoStatusBadge'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
-
-interface SaccoItem {
-  id: string
-  name: string
-  regNo: string
-  status: 'pending' | 'approved' | 'rejected'
-  members: number
-  totalSavings: string
-  registeredDate: string
-}
+import { adminSaccoService } from '../../services/adminSaccoService'
+import type { Sacco, PaginationMeta } from '../../types'
 
 export const ManageSaccosPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const statusParam = searchParams.get('status') as 'pending' | 'approved' | 'rejected' | null
 
-  const [saccosList, setSaccosList] = useState<SaccoItem[]>([
-    {
-      id: '1',
-      name: 'Unity SACCO',
-      regNo: 'REG-2024-001',
-      status: 'pending',
-      members: 0,
-      totalSavings: 'ETB 0',
-      registeredDate: 'Oct 24, 2023',
-    },
-    {
-      id: '2',
-      name: 'Awash Cooperative',
-      regNo: 'REG-2022-045',
-      status: 'approved',
-      members: 450,
-      totalSavings: 'ETB 1.2M',
-      registeredDate: 'Jan 15, 2022',
-    },
-    {
-      id: '3',
-      name: 'Blue Nile Credit',
-      regNo: 'REG-2023-012',
-      status: 'rejected',
-      members: 0,
-      totalSavings: 'ETB 0',
-      registeredDate: 'Sep 10, 2023',
-    },
-    {
-      id: '4',
-      name: 'Oromia Farmers Union',
-      regNo: 'REG-2021-118',
-      status: 'approved',
-      members: 1205,
-      totalSavings: 'ETB 5.4M',
-      registeredDate: 'Mar 02, 2021',
-    },
-    {
-      id: '5',
-      name: 'Addis Teachers SACCO',
-      regNo: 'REG-2024-002',
-      status: 'pending',
-      members: 0,
-      totalSavings: 'ETB 0',
-      registeredDate: 'Oct 26, 2023',
-    },
-    {
-      id: '6',
-      name: 'Rift Valley Traders',
-      regNo: 'REG-2019-033',
-      status: 'approved',
-      members: 890,
-      totalSavings: 'ETB 2.8M',
-      registeredDate: 'Nov 11, 2019',
-    },
-  ])
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>(
+    statusParam && ['pending', 'approved', 'rejected'].includes(statusParam) ? statusParam : 'all'
+  )
 
-  const handleApprove = (id: string, name: string) => {
-    setSaccosList((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: 'approved' } : item))
-    )
-    toast.success(`${name} approved successfully!`)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [saccosList, setSaccosList] = useState<Sacco[]>([])
+  const [meta, setMeta] = useState<PaginationMeta | null>(null)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
+
+  // Counts for tabs
+  const [tabCounts, setTabCounts] = useState<{
+    all?: number
+    pending?: number
+    approved?: number
+    rejected?: number
+  }>({})
+
+  // Sync tab with URL search params if updated externally
+  useEffect(() => {
+    if (statusParam && ['pending', 'approved', 'rejected'].includes(statusParam)) {
+      setActiveTab(statusParam)
+    } else if (!statusParam) {
+      setActiveTab('all')
+    }
+  }, [statusParam])
+
+  // Fetch SACCOs for current tab & page
+  const fetchSaccos = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const statusArg = activeTab === 'all' ? undefined : activeTab
+      const response = await adminSaccoService.getSaccos({
+        status: statusArg,
+        page: currentPage,
+      })
+
+      setSaccosList(response.data || [])
+      setMeta(response.meta || null)
+
+      // Update current active tab count from metadata if returned
+      if (response.meta) {
+        setTabCounts((prev) => ({
+          ...prev,
+          [activeTab]: response.meta?.total,
+        }))
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to fetch SACCOs.'
+      setError(msg)
+      toast.error(msg)
+    } finally {
+      setLoading(false)
+    }
+  }, [activeTab, currentPage])
+
+  useEffect(() => {
+    fetchSaccos()
+  }, [fetchSaccos])
+
+  // Fetch overall tab counts once on mount
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [allRes, pendingRes, approvedRes, rejectedRes] = await Promise.all([
+          adminSaccoService.getSaccos({ page: 1 }),
+          adminSaccoService.getSaccos({ status: 'pending', page: 1 }),
+          adminSaccoService.getSaccos({ status: 'approved', page: 1 }),
+          adminSaccoService.getSaccos({ status: 'rejected', page: 1 }),
+        ])
+        setTabCounts({
+          all: allRes.meta?.total ?? allRes.data?.length,
+          pending: pendingRes.meta?.total ?? pendingRes.data?.length,
+          approved: approvedRes.meta?.total ?? approvedRes.data?.length,
+          rejected: rejectedRes.meta?.total ?? rejectedRes.data?.length,
+        })
+      } catch {
+        // Ignore tab counts error gracefully
+      }
+    }
+    fetchCounts()
+  }, [])
+
+  const handleTabChange = (tab: 'all' | 'pending' | 'approved' | 'rejected') => {
+    setActiveTab(tab)
+    setCurrentPage(1)
+    if (tab === 'all') {
+      searchParams.delete('status')
+    } else {
+      searchParams.set('status', tab)
+    }
+    setSearchParams(searchParams)
   }
 
-  const handleReject = (id: string, name: string) => {
-    setSaccosList((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: 'rejected' } : item))
-    )
-    toast.error(`${name} rejected.`)
+  const handleApprove = async (sacco: Sacco) => {
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.approveSacco(sacco.id)
+      toast.success(`${sacco.name} approved successfully!`)
+      fetchSaccos()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to approve SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
   }
 
-  const filteredSaccos = saccosList.filter((item) => {
-    if (activeTab === 'all') return true
-    return item.status === activeTab
-  })
+  const handleReject = async (sacco: Sacco) => {
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.rejectSacco(sacco.id)
+      toast.error(`${sacco.name} rejected.`)
+      fetchSaccos()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to reject SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
 
-  const counts = {
-    all: 28,
-    pending: 4,
-    approved: 22,
-    rejected: 2,
+  const renderPageNumbers = () => {
+    if (!meta || meta.last_page <= 1) return null
+    const pages = []
+    for (let i = 1; i <= meta.last_page; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`w-7 h-7 rounded flex items-center justify-center font-bold text-xs transition-colors ${
+            currentPage === i
+              ? 'bg-[#0B1727] text-white'
+              : 'hover:bg-slate-100 text-slate-700'
+          }`}
+        >
+          {i}
+        </button>
+      )
+    }
+    return pages
   }
 
   return (
@@ -112,55 +167,65 @@ export const ManageSaccosPage: React.FC = () => {
             Review, approve, and manage registered cooperatives across the platform.
           </p>
         </div>
-        <button
-          onClick={() => toast.success('SACCO report exported successfully')}
-          className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-2xs transition-colors shrink-0"
-        >
-          Export Report
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={fetchSaccos}
+            disabled={loading}
+            className="p-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+            title="Refresh data"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={() => toast.info('Export functionality requires export API support.')}
+            className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-2xs transition-colors"
+          >
+            Export Report
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs */}
       <div className="border-b border-slate-200 flex items-center gap-6 overflow-x-auto pb-0.5">
         <button
-          onClick={() => setActiveTab('all')}
+          onClick={() => handleTabChange('all')}
           className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'all'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          All ({counts.all})
+          All {tabCounts.all !== undefined ? `(${tabCounts.all})` : ''}
         </button>
         <button
-          onClick={() => setActiveTab('pending')}
+          onClick={() => handleTabChange('pending')}
           className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'pending'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          Pending ({counts.pending})
+          Pending {tabCounts.pending !== undefined ? `(${tabCounts.pending})` : ''}
         </button>
         <button
-          onClick={() => setActiveTab('approved')}
+          onClick={() => handleTabChange('approved')}
           className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'approved'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          Approved ({counts.approved})
+          Approved {tabCounts.approved !== undefined ? `(${tabCounts.approved})` : ''}
         </button>
         <button
-          onClick={() => setActiveTab('rejected')}
+          onClick={() => handleTabChange('rejected')}
           className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'rejected'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          Rejected ({counts.rejected})
+          Rejected {tabCounts.rejected !== undefined ? `(${tabCounts.rejected})` : ''}
         </button>
       </div>
 
@@ -174,20 +239,42 @@ export const ManageSaccosPage: React.FC = () => {
                 <th className="py-4 px-6">Registration #</th>
                 <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6 text-center">Members</th>
-                <th className="py-4 px-6">Total Savings</th>
                 <th className="py-4 px-6">Registered Date</th>
                 <th className="py-4 px-6 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-              {filteredSaccos.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={6} className="py-12 text-center text-slate-500">
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+                      <span>Loading SACCOs...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-rose-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span>{error}</span>
+                      <button
+                        onClick={fetchSaccos}
+                        className="px-3 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold rounded-md transition-colors"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : saccosList.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-500">
                     No SACCOs match the selected status.
                   </td>
                 </tr>
               ) : (
-                filteredSaccos.map((sacco) => (
+                saccosList.map((sacco) => (
                   <tr key={sacco.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-4 px-6 font-bold text-slate-900">
                       <Link
@@ -198,32 +285,31 @@ export const ManageSaccosPage: React.FC = () => {
                       </Link>
                     </td>
                     <td className="py-4 px-6 font-mono text-xs font-semibold text-slate-600">
-                      {sacco.regNo}
+                      {sacco.registration_number}
                     </td>
                     <td className="py-4 px-6">
                       <SaccoStatusBadge status={sacco.status} />
                     </td>
                     <td className="py-4 px-6 text-center font-medium">
-                      {sacco.members.toLocaleString()}
-                    </td>
-                    <td className="py-4 px-6 font-bold text-slate-900">
-                      {sacco.totalSavings}
+                      {(sacco.members_count ?? 0).toLocaleString()}
                     </td>
                     <td className="py-4 px-6 text-slate-500 text-xs font-medium">
-                      {sacco.registeredDate}
+                      {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-4 px-6 text-center">
                       {sacco.status === 'pending' ? (
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => handleApprove(sacco.id, sacco.name)}
-                            className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors"
+                            disabled={actionLoadingId === sacco.id}
+                            onClick={() => handleApprove(sacco)}
+                            className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
                           >
                             Approve
                           </button>
                           <button
-                            onClick={() => handleReject(sacco.id, sacco.name)}
-                            className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors"
+                            disabled={actionLoadingId === sacco.id}
+                            onClick={() => handleReject(sacco)}
+                            className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
                           >
                             Reject
                           </button>
@@ -246,25 +332,29 @@ export const ManageSaccosPage: React.FC = () => {
 
         {/* Table Footer Pagination */}
         <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div>Showing 1 to 6 of 28 entries</div>
+          <div>
+            {meta && meta.total > 0 ? (
+              <>Showing {meta.from ?? 1} to {meta.to ?? meta.total} of {meta.total} entries</>
+            ) : (
+              'Showing 0 entries'
+            )}
+          </div>
           <div className="flex items-center gap-1.5 font-semibold">
             <button
-              className="p-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-40"
-              disabled
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={!meta || meta.current_page <= 1 || loading}
+              className="p-1 rounded text-slate-600 hover:text-slate-900 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="w-7 h-7 rounded bg-[#0B1727] text-white flex items-center justify-center font-bold text-xs">
-              1
-            </button>
-            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs">
-              2
-            </button>
-            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs">
-              3
-            </button>
-            <span className="px-1 text-slate-400">...</span>
-            <button className="p-1 rounded text-slate-600 hover:text-slate-900">
+
+            {renderPageNumbers()}
+
+            <button
+              onClick={() => setCurrentPage((prev) => (meta ? Math.min(prev + 1, meta.last_page) : prev))}
+              disabled={!meta || meta.current_page >= meta.last_page || loading}
+              className="p-1 rounded text-slate-600 hover:text-slate-900 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -273,4 +363,5 @@ export const ManageSaccosPage: React.FC = () => {
     </div>
   )
 }
+
 

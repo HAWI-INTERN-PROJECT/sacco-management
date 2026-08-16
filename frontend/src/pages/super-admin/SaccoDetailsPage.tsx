@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   Building2,
@@ -10,29 +10,107 @@ import {
   ShieldCheck,
   Check,
   X,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { adminSaccoService } from '../../services/adminSaccoService'
+import type { Sacco } from '../../types'
 
 export const SaccoDetailsPage: React.FC = () => {
-  useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [rejectionReason, setRejectionReason] = useState('')
-  const [status, setStatus] = useState<'pending' | 'approved' | 'rejected'>('pending')
 
-  const handleApprove = () => {
-    setStatus('approved')
-    toast.success('Forward Credit Union has been approved successfully!')
-    setTimeout(() => navigate('/super-admin/saccos'), 1200)
+  const [sacco, setSacco] = useState<Sacco | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
+  const [actionLoading, setActionLoading] = useState<boolean>(false)
+
+  const fetchSaccoDetails = useCallback(async () => {
+    if (!id) return
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await adminSaccoService.getSaccoById(id)
+      setSacco(response.data)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to fetch SACCO details.'
+      setError(msg)
+      toast.error(msg)
+    } finally {
+      setLoading(false)
+    }
+  }, [id])
+
+  useEffect(() => {
+    fetchSaccoDetails()
+  }, [fetchSaccoDetails])
+
+  const handleApprove = async () => {
+    if (!id || !sacco) return
+    setActionLoading(true)
+    try {
+      const response = await adminSaccoService.approveSacco(id)
+      setSacco(response.data || { ...sacco, status: 'approved' })
+      toast.success(`${sacco.name} has been approved successfully!`)
+      setTimeout(() => navigate('/super-admin/saccos'), 1200)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to approve SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoading(false)
+    }
   }
 
-  const handleReject = () => {
-    if (!rejectionReason.trim()) {
-      toast.error('Please enter a rejection reason before rejecting.')
-      return
+  const handleReject = async () => {
+    if (!id || !sacco) return
+    setActionLoading(true)
+    try {
+      const response = await adminSaccoService.rejectSacco(id)
+      setSacco(response.data || { ...sacco, status: 'rejected' })
+      toast.error(`${sacco.name} application rejected.`)
+      setTimeout(() => navigate('/super-admin/saccos'), 1200)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to reject SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoading(false)
     }
-    setStatus('rejected')
-    toast.error('Forward Credit Union application rejected.')
-    setTimeout(() => navigate('/super-admin/saccos'), 1200)
+  }
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center text-slate-500">
+        <div className="flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+          <span className="text-sm font-semibold">Loading SACCO details...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !sacco) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center text-slate-700 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">SACCO Not Found</h2>
+        <p className="text-sm text-slate-500">{error || 'The requested SACCO could not be found.'}</p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={fetchSaccoDetails}
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+          <Link
+            to="/super-admin/saccos"
+            className="px-4 py-2 bg-[#0B1727] text-white text-xs font-semibold rounded-lg hover:bg-[#0B1727]/90 transition-colors"
+          >
+            Back to SACCOs
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -43,27 +121,37 @@ export const SaccoDetailsPage: React.FC = () => {
           SACCOs
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-slate-900 font-bold">Forward Credit Union</span>
+        <span className="text-slate-900 font-bold">{sacco.name}</span>
       </nav>
 
       {/* Page Title & Status Badge */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
-          SACCO Details
-        </h1>
-        {status === 'pending' && (
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
+            SACCO Details
+          </h1>
+          <button
+            onClick={fetchSaccoDetails}
+            disabled={loading}
+            className="p-1.5 rounded text-slate-400 hover:text-slate-600 transition-colors"
+            title="Refresh details"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+        {sacco.status === 'pending' && (
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#FEF9C3] text-[#854D0E] border border-amber-200/60">
             <Clock className="w-3.5 h-3.5 text-[#854D0E]" />
             <span>Pending Approval</span>
           </span>
         )}
-        {status === 'approved' && (
+        {sacco.status === 'approved' && (
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#DCFCE7] text-[#15803D] border border-emerald-200/60">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D]" />
             <span>Approved</span>
           </span>
         )}
-        {status === 'rejected' && (
+        {sacco.status === 'rejected' && (
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#FEE2E2] text-[#B91C1C] border border-rose-200/60">
             <XCircle className="w-3.5 h-3.5 text-[#B91C1C]" />
             <span>Rejected</span>
@@ -88,7 +176,7 @@ export const SaccoDetailsPage: React.FC = () => {
                 SACCO Name
               </span>
               <span className="text-sm font-bold text-slate-900">
-                Forward Credit Union
+                {sacco.name}
               </span>
             </div>
             <div>
@@ -96,31 +184,31 @@ export const SaccoDetailsPage: React.FC = () => {
                 Registration Number
               </span>
               <span className="text-sm font-mono font-bold text-slate-800">
-                REG-2023-88942
+                {sacco.registration_number}
               </span>
             </div>
             <div>
               <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
                 Organization Email
               </span>
-              <span className="text-sm font-medium text-slate-800">
-                contact@forwardcu.org
+              <span className="text-sm font-medium text-slate-500">
+                N/A
               </span>
             </div>
             <div>
               <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
                 Phone
               </span>
-              <span className="text-sm font-medium text-slate-800">
-                +251 911 234 567
+              <span className="text-sm font-medium text-slate-500">
+                N/A
               </span>
             </div>
             <div className="md:col-span-2">
               <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
                 Address
               </span>
-              <span className="text-sm font-medium text-slate-800">
-                Bole Sub-city, Woreda 03, House No. 124, Addis Ababa
+              <span className="text-sm font-medium text-slate-500">
+                N/A
               </span>
             </div>
             <div>
@@ -128,7 +216,7 @@ export const SaccoDetailsPage: React.FC = () => {
                 Date Submitted
               </span>
               <span className="text-sm font-medium text-slate-800">
-                October 24, 2023
+                {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}
               </span>
             </div>
           </div>
@@ -146,14 +234,14 @@ export const SaccoDetailsPage: React.FC = () => {
 
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-full bg-[#0B1727] text-white flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
-                ET
+                {sacco.name.substring(0, 2).toUpperCase()}
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                  Elias Tadesse
+                  Primary Administrator
                 </h3>
                 <span className="text-xs font-medium text-slate-500">
-                  Primary Admin
+                  SACCO Admin
                 </span>
               </div>
             </div>
@@ -161,20 +249,11 @@ export const SaccoDetailsPage: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                  Admin Email
+                  Admin Details
                 </span>
-                <span className="text-sm font-medium text-slate-800">
-                  elias.t@forwardcu.org
+                <span className="text-sm font-medium text-slate-500">
+                  Contact details unavailable
                 </span>
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                  Phone Verification
-                </span>
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Verified</span>
-                </div>
               </div>
             </div>
           </div>
@@ -191,7 +270,7 @@ export const SaccoDetailsPage: React.FC = () => {
             </h2>
           </div>
           <span className="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-md">
-            Pre-activation state
+            {sacco.status === 'approved' ? 'Active SACCO' : 'Pre-activation state'}
           </span>
         </div>
 
@@ -200,21 +279,25 @@ export const SaccoDetailsPage: React.FC = () => {
             <span className="text-xs font-bold text-slate-500 block mb-1">
               Member Count
             </span>
-            <span className="text-2xl font-extrabold text-slate-900">0</span>
+            <span className="text-2xl font-extrabold text-slate-900">
+              {(sacco.members_count ?? 0).toLocaleString()}
+            </span>
           </div>
           <div className="bg-slate-50/70 p-4 rounded-xl border-l-[4px] border-l-emerald-500 border border-slate-200/60">
             <span className="text-xs font-bold text-slate-500 block mb-1">
               Total Savings
             </span>
             <span className="text-2xl font-extrabold text-slate-900">
-              ETB 0.00
+              N/A
             </span>
           </div>
           <div className="bg-slate-50/70 p-4 rounded-xl border-l-[4px] border-l-amber-500 border border-slate-200/60">
             <span className="text-xs font-bold text-slate-500 block mb-1">
               Active Loans
             </span>
-            <span className="text-2xl font-extrabold text-slate-900">0</span>
+            <span className="text-2xl font-extrabold text-slate-900">
+              N/A
+            </span>
           </div>
         </div>
       </div>
@@ -231,31 +314,33 @@ export const SaccoDetailsPage: React.FC = () => {
               htmlFor="rejectionReason"
               className="text-xs font-semibold text-slate-600 block mb-2"
             >
-              Rejection Reason (Required if rejecting)
+              Rejection Reason (Optional Notes)
             </label>
             <textarea
               id="rejectionReason"
               rows={3}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="Enter reason for rejection..."
+              placeholder="Enter optional notes..."
               className="w-full p-3.5 bg-slate-50/40 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all"
             />
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-2">
             <button
+              disabled={actionLoading || sacco.status !== 'pending'}
               onClick={handleReject}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-rose-600 bg-white hover:bg-rose-50 text-rose-600 text-sm font-bold transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-rose-600 bg-white hover:bg-rose-50 text-rose-600 text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <X className="w-4 h-4 stroke-[2.5]" />
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4 stroke-[2.5]" />}
               <span>Reject SACCO</span>
             </button>
             <button
+              disabled={actionLoading || sacco.status !== 'pending'}
               onClick={handleApprove}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#10B981] hover:bg-emerald-600 text-white text-sm font-bold transition-colors shadow-2xs"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#10B981] hover:bg-emerald-600 text-white text-sm font-bold transition-colors shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Check className="w-4 h-4 stroke-[2.5]" />
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 stroke-[2.5]" />}
               <span>Approve SACCO</span>
             </button>
           </div>
@@ -264,4 +349,5 @@ export const SaccoDetailsPage: React.FC = () => {
     </div>
   )
 }
+
 
