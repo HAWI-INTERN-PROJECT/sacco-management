@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Shield, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 export default function PublicLayout() {
   const location = useLocation();
@@ -15,9 +16,9 @@ export default function PublicLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-white">
+    <div className="min-h-screen flex flex-col font-sans bg-white dark:bg-slate-900 transition-colors duration-300">
       {/* NAVIGATION BAR */}
-      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
+      <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             
@@ -37,8 +38,8 @@ export default function PublicLayout() {
                   <Link
                     key={link.name}
                     to={link.path}
-                    className={`text-sm font-medium transition-colors hover:text-[#0B6B3A] ${
-                      isActive ? 'text-[#0B6B3A] border-b-2 border-[#0B6B3A]' : 'text-slate-600'
+                    className={`text-sm font-medium transition-colors hover:text-[#0B6B3A] dark:hover:text-emerald-400 ${
+                      isActive ? 'text-[#0B6B3A] dark:text-emerald-400 border-b-2 border-[#0B6B3A] dark:border-emerald-400' : 'text-slate-600 dark:text-slate-300'
                     }`}
                   >
                     {link.name}
@@ -49,9 +50,10 @@ export default function PublicLayout() {
 
             {/* CTAs */}
             <div className="hidden md:flex items-center space-x-4">
+              <ThemeToggle />
               <Link 
                 to="/login" 
-                className="text-sm font-medium text-slate-600 hover:text-[#0B6B3A] transition-colors"
+                className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B6B3A] dark:hover:text-emerald-400 transition-colors"
               >
                 Login
               </Link>
@@ -81,7 +83,7 @@ export default function PublicLayout() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden bg-white border-t border-slate-100 overflow-hidden"
+              className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 overflow-hidden"
             >
               <div className="px-4 py-4 space-y-3">
                 {navLinks.map((link) => (
@@ -91,15 +93,16 @@ export default function PublicLayout() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`block py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                       location.pathname === link.path 
-                        ? 'bg-green-50 text-[#0B6B3A]' 
-                        : 'text-slate-600 hover:bg-slate-50'
+                        ? 'bg-green-50 dark:bg-slate-800 text-[#0B6B3A] dark:text-emerald-400' 
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     {link.name}
                   </Link>
                 ))}
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg">Login</Link>
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 flex flex-col">
+                  <div className="px-3 pb-2"><ThemeToggle /></div>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">Login</Link>
                   <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium text-white bg-[#0B6B3A] rounded-lg text-center">Register SACCO</Link>
                 </div>
               </div>
