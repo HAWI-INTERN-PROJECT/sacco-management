@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SaccoStatusBadge } from '../../components/super-admin/SaccoStatusBadge'
-import { Download, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface SaccoItem {
@@ -105,7 +105,7 @@ export const ManageSaccosPage: React.FC = () => {
       {/* Header Title Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
             Manage SACCOs
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -114,10 +114,9 @@ export const ManageSaccosPage: React.FC = () => {
         </div>
         <button
           onClick={() => toast.success('SACCO report exported successfully')}
-          className="inline-flex items-center justify-center gap-2 bg-[#0B192C] hover:bg-[#0B192C]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-xs transition-colors shrink-0"
+          className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-2xs transition-colors shrink-0"
         >
-          <Download className="w-4 h-4" />
-          <span>Export Report</span>
+          Export Report
         </button>
       </div>
 
@@ -125,7 +124,7 @@ export const ManageSaccosPage: React.FC = () => {
       <div className="border-b border-slate-200 flex items-center gap-6 overflow-x-auto pb-0.5">
         <button
           onClick={() => setActiveTab('all')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
+          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'all'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
@@ -135,7 +134,7 @@ export const ManageSaccosPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('pending')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
+          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'pending'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
@@ -145,7 +144,7 @@ export const ManageSaccosPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('approved')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
+          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'approved'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
@@ -155,7 +154,7 @@ export const ManageSaccosPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('rejected')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
+          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
             activeTab === 'rejected'
               ? 'text-slate-900 border-b-2 border-slate-900'
               : 'text-slate-500 hover:text-slate-800'
@@ -166,18 +165,18 @@ export const ManageSaccosPage: React.FC = () => {
       </div>
 
       {/* Data Table Container */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[700px]">
+          <table className="w-full text-left border-collapse min-w-[750px]">
             <thead>
-              <tr className="bg-[#0B192C] text-white text-xs uppercase tracking-wider font-bold">
+              <tr className="bg-[#0B1727] text-white text-[11px] uppercase tracking-wider font-bold">
                 <th className="py-4 px-6">SACCO Name</th>
                 <th className="py-4 px-6">Registration #</th>
                 <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6 text-center">Members</th>
                 <th className="py-4 px-6">Total Savings</th>
                 <th className="py-4 px-6">Registered Date</th>
-                <th className="py-4 px-6 text-right">Actions</th>
+                <th className="py-4 px-6 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
@@ -193,7 +192,7 @@ export const ManageSaccosPage: React.FC = () => {
                     <td className="py-4 px-6 font-bold text-slate-900">
                       <Link
                         to={`/super-admin/saccos/${sacco.id}`}
-                        className="hover:text-amber-600 transition-colors"
+                        className="hover:text-amber-700 transition-colors"
                       >
                         {sacco.name}
                       </Link>
@@ -213,18 +212,18 @@ export const ManageSaccosPage: React.FC = () => {
                     <td className="py-4 px-6 text-slate-500 text-xs font-medium">
                       {sacco.registeredDate}
                     </td>
-                    <td className="py-4 px-6 text-right">
+                    <td className="py-4 px-6 text-center">
                       {sacco.status === 'pending' ? (
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleApprove(sacco.id, sacco.name)}
-                            className="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-md transition-colors"
+                            className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleReject(sacco.id, sacco.name)}
-                            className="px-3 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold rounded-md transition-colors"
+                            className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors"
                           >
                             Reject
                           </button>
@@ -232,7 +231,7 @@ export const ManageSaccosPage: React.FC = () => {
                       ) : (
                         <Link
                           to={`/super-admin/saccos/${sacco.id}`}
-                          className="text-xs font-semibold text-sky-600 hover:text-sky-800 hover:underline"
+                          className="text-xs font-semibold text-sky-400 hover:text-sky-600 transition-colors"
                         >
                           View
                         </Link>
@@ -250,18 +249,18 @@ export const ManageSaccosPage: React.FC = () => {
           <div>Showing 1 to 6 of 28 entries</div>
           <div className="flex items-center gap-1.5 font-semibold">
             <button
-              className="p-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-50"
+              className="p-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-40"
               disabled
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="w-7 h-7 rounded bg-[#0B192C] text-white flex items-center justify-center font-bold">
+            <button className="w-7 h-7 rounded bg-[#0B1727] text-white flex items-center justify-center font-bold text-xs">
               1
             </button>
-            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center">
+            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs">
               2
             </button>
-            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center">
+            <button className="w-7 h-7 rounded hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs">
               3
             </button>
             <span className="px-1 text-slate-400">...</span>
@@ -274,3 +273,4 @@ export const ManageSaccosPage: React.FC = () => {
     </div>
   )
 }
+

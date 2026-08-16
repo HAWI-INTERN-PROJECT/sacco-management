@@ -13,27 +13,36 @@ export const SaccoStatusBadge: React.FC<SaccoStatusBadgeProps> = ({ status, clas
   switch (normalized) {
     case 'pending':
       return (
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200/60 ${className}`}>
+        <span
+          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#FEF9C3] text-[#854D0E] ${className}`}
+        >
           Pending
         </span>
       )
     case 'approved':
       return (
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200/60 ${className}`}>
+        <span
+          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#DCFCE7] text-[#15803D] ${className}`}
+        >
           Approved
         </span>
       )
     case 'rejected':
       return (
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200/60 ${className}`}>
+        <span
+          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#FEE2E2] text-[#B91C1C] ${className}`}
+        >
           Rejected
         </span>
       )
     default:
       return (
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ${className}`}>
+        <span
+          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 ${className}`}
+        >
           {status}
         </span>
       )
   }
 }
+
