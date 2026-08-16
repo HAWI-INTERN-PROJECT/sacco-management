@@ -65,4 +65,44 @@ class ActivityLogger
     {
         self::auth('email_verified', $request);
     }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     */
+    public static function settingsUpdated(?Request $request = null, array $extra = []): void
+    {
+        self::log('settings_updated', 'SACCO settings updated', $request, $extra);
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     */
+    public static function memberSharesUpdated(?Request $request = null, array $extra = []): void
+    {
+        self::log('member_shares_updated', 'Member shares updated', $request, $extra);
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     */
+    public static function dividendsCalculated(?Request $request = null, array $extra = []): void
+    {
+        self::log('dividends_calculated', 'Dividends calculated', $request, $extra);
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     */
+    public static function dividendsDistributed(?Request $request = null, array $extra = []): void
+    {
+        self::log('dividends_distributed', 'Dividends distributed', $request, $extra);
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     */
+    public static function repaymentRecorded(?Request $request = null, array $extra = []): void
+    {
+        self::log('repayment_recorded', 'Loan repayment recorded', $request, $extra);
+    }
 }

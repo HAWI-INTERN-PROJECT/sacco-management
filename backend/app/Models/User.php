@@ -20,10 +20,13 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
+        'role',
+        'sacco_id',
         'name',
         'email',
         'username',
         'password',
+        'shares',
     ];
 
     /**
@@ -46,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'shares' => 'decimal:2',
         ];
     }
 
@@ -58,5 +62,69 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Get the SACCO the user belongs to.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
+     */
+    public function sacco(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Sacco::class);
+    }
+
+    /**
+     * Check if user is a superadmin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    /**
+     * Check if user is a SACCO admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is a regular member.
+     */
+    public function isMember(): bool
+    {
+        return $this->role === 'member';
+    }
+
+    /**
+     * Savings transactions recorded against this member.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\SavingsTransaction, $this>
+     */
+    public function savingsTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SavingsTransaction::class, 'member_id');
+    }
+
+    /**
+     * Loans belonging to this member.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     */
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Loan::class, 'member_id');
+    }
+
+    /**
+     * Dividend records belonging to this member.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
+     */
+    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Dividend::class, 'member_id');
     }
 }
