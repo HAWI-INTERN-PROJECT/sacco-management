@@ -7,9 +7,6 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth'
 import { Shield, Eye, EyeOff, Mail, Lock, ShieldCheck, TrendingUp, Zap } from 'lucide-react'
 import { useState } from 'react'
-import dashboardMockup from '../assets/finance-animation.json' // Not actually an image, but we can reuse the Lottie or CSS decoration
-import LottieModule from 'lottie-react'
-const Lottie = (LottieModule as any).default || LottieModule
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -40,10 +37,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row font-sans">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row font-sans bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       
       {/* LEFT PANEL */}
-      <div className="hidden lg:flex w-1/2 bg-[#0B6B3A] relative overflow-hidden flex-col px-12 xl:px-20 py-12 sticky top-0 h-screen justify-between">
+      <div className="hidden lg:flex w-1/2 bg-[#0B6B3A] dark:bg-emerald-950 relative overflow-hidden flex-col px-12 xl:px-20 py-12 sticky top-0 h-screen justify-between">
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
          
          <div className="relative z-10 text-white flex-1 flex flex-col justify-center max-w-xl mx-auto">
@@ -63,24 +60,21 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Mockup Area */}
-            <div className="w-full aspect-[16/9] bg-gradient-to-br from-white/10 to-transparent rounded-2xl border border-white/10 mb-10 overflow-hidden relative shadow-2xl flex items-center justify-center">
-              <div className="absolute inset-0 bg-[#0B6B3A]/40 backdrop-blur-[2px] z-10"></div>
-              <Lottie animationData={dashboardMockup} loop={true} className="w-[120%] h-[120%] absolute opacity-60 mix-blend-screen" />
-              {/* Inner floating elements mimicking the dashboard screenshot */}
-              <div className="relative z-20 bg-white rounded-xl shadow-2xl w-3/4 aspect-[16/10] overflow-hidden border border-white/20 flex flex-col">
-                 <div className="h-3 bg-slate-100 flex items-center px-2 gap-1 border-b border-slate-200">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
-                 </div>
-                 <div className="flex-1 bg-slate-50 flex items-center justify-center">
-                    <div className="text-center">
-                      <Shield className="w-8 h-8 text-[#0B6B3A] mx-auto mb-2" />
-                      <div className="h-2 w-24 bg-slate-200 rounded-full mx-auto mb-1"></div>
-                      <div className="h-1.5 w-16 bg-slate-200 rounded-full mx-auto"></div>
-                    </div>
-                 </div>
+            {/* Ethiopian SACCO Context */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 mb-10">
+              <h4 className="text-[#F59E0B] font-bold text-sm uppercase tracking-wider mb-3">Why SACCOs Matter</h4>
+              <p className="text-green-50 text-sm leading-relaxed mb-4">
+                From the traditional <span className="text-[#F59E0B] font-semibold">Equb</span> and <span className="text-[#F59E0B] font-semibold">Edir</span> systems, Ethiopians have always believed in the power of collective savings. SACCOs modernize this heritage — giving communities bank-grade tools to save, lend, and grow together.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center">
+                  <p className="text-2xl font-bold text-white">25K+</p>
+                  <p className="text-green-200 text-[10px] uppercase tracking-wider mt-1">SACCOs in Ethiopia</p>
+                </div>
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center">
+                  <p className="text-2xl font-bold text-white">5M+</p>
+                  <p className="text-green-200 text-[10px] uppercase tracking-wider mt-1">Members Nationwide</p>
+                </div>
               </div>
             </div>
 
@@ -112,18 +106,18 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT PANEL (Login Form) */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 xl:p-20 bg-white min-h-screen">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 xl:p-20 bg-white dark:bg-slate-900 min-h-screen transition-colors duration-300">
          <div className="w-full max-w-[400px]">
             
             <div className="mb-10">
-              <h1 className="text-3xl font-bold text-[#1E293B] mb-3 tracking-tight">Welcome Back</h1>
-              <p className="text-slate-500 text-sm leading-relaxed">Sign in to your SACCO account to continue.</p>
+              <h1 className="text-3xl font-bold text-[#1E293B] dark:text-white mb-3 tracking-tight">Welcome Back</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Sign in to your SACCO account to continue.</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Email Address or Member ID</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address or Member ID</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                     <Mail className="w-5 h-5" />
@@ -131,7 +125,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     placeholder="name@sacco.org"
-                    className={`w-full pl-12 pr-4 py-3.5 rounded-xl border ${errors.login ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white`}
+                    className={`w-full pl-12 pr-4 py-3.5 rounded-xl border ${errors.login ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('login')}
                   />
                 </div>
@@ -141,7 +135,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Password</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Password</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                     <Lock className="w-5 h-5" />
@@ -149,7 +143,7 @@ export default function LoginPage() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    className={`w-full pl-12 pr-12 py-3.5 rounded-xl border ${errors.password ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white`}
+                    className={`w-full pl-12 pr-12 py-3.5 rounded-xl border ${errors.password ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('password')}
                   />
                   <button 
@@ -167,10 +161,10 @@ export default function LoginPage() {
 
               <div className="flex items-center justify-between pt-1">
                  <label className="flex items-center gap-2.5 cursor-pointer group">
-                   <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#0B6B3A] focus:ring-[#0B6B3A] focus:ring-offset-0 transition-all cursor-pointer" />
-                   <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Remember me</span>
+                   <input type="checkbox" className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#0B6B3A] focus:ring-[#0B6B3A] focus:ring-offset-0 transition-all cursor-pointer dark:bg-slate-800" />
+                   <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Remember me</span>
                  </label>
-                 <Link to="#" className="text-sm font-semibold text-[#0B6B3A] hover:text-[#065F46] transition-colors">
+                 <Link to="#" className="text-sm font-semibold text-[#0B6B3A] dark:text-emerald-400 hover:text-[#065F46] dark:hover:text-emerald-300 transition-colors">
                    Forgot Password?
                  </Link>
               </div>
@@ -184,9 +178,9 @@ export default function LoginPage() {
               </button>
 
               <div className="text-center pt-2">
-                <p className="text-slate-500 text-sm font-medium">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                   Don't have a SACCO?{' '}
-                  <Link to="/register" className="font-bold text-[#0B6B3A] hover:text-[#08522c] transition-colors">
+                  <Link to="/register" className="font-bold text-[#0B6B3A] dark:text-emerald-400 hover:text-[#08522c] transition-colors">
                     Register here
                   </Link>
                 </p>

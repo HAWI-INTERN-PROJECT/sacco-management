@@ -72,10 +72,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row font-sans">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row font-sans bg-white dark:bg-slate-900 transition-colors duration-300">
       
       {/* LEFT PANEL */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#0B6B3A] to-[#065F46] relative overflow-hidden flex-col justify-end px-12 xl:px-20 pb-16 sticky top-0 h-screen">
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#0B6B3A] to-[#065F46] dark:from-emerald-900 dark:to-emerald-950 relative overflow-hidden flex-col justify-end px-12 xl:px-20 pb-16 sticky top-0 h-screen">
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
          
@@ -135,23 +135,23 @@ export default function RegisterPage() {
       </div>
 
       {/* RIGHT PANEL (Register Form) */}
-      <div className="w-full lg:w-1/2 flex items-start justify-center p-6 lg:p-12 xl:p-16 bg-white min-h-screen overflow-y-auto">
+      <div className="w-full lg:w-1/2 flex items-start justify-center p-6 lg:p-12 xl:p-16 bg-white dark:bg-slate-900 min-h-screen overflow-y-auto transition-colors duration-300">
          <div className="w-full max-w-lg py-8">
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               
               {/* SECTION 1: Organization Details */}
               <div className="space-y-5">
-                <h2 className="text-2xl font-bold text-[#1E293B] border-b border-slate-200 pb-3">
+                <h2 className="text-2xl font-bold text-[#1E293B] dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">
                   1. Organization Details
                 </h2>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">SACCO Name <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">SACCO Name <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     placeholder="e.g. Awash Cooperative"
-                    className={`w-full px-4 py-3 rounded-xl border ${errors.sacco_name ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                    className={`w-full px-4 py-3 rounded-xl border ${errors.sacco_name ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('sacco_name')}
                   />
                   {errors.sacco_name && <p className="text-sm text-red-500">{errors.sacco_name.message}</p>}
@@ -160,26 +160,26 @@ export default function RegisterPage() {
 
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Official Email</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Official Email</label>
                   <input
                     type="email"
                     placeholder="info@sacco.com"
-                    className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                    className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('email')}
                   />
                   {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Phone Number <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone Number <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
-                    <div className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 font-medium text-sm shrink-0">
+                    <div className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium text-sm shrink-0">
                       +251
                     </div>
                     <input
                       type="tel"
                       placeholder="911 234 567"
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                       {...register('phone')}
                     />
                   </div>
@@ -187,11 +187,11 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Physical Address <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Physical Address <span className="text-red-500">*</span></label>
                   <textarea
                     placeholder="Sub-city, Woreda, Building Name"
                     rows={2}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none"
                     {...register('address')}
                   ></textarea>
                 </div>
@@ -199,39 +199,39 @@ export default function RegisterPage() {
 
               {/* SECTION 2: Admin Account */}
               <div className="space-y-5">
-                <h2 className="text-2xl font-bold text-[#1E293B] border-b border-slate-200 pb-3">
+                <h2 className="text-2xl font-bold text-[#1E293B] dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">
                   2. Admin Account
                 </h2>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Admin Full Name <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Admin Full Name <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     placeholder="Abebe Kebede"
-                    className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                    className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('name')}
                   />
                   {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Admin Email <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Admin Email <span className="text-red-500">*</span></label>
                   <input
                     type="email"
                     placeholder="admin@sacco.com"
-                    className={`w-full px-4 py-3 rounded-xl border ${errors.admin_email ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                    className={`w-full px-4 py-3 rounded-xl border ${errors.admin_email ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                     {...register('admin_email')}
                   />
                   {errors.admin_email && <p className="text-sm text-red-500">{errors.admin_email.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Password <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.password ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.password ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                       {...register('password', {
                         onChange: (e) => setPasswordValue(e.target.value),
                       })}
@@ -252,7 +252,7 @@ export default function RegisterPage() {
                           <div
                             key={i}
                             className={`h-1.5 flex-1 rounded-full transition-colors ${
-                              i < passwordStrength ? strengthColors[passwordStrength - 1] : 'bg-slate-200'
+                              i < passwordStrength ? strengthColors[passwordStrength - 1] : 'bg-slate-200 dark:bg-slate-700'
                             }`}
                           />
                         ))}
@@ -269,12 +269,12 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Confirm Password <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Confirm Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.password_confirmation ? 'border-red-500' : 'border-slate-200'} focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 focus:bg-white`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.password_confirmation ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
                       {...register('password_confirmation')}
                     />
                     <button 
@@ -292,9 +292,9 @@ export default function RegisterPage() {
               {/* Terms & Submit */}
               <div className="space-y-6">
                 <div className="flex items-start gap-3">
-                  <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-slate-300 text-[#0B6B3A] focus:ring-[#0B6B3A]" />
-                  <p className="text-sm text-slate-600">
-                    I agree to the <Link to="#" className="text-[#0B6B3A] font-medium hover:underline">Terms of Service</Link> and <Link to="#" className="text-[#0B6B3A] font-medium hover:underline">Privacy Policy</Link>.
+                  <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#0B6B3A] focus:ring-[#0B6B3A] dark:bg-slate-800" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    I agree to the <Link to="#" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Terms of Service</Link> and <Link to="#" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Privacy Policy</Link>.
                   </p>
                 </div>
 
@@ -309,9 +309,9 @@ export default function RegisterPage() {
                 </button>
 
                 <div className="text-center">
-                  <p className="text-slate-600 text-sm">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">
                     Already registered?{' '}
-                    <Link to="/login" className="font-bold text-[#0B6B3A] hover:underline">
+                    <Link to="/login" className="font-bold text-[#0B6B3A] dark:text-emerald-400 hover:underline">
                       Log in here
                     </Link>
                   </p>
