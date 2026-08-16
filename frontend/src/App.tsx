@@ -22,8 +22,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function GuestRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore()
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />
+  const { isAuthenticated, user } = useAuthStore()
+  if (isAuthenticated) {
+    if (
+      user?.role === 'superadmin' ||
+      user?.username === 'superadmin' ||
+      user?.email === 'superadmin@example.com'
+    ) {
+      return <Navigate to="/super-admin" replace />
+    }
+    return <Navigate to="/dashboard" replace />
+  }
   return <>{children}</>
 }
 
@@ -43,6 +52,13 @@ export default function App() {
               <Route index element={<SuperAdminDashboardPage />} />
               <Route path="saccos" element={<ManageSaccosPage />} />
               <Route path="saccos/:id" element={<SaccoDetailsPage />} />
+              <Route path="members" element={<ManageSaccosPage />} />
+              <Route path="loans" element={<ManageSaccosPage />} />
+              <Route path="savings" element={<ManageSaccosPage />} />
+              <Route path="accounts" element={<ManageSaccosPage />} />
+              <Route path="reports" element={<ManageSaccosPage />} />
+              <Route path="settings" element={<SuperAdminDashboardPage />} />
+              <Route path="support" element={<SuperAdminDashboardPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />

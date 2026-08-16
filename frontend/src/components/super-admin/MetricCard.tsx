@@ -21,46 +21,51 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   bgHighlight = false,
 }) => {
   const borderMap = {
-    black: 'border-l-slate-900',
-    green: 'border-l-emerald-500',
-    amber: 'border-l-amber-500',
-    blue: 'border-l-sky-500',
-    purple: 'border-l-purple-500',
+    black: 'border-l-[4px] border-l-slate-900',
+    green: 'border-l-[4px] border-l-emerald-500',
+    amber: 'border-l-[4px] border-l-amber-500',
+    blue: 'border-l-[4px] border-l-sky-400',
+    purple: 'border-l-[4px] border-l-purple-500',
   }
 
   const iconBgMap = {
     black: 'bg-slate-100 text-slate-700',
-    green: 'bg-emerald-50 text-emerald-600',
-    amber: 'bg-amber-100 text-amber-600',
-    blue: 'bg-sky-50 text-sky-600',
-    purple: 'bg-purple-50 text-purple-600',
+    green: 'bg-emerald-100/80 text-emerald-600',
+    amber: 'bg-amber-100/80 text-amber-600',
+    blue: 'bg-sky-100/80 text-sky-500',
+    purple: 'bg-purple-100/80 text-purple-600',
   }
 
   return (
     <div
-      className={`bg-white rounded-lg border border-gray-200 border-l-4 ${borderMap[accentColor]} p-5 shadow-xs transition-shadow hover:shadow-sm ${
-        bgHighlight ? 'bg-amber-50/40' : ''
+      className={`rounded-xl border border-slate-200/90 ${borderMap[accentColor]} p-5 shadow-2xs transition-shadow hover:shadow-xs ${
+        bgHighlight ? 'bg-[#FFFDF0] border-amber-300/80' : 'bg-white'
       }`}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className={`text-[11px] font-extrabold tracking-wider uppercase ${
+            bgHighlight ? 'text-[#B45309]' : 'text-slate-500'
+          }`}
+        >
           {title}
         </span>
         <div
-          className={`p-2.5 rounded-full ${
+          className={`p-2.5 rounded-full flex items-center justify-center shrink-0 ${
             iconBgColor && iconTextColor
               ? `${iconBgColor} ${iconTextColor}`
               : iconBgMap[accentColor]
           }`}
         >
-          <Icon className="w-5 h-5" />
+          <Icon className="w-4 h-4 stroke-[2.2]" />
         </div>
       </div>
-      <div className="mt-3">
-        <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
+      <div className="mt-2.5">
+        <span className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
           {value}
         </span>
       </div>
     </div>
   )
 }
+

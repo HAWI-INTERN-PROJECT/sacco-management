@@ -59,7 +59,7 @@ export const SuperAdminDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <MetricCard
@@ -102,14 +102,14 @@ export const SuperAdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Pending SACCO Approvals Section */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden mt-6">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-bold text-slate-900 tracking-tight">
             Pending SACCO Approvals
           </h2>
           <Link
             to="/super-admin/saccos"
-            className="text-xs font-semibold text-slate-700 hover:text-amber-600 transition-colors"
+            className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
           >
             View All
           </Link>
@@ -124,29 +124,29 @@ export const SuperAdminDashboardPage: React.FC = () => {
             pendingList.map((sacco) => (
               <div
                 key={sacco.id}
-                className="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/60 transition-colors"
+                className="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors"
               >
                 {/* Left Info */}
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-slate-100 rounded-lg text-slate-600 shrink-0">
-                    <Building2 className="w-5 h-5" />
+                  <div className="w-10 h-10 bg-slate-100/90 rounded-xl flex items-center justify-center text-slate-600 shrink-0 border border-slate-200/60">
+                    <Building2 className="w-5 h-5 text-slate-600" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 leading-snug">
                       {sacco.name}
                     </h3>
                     <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                      <span className="px-2 py-0.5 rounded bg-slate-100 font-mono text-[11px] font-semibold text-slate-700">
+                      <span className="px-2 py-0.5 rounded bg-slate-100/90 font-mono text-[11px] font-semibold text-slate-700 border border-slate-200/60">
                         {sacco.regNo}
                       </span>
-                      <span>•</span>
+                      <span className="text-slate-400">•</span>
                       <span>{sacco.dateSubmitted}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end shrink-0">
                   <button
                     onClick={() => handleReject(sacco.name, sacco.id)}
                     className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors"
@@ -156,7 +156,7 @@ export const SuperAdminDashboardPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleApprove(sacco.name, sacco.id)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-2xs"
+                    className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#10B981] hover:bg-emerald-600 text-white text-xs font-semibold transition-colors shadow-2xs"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>Approve</span>
@@ -170,3 +170,4 @@ export const SuperAdminDashboardPage: React.FC = () => {
     </div>
   )
 }
+
