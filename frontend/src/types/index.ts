@@ -22,12 +22,13 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  name: string
-  email: string
-  username: string
+  sacco_name: string
+  registration_number: string
+  admin_name: string
+  admin_email: string
+  admin_username: string
   password: string
   password_confirmation: string
-  remember_me?: boolean
 }
 
 export interface ApiResponse<T> {

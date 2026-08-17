@@ -8,6 +8,12 @@ import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+import PublicLayout from './components/PublicLayout'
+import LandingPage from './pages/LandingPage'
+import AboutPage from './pages/AboutPage'
+import ServicesPage from './pages/ServicesPage'
+import ContactPage from './pages/ContactPage'
+
 const queryClient = new QueryClient()
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -24,19 +30,24 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ErrorBoundary>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </QueryClientProvider>
-    </ErrorBoundary>
+        </ErrorBoundary>
+      </BrowserRouter>
+      <Toaster position="top-right" richColors />
+    </QueryClientProvider>
   )
 }
