@@ -16,6 +16,10 @@ class Sacco extends Model
     ];
 
     /**
+<<<<<<< HEAD
+=======
+     * @return HasMany<User, $this>
+>>>>>>> 77b8048 (Add repayment API endpoints)
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
