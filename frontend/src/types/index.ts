@@ -47,9 +47,34 @@ export interface Sacco {
   name: string
   registration_number: string
   status: 'pending' | 'approved' | 'rejected'
+  rejection_reason?: string | null
   members_count?: number
   created_at: string
   updated_at: string
+}
+
+export interface DashboardStats {
+  total_saccos: number
+  approved_saccos: number
+  pending_saccos: number
+  rejected_saccos: number
+  total_members: number
+  total_savings: number
+  total_active_loans: number
+}
+
+export interface SaccoAdministrator {
+  id: number
+  name: string
+  email: string
+  username: string
+}
+
+export interface ExtendedSaccoDetails {
+  sacco: Sacco
+  administrator: SaccoAdministrator | null
+  total_savings: number
+  active_loans_count: number
 }
 
 export interface PaginationMeta {
