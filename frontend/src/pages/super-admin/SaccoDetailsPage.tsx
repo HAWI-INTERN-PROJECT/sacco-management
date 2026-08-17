@@ -12,15 +12,18 @@ import {
   X,
   Loader2,
   RefreshCw,
+  Mail,
+  UserCheck,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { adminSaccoService } from '../../services/adminSaccoService'
-import type { Sacco } from '../../types'
+import type { Sacco, ExtendedSaccoDetails } from '../../types'
 
 export const SaccoDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
+  const [details, setDetails] = useState<ExtendedSaccoDetails | null>(null)
   const [sacco, setSacco] = useState<Sacco | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -32,12 +35,24 @@ export const SaccoDetailsPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await adminSaccoService.getSaccoById(id)
-      setSacco(response.data)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to fetch SACCO details.'
-      setError(msg)
-      toast.error(msg)
+      const response = await adminSaccoService.getSaccoExtendedDetails(id)
+      if (response.data) {
+        setDetails(response.data)
+        setSacco(response.data.sacco)
+        if (response.data.sacco.rejection_reason) {
+          setRejectionReason(response.data.sacco.rejection_reason)
+        }
+      }
+    } catch {
+      // Fallback to simple getSaccoById if details endpoint fails
+      try {
+        const fallbackRes = await adminSaccoService.getSaccoById(id)
+        setSacco(fallbackRes.data)
+      } catch (fallbackErr: unknown) {
+        const msg = fallbackErr instanceof Error ? fallbackErr.message : 'Failed to fetch SACCO details.'
+        setError(msg)
+        toast.error(msg)
+      }
     } finally {
       setLoading(false)
     }
@@ -67,9 +82,9 @@ export const SaccoDetailsPage: React.FC = () => {
     if (!id || !sacco) return
     setActionLoading(true)
     try {
-      const response = await adminSaccoService.rejectSacco(id)
-      setSacco(response.data || { ...sacco, status: 'rejected' })
-      toast.error(`${sacco.name} application rejected.`)
+      const response = await adminSaccoService.rejectSacco(id, rejectionReason)
+      setSacco(response.data || { ...sacco, status: 'rejected', rejection_reason: rejectionReason })
+      toast.error(`${sacco.name} application has been rejected.`)
       setTimeout(() => navigate('/super-admin/saccos'), 1200)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to reject SACCO.'
@@ -77,6 +92,10 @@ export const SaccoDetailsPage: React.FC = () => {
     } finally {
       setActionLoading(false)
     }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return `ETB ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
   if (loading) {
@@ -112,6 +131,8 @@ export const SaccoDetailsPage: React.FC = () => {
       </div>
     )
   }
+
+  const admin = details?.administrator
 
   return (
     <div className="space-y-6">
@@ -189,26 +210,10 @@ export const SaccoDetailsPage: React.FC = () => {
             </div>
             <div>
               <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                Organization Email
+                Status
               </span>
-              <span className="text-sm font-medium text-slate-500">
-                N/A
-              </span>
-            </div>
-            <div>
-              <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                Phone
-              </span>
-              <span className="text-sm font-medium text-slate-500">
-                N/A
-              </span>
-            </div>
-            <div className="md:col-span-2">
-              <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                Address
-              </span>
-              <span className="text-sm font-medium text-slate-500">
-                N/A
+              <span className="text-sm font-semibold capitalize text-slate-800">
+                {sacco.status}
               </span>
             </div>
             <div>
@@ -219,6 +224,16 @@ export const SaccoDetailsPage: React.FC = () => {
                 {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}
               </span>
             </div>
+            {sacco.rejection_reason && (
+              <div className="md:col-span-2 bg-rose-50/60 border border-rose-200/70 p-3.5 rounded-xl">
+                <span className="text-xs font-bold text-rose-700 block mb-1 uppercase tracking-wide">
+                  Rejection Reason
+                </span>
+                <p className="text-xs text-rose-800 font-medium">
+                  {sacco.rejection_reason}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -232,30 +247,38 @@ export const SaccoDetailsPage: React.FC = () => {
               </h2>
             </div>
 
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-[#0B1727] text-white flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
-                {sacco.name.substring(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                  Primary Administrator
-                </h3>
-                <span className="text-xs font-medium text-slate-500">
-                  SACCO Admin
-                </span>
-              </div>
-            </div>
+            {admin ? (
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-full bg-[#0B1727] text-white flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
+                    {admin.name.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                      {admin.name}
+                    </h3>
+                    <span className="text-xs font-medium text-slate-500">
+                      @{admin.username}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="space-y-4">
-              <div>
-                <span className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">
-                  Admin Details
-                </span>
-                <span className="text-sm font-medium text-slate-500">
-                  Contact details unavailable
-                </span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{admin.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <UserCheck className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Primary SACCO Administrator</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="py-6 text-center text-xs text-slate-400 font-medium">
+                No administrator user registered yet for this SACCO.
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -288,7 +311,7 @@ export const SaccoDetailsPage: React.FC = () => {
               Total Savings
             </span>
             <span className="text-2xl font-extrabold text-slate-900">
-              N/A
+              {formatCurrency(details?.total_savings ?? 0)}
             </span>
           </div>
           <div className="bg-slate-50/70 p-4 rounded-xl border-l-[4px] border-l-amber-500 border border-slate-200/60">
@@ -296,7 +319,7 @@ export const SaccoDetailsPage: React.FC = () => {
               Active Loans
             </span>
             <span className="text-2xl font-extrabold text-slate-900">
-              N/A
+              {(details?.active_loans_count ?? 0).toLocaleString()}
             </span>
           </div>
         </div>
@@ -321,8 +344,9 @@ export const SaccoDetailsPage: React.FC = () => {
               rows={3}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
+              disabled={sacco.status !== 'pending'}
               placeholder="Enter optional notes..."
-              className="w-full p-3.5 bg-slate-50/40 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all"
+              className="w-full p-3.5 bg-slate-50/40 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -349,5 +373,3 @@ export const SaccoDetailsPage: React.FC = () => {
     </div>
   )
 }
-
-

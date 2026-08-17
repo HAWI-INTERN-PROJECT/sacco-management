@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { SaccoStatusBadge } from '../../components/super-admin/SaccoStatusBadge'
-import { ChevronLeft, ChevronRight, Loader2, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { adminSaccoService } from '../../services/adminSaccoService'
 import type { Sacco, PaginationMeta } from '../../types'
@@ -9,12 +9,15 @@ import type { Sacco, PaginationMeta } from '../../types'
 export const ManageSaccosPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const statusParam = searchParams.get('status') as 'pending' | 'approved' | 'rejected' | null
+  const searchParam = searchParams.get('search') || ''
 
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>(
     statusParam && ['pending', 'approved', 'rejected'].includes(statusParam) ? statusParam : 'all'
   )
+  const [searchQuery, setSearchQuery] = useState<string>(searchParam)
 
   const [loading, setLoading] = useState<boolean>(true)
+  const [exporting, setExporting] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [saccosList, setSaccosList] = useState<Sacco[]>([])
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
@@ -38,7 +41,7 @@ export const ManageSaccosPage: React.FC = () => {
     }
   }, [statusParam])
 
-  // Fetch SACCOs for current tab & page
+  // Fetch SACCOs for current tab, search query & page
   const fetchSaccos = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -46,6 +49,7 @@ export const ManageSaccosPage: React.FC = () => {
       const statusArg = activeTab === 'all' ? undefined : activeTab
       const response = await adminSaccoService.getSaccos({
         status: statusArg,
+        search: searchQuery.trim() || undefined,
         page: currentPage,
       })
 
@@ -53,7 +57,7 @@ export const ManageSaccosPage: React.FC = () => {
       setMeta(response.meta || null)
 
       // Update current active tab count from metadata if returned
-      if (response.meta) {
+      if (response.meta && !searchQuery.trim()) {
         setTabCounts((prev) => ({
           ...prev,
           [activeTab]: response.meta?.total,
@@ -66,7 +70,7 @@ export const ManageSaccosPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [activeTab, currentPage])
+  }, [activeTab, searchQuery, currentPage])
 
   useEffect(() => {
     fetchSaccos()
@@ -104,6 +108,34 @@ export const ManageSaccosPage: React.FC = () => {
       searchParams.set('status', tab)
     }
     setSearchParams(searchParams)
+  }
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val)
+    setCurrentPage(1)
+    if (val.trim()) {
+      searchParams.set('search', val.trim())
+    } else {
+      searchParams.delete('search')
+    }
+    setSearchParams(searchParams)
+  }
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const statusArg = activeTab === 'all' ? undefined : activeTab
+      await adminSaccoService.exportSaccos({
+        status: statusArg,
+        search: searchQuery.trim() || undefined,
+      })
+      toast.success('SACCO export report downloaded successfully.')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to export SACCO report.'
+      toast.error(msg)
+    } finally {
+      setExporting(false)
+    }
   }
 
   const handleApprove = async (sacco: Sacco) => {
@@ -167,20 +199,32 @@ export const ManageSaccosPage: React.FC = () => {
             Review, approve, and manage registered cooperatives across the platform.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Search SACCOs..."
+              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all w-48 sm:w-64"
+            />
+          </div>
           <button
             onClick={fetchSaccos}
             disabled={loading}
-            className="p-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
             title="Refresh data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
-            onClick={() => toast.info('Export functionality requires export API support.')}
-            className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-2xs transition-colors"
+            onClick={handleExport}
+            disabled={exporting}
+            className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-2xs transition-colors disabled:opacity-50 inline-flex items-center gap-2"
           >
-            Export Report
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            <span>Export Report</span>
           </button>
         </div>
       </div>
