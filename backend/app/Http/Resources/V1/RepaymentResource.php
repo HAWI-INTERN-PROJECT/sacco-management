@@ -7,11 +7,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property-read int $id
+ * @property-read int $sacco_id
  * @property-read int $loan_id
- * @property-read int $user_id
+ * @property-read int $loan_schedule_id
  * @property-read float $amount
- * @property-read \Carbon\Carbon $payment_date
- * @property-read string|null $notes
+ * @property-read \Carbon\Carbon $paid_at
+ * @property-read string $method
+ * @property-read int $recorded_by
  * @property-read \Carbon\Carbon|null $created_at
  * @property-read \Carbon\Carbon|null $updated_at
  */
@@ -26,11 +28,13 @@ class RepaymentResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'sacco_id' => $this->sacco_id,
             'loan_id' => $this->loan_id,
-            'user_id' => $this->user_id,
+            'loan_schedule_id' => $this->loan_schedule_id,
             'amount' => (float) $this->amount,
-            'payment_date' => $this->payment_date->toDateString(),
-            'notes' => $this->notes,
+            'paid_at' => $this->paid_at->toDateString(),
+            'method' => $this->method,
+            'recorded_by' => $this->recorded_by,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
         ];
