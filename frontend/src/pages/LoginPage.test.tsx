@@ -24,10 +24,10 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Welcome back')).toBeInTheDocument()
-    expect(screen.getByText('Sign in to your account')).toBeInTheDocument()
-    expect(screen.getByLabelText(/email or username/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
+    expect(screen.getByText('Welcome Back')).toBeInTheDocument()
+    expect(screen.getByText(/sign in to your sacco account/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('name@sacco.org')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 
@@ -38,8 +38,8 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText(/don't have an account/i)).toBeInTheDocument()
-    expect(screen.getByText('Sign Up')).toHaveAttribute('href', '/register')
+    expect(screen.getByText(/don't have a sacco/i)).toBeInTheDocument()
+    expect(screen.getByText('Register here')).toHaveAttribute('href', '/register')
   })
 
   it('validates required fields', async () => {
@@ -80,8 +80,8 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    await user.type(screen.getByLabelText(/email or username/i), 'john@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'password123')
+    await user.type(screen.getByPlaceholderText('name@sacco.org'), 'john@example.com')
+    await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     expect(mockLogin).toHaveBeenCalledWith({
