@@ -29,7 +29,19 @@ export default function LoginPage() {
     try {
       await login(data)
       toast.success('Logged in successfully')
-      navigate('/dashboard')
+      const loggedInUser = useAuthStore.getState().user
+      const isSuperAdmin =
+        loggedInUser?.role === 'superadmin' ||
+        loggedInUser?.username === 'superadmin' ||
+        loggedInUser?.email === 'superadmin@example.com' ||
+        data.login === 'superadmin' ||
+        data.login === 'superadmin@example.com'
+
+      if (isSuperAdmin) {
+        navigate('/super-admin')
+      } else {
+        navigate('/dashboard')
+      }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Login failed'
       toast.error(message)

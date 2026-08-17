@@ -15,9 +15,26 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) {
-      getProfile().catch(() => {
-        navigate('/login')
-      })
+      getProfile()
+        .then(() => {
+          const currentUser = useAuthStore.getState().user
+          if (
+            currentUser?.role === 'superadmin' ||
+            currentUser?.username === 'superadmin' ||
+            currentUser?.email === 'superadmin@example.com'
+          ) {
+            navigate('/super-admin', { replace: true })
+          }
+        })
+        .catch(() => {
+          navigate('/login')
+        })
+    } else if (
+      user.role === 'superadmin' ||
+      user.username === 'superadmin' ||
+      user.email === 'superadmin@example.com'
+    ) {
+      navigate('/super-admin', { replace: true })
     }
   }, [user, getProfile, navigate])
 
