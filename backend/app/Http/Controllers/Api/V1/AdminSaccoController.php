@@ -3,34 +3,78 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\RejectSaccoRequest;
 use App\Http\Resources\V1\SaccoResource;
 use App\Http\Traits\ApiResponse;
+use App\Models\Loan;
 use App\Models\Sacco;
+use App\Models\SavingsTransaction;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminSaccoController extends Controller
 {
     use ApiResponse;
 
     /**
-     * List all SACCOs
+     * Get Super Admin dashboard platform statistics.
+     *
+     * @return JsonResponse
+     */
+    public function stats(): JsonResponse
+    {
+        $totalSaccos = Sacco::count();
+        $approvedSaccos = Sacco::where('status', 'approved')->count();
+        $pendingSaccos = Sacco::where('status', 'pending')->count();
+        $rejectedSaccos = Sacco::where('status', 'rejected')->count();
+
+        $totalMembers = User::where('role', 'member')->count();
+
+        $deposits = (float) SavingsTransaction::where('type', 'deposit')->sum('amount');
+        $withdrawals = (float) SavingsTransaction::where('type', 'withdraw')->sum('amount');
+        $totalSavings = round(max(0, $deposits - $withdrawals), 2);
+
+        $totalActiveLoans = Loan::where('status', 'active')->count();
+
+        return $this->success([
+            'total_saccos' => $totalSaccos,
+            'approved_saccos' => $approvedSaccos,
+            'pending_saccos' => $pendingSaccos,
+            'rejected_saccos' => $rejectedSaccos,
+            'total_members' => $totalMembers,
+            'total_savings' => $totalSavings,
+            'total_active_loans' => $totalActiveLoans,
+        ], 'Dashboard statistics retrieved successfully.');
+    }
+
+    /**
+     * List all SACCOs.
      *
      * Returns a paginated list of all SACCOs on the platform.
-     * Optionally filter by status (pending, approved, rejected).
+     * Optionally filter by status (pending, approved, rejected) and search by name or registration number.
      *
      * @param  Request  $request
      * @return AnonymousResourceCollection
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Sacco::withCount('users');
 
         // Filter by status if provided
-        if ($request->has('status') && in_array($request->query('status'), ['pending', 'approved', 'rejected'])) {
+        if ($request->has('status') && in_array($request->query('status'), ['pending', 'approved', 'rejected'], true)) {
             $query->where('status', $request->query('status'));
+        }
+
+        // Search by name or registration number if provided
+        if ($request->filled('search')) {
+            $search = (string) $request->query('search');
+            $query->where(function ($q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('registration_number', 'like', "%{$search}%");
+            });
         }
 
         $saccos = $query->latest()->paginate(15);
@@ -39,9 +83,64 @@ class AdminSaccoController extends Controller
     }
 
     /**
-     * Show a single SACCO
+     * Export SACCO information as CSV.
      *
-     * Returns detailed information about a specific SACCO including its members.
+     * @param  Request  $request
+     * @return StreamedResponse
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $query = Sacco::withCount('users');
+
+        if ($request->has('status') && in_array($request->query('status'), ['pending', 'approved', 'rejected'], true)) {
+            $query->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = (string) $request->query('search');
+            $query->where(function ($q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('registration_number', 'like', "%{$search}%");
+            });
+        }
+
+        $saccos = $query->latest()->get();
+
+        $filename = 'saccos-export-' . now()->format('Y-m-d-His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($saccos): void {
+            $file = fopen('php://output', 'w');
+            if ($file !== false) {
+                fputcsv($file, ['ID', 'Name', 'Registration Number', 'Status', 'Rejection Reason', 'Members Count', 'Date Created']);
+
+                foreach ($saccos as $sacco) {
+                    fputcsv($file, [
+                        $sacco->id,
+                        $sacco->name,
+                        $sacco->registration_number,
+                        $sacco->status,
+                        $sacco->rejection_reason ?? '',
+                        $sacco->users_count ?? 0,
+                        $sacco->created_at?->toDateTimeString() ?? '',
+                    ]);
+                }
+
+                fclose($file);
+            }
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show a single SACCO.
+     *
+     * Returns detailed information about a specific SACCO including its members count.
      *
      * @param  Sacco  $sacco
      * @return SaccoResource
@@ -54,7 +153,41 @@ class AdminSaccoController extends Controller
     }
 
     /**
-     * Approve a pending SACCO
+     * Extended SACCO details.
+     *
+     * Returns additional information including administrator details, member savings, and active loans.
+     *
+     * @param  Sacco  $sacco
+     * @return JsonResponse
+     */
+    public function details(Sacco $sacco): JsonResponse
+    {
+        $sacco->loadCount('users');
+        /** @var User|null $admin */
+        $admin = $sacco->users()->where('role', 'admin')->first();
+        $memberIds = $sacco->users()->pluck('id');
+
+        $deposits = (float) SavingsTransaction::whereIn('member_id', $memberIds)->where('type', 'deposit')->sum('amount');
+        $withdrawals = (float) SavingsTransaction::whereIn('member_id', $memberIds)->where('type', 'withdraw')->sum('amount');
+        $totalSavings = round(max(0, $deposits - $withdrawals), 2);
+
+        $activeLoansCount = $sacco->loans()->where('status', 'active')->count();
+
+        return $this->success([
+            'sacco' => SaccoResource::make($sacco),
+            'administrator' => $admin ? [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'username' => $admin->username,
+            ] : null,
+            'total_savings' => $totalSavings,
+            'active_loans_count' => $activeLoansCount,
+        ], 'SACCO details retrieved successfully.');
+    }
+
+    /**
+     * Approve a pending SACCO.
      *
      * Changes the SACCO status from "pending" to "approved",
      * allowing its admin and members to fully operate on the platform.
@@ -80,14 +213,15 @@ class AdminSaccoController extends Controller
     }
 
     /**
-     * Reject a pending SACCO
+     * Reject a pending SACCO.
      *
-     * Changes the SACCO status from "pending" to "rejected".
+     * Changes the SACCO status from "pending" to "rejected" and stores the rejection reason.
      *
+     * @param  RejectSaccoRequest  $request
      * @param  Sacco  $sacco
      * @return JsonResponse
      */
-    public function reject(Sacco $sacco): JsonResponse
+    public function reject(RejectSaccoRequest $request, Sacco $sacco): JsonResponse
     {
         if ($sacco->status !== 'pending') {
             return $this->error(
@@ -96,7 +230,12 @@ class AdminSaccoController extends Controller
             );
         }
 
-        $sacco->update(['status' => 'rejected']);
+        $rejectionReason = $request->validated('rejection_reason');
+
+        $sacco->update([
+            'status' => 'rejected',
+            'rejection_reason' => is_string($rejectionReason) ? $rejectionReason : null,
+        ]);
 
         return $this->success(
             SaccoResource::make($sacco->loadCount('users')),
