@@ -16,7 +16,6 @@ class Sacco extends Model
     ];
 
     /**
-     * @return HasMany<User, $this>
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
