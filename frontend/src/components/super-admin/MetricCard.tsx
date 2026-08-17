@@ -5,7 +5,7 @@ interface MetricCardProps {
   title: string
   value: string | number
   icon: LucideIcon
-  accentColor: 'black' | 'green' | 'amber' | 'blue' | 'purple'
+  accentColor: 'black' | 'green' | 'amber' | 'blue' | 'purple' | 'rose'
   iconBgColor?: string
   iconTextColor?: string
   bgHighlight?: boolean
@@ -26,6 +26,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     amber: 'border-l-[4px] border-l-amber-500',
     blue: 'border-l-[4px] border-l-sky-400',
     purple: 'border-l-[4px] border-l-purple-500',
+    rose: 'border-l-[4px] border-l-rose-500',
   }
 
   const iconBgMap = {
@@ -34,6 +35,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     amber: 'bg-amber-100/80 text-amber-600',
     blue: 'bg-sky-100/80 text-sky-500',
     purple: 'bg-purple-100/80 text-purple-600',
+    rose: 'bg-rose-100/80 text-rose-600',
   }
 
   return (

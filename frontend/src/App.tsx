@@ -12,6 +12,11 @@ import { SuperAdminLayout } from './layouts/super-admin/SuperAdminLayout'
 import { SuperAdminDashboardPage } from './pages/super-admin/SuperAdminDashboardPage'
 import { ManageSaccosPage } from './pages/super-admin/ManageSaccosPage'
 import { SaccoDetailsPage } from './pages/super-admin/SaccoDetailsPage'
+import PublicLayout from './components/PublicLayout'
+import LandingPage from './pages/LandingPage'
+import AboutPage from './pages/AboutPage'
+import ServicesPage from './pages/ServicesPage'
+import ContactPage from './pages/ContactPage'
 
 const queryClient = new QueryClient()
 
@@ -38,11 +43,16 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ErrorBoundary>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
@@ -63,9 +73,9 @@ export default function App() {
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </QueryClientProvider>
-    </ErrorBoundary>
+        </ErrorBoundary>
+      </BrowserRouter>
+      <Toaster position="top-right" richColors />
+    </QueryClientProvider>
   )
 }

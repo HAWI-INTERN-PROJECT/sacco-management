@@ -7,6 +7,7 @@ import {
   Users,
   Wallet,
   FileText,
+  XCircle,
   X,
   Check,
   Loader2,
@@ -15,44 +16,30 @@ import {
 import { MetricCard } from '../../components/super-admin/MetricCard'
 import { toast } from 'sonner'
 import { adminSaccoService } from '../../services/adminSaccoService'
-import type { Sacco } from '../../types'
+import type { Sacco, DashboardStats } from '../../types'
 
 export const SuperAdminDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [pendingList, setPendingList] = useState<Sacco[]>([])
-
-  const [totalCount, setTotalCount] = useState<number | string>('-')
-  const [approvedCount, setApprovedCount] = useState<number | string>('-')
-  const [pendingCount, setPendingCount] = useState<number | string>('-')
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
 
   const fetchDashboardData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      // Fetch total count, approved count, and pending list in parallel
-      const [allRes, approvedRes, pendingRes] = await Promise.all([
-        adminSaccoService.getSaccos().catch(() => null),
-        adminSaccoService.getSaccos({ status: 'approved' }).catch(() => null),
-        adminSaccoService.getSaccos({ status: 'pending' }).catch(() => null),
+      const [statsRes, pendingRes] = await Promise.all([
+        adminSaccoService.getDashboardStats(),
+        adminSaccoService.getSaccos({ status: 'pending' }),
       ])
 
-      if (allRes?.meta) {
-        setTotalCount(allRes.meta.total)
-      } else if (allRes?.data) {
-        setTotalCount(allRes.data.length)
-      }
-
-      if (approvedRes?.meta) {
-        setApprovedCount(approvedRes.meta.total)
-      } else if (approvedRes?.data) {
-        setApprovedCount(approvedRes.data.length)
+      if (statsRes.data) {
+        setStats(statsRes.data)
       }
 
       if (pendingRes) {
         setPendingList(pendingRes.data || [])
-        setPendingCount(pendingRes.meta?.total ?? pendingRes.data?.length ?? 0)
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load dashboard data.'
@@ -72,7 +59,6 @@ export const SuperAdminDashboardPage: React.FC = () => {
     try {
       await adminSaccoService.approveSacco(sacco.id)
       toast.success(`${sacco.name} has been approved successfully.`)
-      // Refresh counts & pending list
       fetchDashboardData()
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to approve SACCO.'
@@ -87,7 +73,6 @@ export const SuperAdminDashboardPage: React.FC = () => {
     try {
       await adminSaccoService.rejectSacco(sacco.id)
       toast.error(`${sacco.name} application has been rejected.`)
-      // Refresh counts & pending list
       fetchDashboardData()
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to reject SACCO.'
@@ -97,44 +82,54 @@ export const SuperAdminDashboardPage: React.FC = () => {
     }
   }
 
+  const formatCurrency = (amount: number) => {
+    return `ETB ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  }
+
   return (
     <div className="space-y-6">
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
           title="TOTAL SACCOS"
-          value={loading ? '...' : totalCount}
+          value={loading ? '...' : (stats?.total_saccos ?? 0).toLocaleString()}
           icon={Building2}
           accentColor="black"
         />
         <MetricCard
           title="APPROVED SACCOS"
-          value={loading ? '...' : approvedCount}
+          value={loading ? '...' : (stats?.approved_saccos ?? 0).toLocaleString()}
           icon={CheckCircle2}
           accentColor="green"
         />
         <MetricCard
           title="PENDING APPROVAL"
-          value={loading ? '...' : pendingCount}
+          value={loading ? '...' : (stats?.pending_saccos ?? 0).toLocaleString()}
           icon={Clock}
           accentColor="amber"
           bgHighlight={true}
         />
         <MetricCard
+          title="REJECTED SACCOS"
+          value={loading ? '...' : (stats?.rejected_saccos ?? 0).toLocaleString()}
+          icon={XCircle}
+          accentColor="rose"
+        />
+        <MetricCard
           title="TOTAL MEMBERS"
-          value="N/A"
+          value={loading ? '...' : (stats?.total_members ?? 0).toLocaleString()}
           icon={Users}
           accentColor="blue"
         />
         <MetricCard
           title="TOTAL SAVINGS"
-          value="N/A"
+          value={loading ? '...' : formatCurrency(stats?.total_savings ?? 0)}
           icon={Wallet}
           accentColor="green"
         />
         <MetricCard
           title="TOTAL ACTIVE LOANS"
-          value="N/A"
+          value={loading ? '...' : (stats?.total_active_loans ?? 0).toLocaleString()}
           icon={FileText}
           accentColor="purple"
         />
