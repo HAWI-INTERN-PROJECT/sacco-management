@@ -64,7 +64,7 @@ class DashboardController extends Controller
             ->where('role', 'member')
             ->sum('num_shares');
 
-        $shareValue = $request->user()->sacco?->share_value ?? 0;
+        $shareValue = $request->user()->sacco->share_value ?? 0;
 
         $totalShareCapital = $totalShares * $shareValue;
 
