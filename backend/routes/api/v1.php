@@ -68,6 +68,10 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
 // Protected by auth + role:admin middleware
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
     ->group(function (): void {
-        Route::apiResource('members', \App\Http\Controllers\Api\V1\MemberController::class)->names('api.v1.members');
+        Route::get('dashboard', [\App\Http\Controllers\Api\V1\DashboardController::class, 'index'])
+            ->name('api.v1.dashboard');
+
+        Route::apiResource('members', \App\Http\Controllers\Api\V1\MemberController::class)
+            ->names('api.v1.members');
     });
 
