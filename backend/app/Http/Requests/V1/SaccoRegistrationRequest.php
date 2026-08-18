@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V1;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SaccoRegistrationRequest extends FormRequest
@@ -17,7 +18,7 @@ class SaccoRegistrationRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -25,7 +26,7 @@ class SaccoRegistrationRequest extends FormRequest
             // SACCO Fields
             'sacco_name' => ['required', 'string', 'max:255'],
             'registration_number' => ['required', 'string', 'max:255', 'unique:saccos,registration_number'],
-            
+
             // Admin User Fields
             'admin_name' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],

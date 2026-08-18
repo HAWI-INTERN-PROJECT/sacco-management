@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (data: RegisterRequest) => {
     set({ isLoading: true })
     try {
-      const response = await api.post<AuthResponse>('/register', data)
+      const response = await api.post<AuthResponse>('/saccos/register', data)
       const { user, access_token } = response.data
       localStorage.setItem('token', access_token)
       set({ user, token: access_token, isAuthenticated: true, isLoading: false })

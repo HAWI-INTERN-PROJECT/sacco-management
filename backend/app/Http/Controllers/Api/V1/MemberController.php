@@ -8,8 +8,10 @@ use App\Http\Requests\Api\V1\UpdateMemberRequest;
 use App\Http\Resources\V1\UserResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
 
 class MemberController extends Controller
@@ -18,11 +20,12 @@ class MemberController extends Controller
 
     /**
      * Get a query builder scoped to members of the admin's SACCO.
-     * 
-     * @param Request $request
+     *
+     * @param  Request  $request
+     * @return Builder<User>
      * @return \Illuminate\Database\Eloquent\Builder<\App\Models\User>
      */
-    private function getScopedMemberQuery(Request $request): \Illuminate\Database\Eloquent\Builder
+    private function getScopedMemberQuery(Request $request): Builder
     {
         return User::where('sacco_id', $request->user()->sacco_id)
             ->where('role', 'member');
@@ -31,10 +34,11 @@ class MemberController extends Controller
     /**
      * List all members in the SACCO.
      *
-     * @param Request $request
+     * @param  Request  $request
+     * @return AnonymousResourceCollection
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $members = $this->getScopedMemberQuery($request)->latest()->paginate(15);
 
@@ -44,7 +48,7 @@ class MemberController extends Controller
     /**
      * Create a new member in the SACCO.
      *
-     * @param StoreMemberRequest $request
+     * @param  StoreMemberRequest  $request
      * @return JsonResponse
      */
     public function store(StoreMemberRequest $request): JsonResponse
@@ -67,8 +71,8 @@ class MemberController extends Controller
     /**
      * View a specific member.
      *
-     * @param Request $request
-     * @param User $member
+     * @param  Request  $request
+     * @param  User  $member
      * @return JsonResponse|UserResource
      */
     public function show(Request $request, User $member)
@@ -84,8 +88,8 @@ class MemberController extends Controller
     /**
      * Update a specific member.
      *
-     * @param UpdateMemberRequest $request
-     * @param User $member
+     * @param  UpdateMemberRequest  $request
+     * @param  User  $member
      * @return JsonResponse
      */
     public function update(UpdateMemberRequest $request, User $member): JsonResponse
@@ -96,7 +100,7 @@ class MemberController extends Controller
         }
 
         $data = $request->validated();
-        
+
         // Hash password if provided
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -113,8 +117,8 @@ class MemberController extends Controller
     /**
      * Delete a specific member.
      *
-     * @param Request $request
-     * @param User $member
+     * @param  Request  $request
+     * @param  User  $member
      * @return JsonResponse
      */
     public function destroy(Request $request, User $member): JsonResponse

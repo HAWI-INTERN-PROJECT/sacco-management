@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,8 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string $name
  * @property-read string $registration_number
  * @property-read string $status
- * @property-read \Carbon\Carbon|null $created_at
- * @property-read \Carbon\Carbon|null $updated_at
+ * @property-read Carbon|null $created_at
+ * @property-read Carbon|null $updated_at
  */
 class SaccoResource extends JsonResource
 {
