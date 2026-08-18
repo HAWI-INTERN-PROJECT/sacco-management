@@ -31,10 +31,10 @@ class AuthController extends Controller
      *
      * @unauthenticated
      *
-     * @param RegisterRequest $request
+     * @param  RegisterRequest  $request
      * @return JsonResponse
      */
-    public function register(RegisterRequest $request): AuthResource | JsonResponse
+    public function register(RegisterRequest $request): AuthResource|JsonResponse
     {
         try {
             return DB::transaction(function () use ($request) {
@@ -65,10 +65,10 @@ class AuthController extends Controller
      *
      * @unauthenticated
      *
-     * @param LoginRequest $request
+     * @param  LoginRequest  $request
      * @return JsonResponse
      */
-    public function login(LoginRequest $request): AuthResource | JsonResponse
+    public function login(LoginRequest $request): AuthResource|JsonResponse
     {
 
         $request->authenticate();
@@ -83,7 +83,7 @@ class AuthController extends Controller
     /**
      * Logout User
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function logout(Request $request): JsonResponse
@@ -99,7 +99,7 @@ class AuthController extends Controller
     /**
      * Change Password
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function changePassword(Request $request): JsonResponse
@@ -131,7 +131,7 @@ class AuthController extends Controller
     /**
      * Get User
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return UserResource
      */
     public function profile(Request $request): UserResource
@@ -189,7 +189,7 @@ class AuthController extends Controller
     /**
      * Forgot Password
      *
-     * @param ForgotPasswordRequest $request
+     * @param  ForgotPasswordRequest  $request
      * @return JsonResponse
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
@@ -212,7 +212,7 @@ class AuthController extends Controller
     /**
      * Reset Password
      *
-     * @param ResetPasswordRequest $request
+     * @param  ResetPasswordRequest  $request
      * @return JsonResponse
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse

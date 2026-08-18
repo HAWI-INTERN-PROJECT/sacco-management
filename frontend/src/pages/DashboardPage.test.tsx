@@ -28,7 +28,7 @@ vi.mock('../components/LanguageSwitcher', () => ({
 }))
 
 vi.mock('../components/ThemeToggle', () => ({
-  ThemeToggle: () => <button data-testid="theme-toggle">Theme</button>,
+  default: () => <button data-testid="theme-toggle">Theme</button>,
 }))
 
 describe('DashboardPage', () => {
