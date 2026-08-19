@@ -63,72 +63,22 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new ResetPasswordNotification($token));
-    }
-
-    /**
-     * Get the SACCO the user belongs to.
-     *
-     * @return BelongsTo<Sacco, $this>
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
-     */
-    public function sacco(): BelongsTo
-    {
-        return $this->belongsTo(Sacco::class);
-    }
-
-    /**
-     * Get the loans for the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
-     */
-    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Loan::class, 'member_id');
-    }
-
-    /**
-     * Get the repayments recorded against this member's loans. Repayments
-     * have no direct member column, so this goes through the loan.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Repayment, \App\Models\Loan, $this>
-     */
-    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
-    {
-        return $this->hasManyThrough(Repayment::class, Loan::class, 'member_id', 'loan_id');
-    }
-
-    /**
-     * Get the dividends for the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
-     */
-    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Dividend::class);
-    }
-
-    /**
-     * Check if user is a superadmin.
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->role === 'superadmin';
-    }
-
-    /**
-     * Check if user is a SACCO admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role === 'admin';
-    }
-
-    /**
-     * Check if user is a regular member.
-     */
-    public function isMember(): bool
-    {
-        return $this->role === 'member';
-    }
+        return $this->role === 'superadmin'; 
+    } 
+ 
+    /** 
+     * Check if user is a SACCO admin. 
+     */ 
+    public function isAdmin(): bool 
+    { 
+        return $this->role === 'admin'; 
+    } 
+ 
+    /** 
+     * Check if user is a regular member. 
+     */ 
+    public function isMember(): bool 
+    { 
+        return $this->role === 'member'; 
+    } 
 }

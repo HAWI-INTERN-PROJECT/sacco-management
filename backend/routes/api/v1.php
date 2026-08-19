@@ -79,8 +79,11 @@ Route::middleware('throttle:6,1')->group(function (): void {
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
     ->prefix('admin')
     ->group(function (): void {
+        Route::get('dashboard/stats', [AdminSaccoController::class, 'stats'])->name('api.v1.admin.dashboard.stats');
+        Route::get('saccos/export', [AdminSaccoController::class, 'export'])->name('api.v1.admin.saccos.export');
         Route::get('saccos', [AdminSaccoController::class, 'index'])->name('api.v1.admin.saccos.index');
         Route::get('saccos/{sacco}', [AdminSaccoController::class, 'show'])->name('api.v1.admin.saccos.show');
+        Route::get('saccos/{sacco}/details', [AdminSaccoController::class, 'details'])->name('api.v1.admin.saccos.details');
         Route::patch('saccos/{sacco}/approve', [AdminSaccoController::class, 'approve'])->name('api.v1.admin.saccos.approve');
         Route::patch('saccos/{sacco}/reject', [AdminSaccoController::class, 'reject'])->name('api.v1.admin.saccos.reject');
     });
