@@ -11,6 +11,7 @@ class Sacco extends Model
         'name',
         'registration_number',
         'status',
+        'rejection_reason',
         'share_value',
         'currency',
     ];
