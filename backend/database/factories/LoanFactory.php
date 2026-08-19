@@ -22,8 +22,8 @@ class LoanFactory extends Factory
     {
         return [
             'sacco_id' => 1,
-            'user_id' => User::factory(),
-            'amount' => 1000.00,
+            'member_id' => User::factory(),
+            'principal_amount' => 1000.00,
             'purpose' => 'Business expansion',
             'status' => 'pending',
         ];
