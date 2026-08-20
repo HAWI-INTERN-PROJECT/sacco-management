@@ -25,6 +25,7 @@ class Repayment extends Model
     protected $fillable = [
         'loan_id',
         'user_id',
+        'loan_schedule_id',
         'amount',
         'payment_date',
         'notes',
@@ -55,5 +56,13 @@ class Repayment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<LoanSchedule, $this>
+     */
+    public function schedule(): BelongsTo
+    {
+        return $this->belongsTo(LoanSchedule::class, 'loan_schedule_id');
     }
 }

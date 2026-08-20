@@ -134,11 +134,10 @@ class MemberSavingsController extends Controller
     {
         $transactions = SavingsTransaction::where('member_id', $member->id)
             ->orderByDesc('created_at')
-            ->limit(50)
-            ->get();
+            ->paginate(15);
 
         return (object) [
-            'balance' => $this->calculateBalance($member->id, $transactions),
+            'balance' => $this->calculateBalance($member->id),
             'transactions' => $transactions,
         ];
     }

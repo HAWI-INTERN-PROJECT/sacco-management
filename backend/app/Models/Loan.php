@@ -39,6 +39,7 @@ class Loan extends Model
     protected $fillable = [
         'sacco_id',
         'user_id',
+        'loan_number',
         'amount',
         'purpose',
         'status',
