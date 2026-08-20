@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MemberSavingsController;
 use App\Http\Controllers\Api\V1\SaccoRegistrationController;
 use App\Http\Controllers\Api\V1\LoanController;
+use App\Http\Controllers\Api\V1\RepaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,8 +79,11 @@ Route::middleware('throttle:6,1')->group(function (): void {
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
     ->prefix('admin')
     ->group(function (): void {
+        Route::get('dashboard/stats', [AdminSaccoController::class, 'stats'])->name('api.v1.admin.dashboard.stats');
+        Route::get('saccos/export', [AdminSaccoController::class, 'export'])->name('api.v1.admin.saccos.export');
         Route::get('saccos', [AdminSaccoController::class, 'index'])->name('api.v1.admin.saccos.index');
         Route::get('saccos/{sacco}', [AdminSaccoController::class, 'show'])->name('api.v1.admin.saccos.show');
+        Route::get('saccos/{sacco}/details', [AdminSaccoController::class, 'details'])->name('api.v1.admin.saccos.details');
         Route::patch('saccos/{sacco}/approve', [AdminSaccoController::class, 'approve'])->name('api.v1.admin.saccos.approve');
         Route::patch('saccos/{sacco}/reject', [AdminSaccoController::class, 'reject'])->name('api.v1.admin.saccos.reject');
     });
@@ -88,12 +92,26 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
 // Protected by auth + role:admin middleware
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
     ->group(function (): void {
-        Route::apiResource('members', MemberController::class)->names('api.v1.members');
-        Route::post('dividends/calculate', [\App\Http\Controllers\Api\V1\DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
-        Route::post('dividends/distribute', [\App\Http\Controllers\Api\V1\DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
-        Route::get('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'show'])->name('api.v1.settings.show');
-        Route::put('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'update'])->name('api.v1.settings.update');
-        Route::patch('members/{member}/shares', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'update'])->name('api.v1.members.shares.update');
+        Route::get('dashboard', [\App\Http\Controllers\Api\V1\DashboardController::class, 'index'])
+            ->name('api.v1.dashboard');
+
+        Route::apiResource('members', MemberController::class)
+            ->names('api.v1.members');
+
+        Route::post('dividends/calculate', [\App\Http\Controllers\Api\V1\DividendController::class, 'calculate'])
+            ->name('api.v1.dividends.calculate');
+
+        Route::post('dividends/distribute', [\App\Http\Controllers\Api\V1\DividendController::class, 'distribute'])
+            ->name('api.v1.dividends.distribute');
+
+        Route::get('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'show'])
+            ->name('api.v1.settings.show');
+
+        Route::put('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'update'])
+            ->name('api.v1.settings.update');
+
+        Route::patch('members/{member}/shares', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'update'])
+            ->name('api.v1.members.shares.update');
     });
 
 // ─── Loan Endpoints ──────────────────────────────────────────────────
@@ -102,6 +120,8 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_a
     Route::patch('loans/{loan}/approve', [LoanController::class, 'approve'])->name('api.v1.loans.approve');
     Route::patch('loans/{loan}/reject', [LoanController::class, 'reject'])->name('api.v1.loans.reject');
     Route::patch('loans/{loan}/disburse', [LoanController::class, 'disburse'])->name('api.v1.loans.disburse');
+    Route::post('loans/{loan}/repayments', [RepaymentController::class, 'store'])->name('api.v1.loans.repayments.store');
+    Route::get('repayments/overdue', [RepaymentController::class, 'overdue'])->name('api.v1.repayments.overdue');
 });
 
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:member'])->group(function (): void {
@@ -111,4 +131,5 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:member'])->gr
 
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
     Route::get('loans/{loan}', [LoanController::class, 'show'])->name('api.v1.loans.show');
+    Route::get('loans/{loan}/repayments', [RepaymentController::class, 'index'])->name('api.v1.loans.repayments.index');
 });
