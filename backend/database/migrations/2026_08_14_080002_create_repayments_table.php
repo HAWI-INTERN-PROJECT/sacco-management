@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('repayments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('sacco_id')->constrained()->cascadeOnDelete();
             $table->foreignId('loan_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('loan_schedule_id')->constrained('loan_schedules')->cascadeOnDelete();
             $table->decimal('amount', 12, 2);
-            $table->date('payment_date');
-            $table->string('notes')->nullable();
+            $table->date('paid_at');
+            $table->string('method')->default('manual');
+            $table->foreignId('recorded_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

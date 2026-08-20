@@ -7,15 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
+ * @property int $sacco_id
  * @property int $loan_id
- * @property int $user_id
+ * @property int $loan_schedule_id
  * @property float $amount
- * @property \Carbon\Carbon $payment_date
- * @property string|null $notes
+ * @property \Carbon\Carbon $paid_at
+ * @property string $method
+ * @property int $recorded_by
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Sacco $sacco
  * @property-read \App\Models\Loan $loan
- * @property-read \App\Models\User $user
+ * @property-read \App\Models\LoanSchedule $loanSchedule
+ * @property-read \App\Models\User $recordedByUser
  */
 class Repayment extends Model
 {
@@ -23,12 +27,13 @@ class Repayment extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'sacco_id',
         'loan_id',
-        'user_id',
         'loan_schedule_id',
         'amount',
-        'payment_date',
-        'notes',
+        'paid_at',
+        'method',
+        'recorded_by',
     ];
 
     /**
@@ -37,9 +42,17 @@ class Repayment extends Model
     protected function casts(): array
     {
         return [
-            'payment_date' => 'date',
+            'paid_at' => 'date',
             'amount' => 'decimal:2',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Sacco, $this>
+     */
+    public function sacco(): BelongsTo
+    {
+        return $this->belongsTo(Sacco::class);
     }
 
     /**
@@ -51,11 +64,21 @@ class Repayment extends Model
     }
 
     /**
+     * @return BelongsTo<LoanSchedule, $this>
+     */
+    public function loanSchedule(): BelongsTo
+    {
+        return $this->belongsTo(LoanSchedule::class, 'loan_schedule_id');
+    }
+
+    /**
+     * The admin who recorded this repayment.
+     *
      * @return BelongsTo<User, $this>
      */
-    public function user(): BelongsTo
+    public function recordedByUser(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'recorded_by');
     }
 
     /**
