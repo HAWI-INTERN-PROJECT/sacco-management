@@ -4,7 +4,7 @@ import { AlertTriangle, Search, CheckCircle2, Download, PlusCircle } from 'lucid
 
 import { useQuery } from '@tanstack/react-query'
 import { adminService } from '../../services/adminService'
-import type { Loan, LoanSchedule } from '../../types'
+import type { LoanSchedule } from '../../types'
 
 export const RepaymentsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('record')
@@ -13,13 +13,13 @@ export const RepaymentsPage: React.FC = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false)
 
   // Fetch active loans for search
-  const { data: loansData, isLoading: isLoadingLoans } = useQuery({
+  const { data: loansData } = useQuery({
     queryKey: ['adminActiveLoans'],
     queryFn: () => adminService.getLoans('active', 1)
   })
 
   // Fetch selected loan details
-  const { data: selectedLoan, isLoading: isLoadingDetails } = useQuery({
+  const { data: selectedLoan } = useQuery({
     queryKey: ['adminLoanDetails', selectedLoanId],
     queryFn: () => selectedLoanId ? adminService.getLoanDetails(selectedLoanId) : null,
     enabled: !!selectedLoanId

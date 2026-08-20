@@ -119,7 +119,7 @@ class DashboardController extends Controller
             ->join('loan_schedules', 'loans.id', '=', 'loan_schedules.loan_id')
             ->where('loans.sacco_id', $saccoId)
             ->where('loans.status', 'active')
-            ->selectRaw('SUM(loan_schedules.amount_due - loan_schedules.paid_amount) as outstanding')
+            ->selectRaw('SUM(loan_schedules.total_due - loan_schedules.amount_paid) as outstanding')
             ->first();
         $outstandingAmount = $outstandingQuery->outstanding ?? 0;
 
@@ -129,7 +129,7 @@ class DashboardController extends Controller
             ->where('loans.sacco_id', $saccoId)
             ->where('loan_schedules.due_date', '<', $now->toDateString())
             ->where('loan_schedules.status', '!=', 'paid')
-            ->selectRaw('COUNT(loan_schedules.id) as overdue_count, SUM(loan_schedules.amount_due - loan_schedules.paid_amount) as overdue_amount')
+            ->selectRaw('COUNT(loan_schedules.id) as overdue_count, SUM(loan_schedules.total_due - loan_schedules.amount_paid) as overdue_amount')
             ->first();
         $overdueCount = $overdueQuery->overdue_count ?? 0;
         $overdueAmount = $overdueQuery->overdue_amount ?? 0;
