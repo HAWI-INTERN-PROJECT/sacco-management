@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sacco_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('loan_number')->unique();
             $table->decimal('amount', 12, 2);
             $table->text('purpose');
             $table->string('status')->default('pending');
