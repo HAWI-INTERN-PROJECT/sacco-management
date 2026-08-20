@@ -36,6 +36,7 @@ class LoanResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'loan_number' => $this->loan_number,
             'sacco_id' => $this->sacco_id,
             'user_id' => $this->user_id,
             'amount' => (float) $this->amount,
