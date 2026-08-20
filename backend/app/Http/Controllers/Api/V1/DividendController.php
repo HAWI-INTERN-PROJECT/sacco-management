@@ -8,6 +8,7 @@ use App\Http\Resources\V1\DividendResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Dividend;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,8 +130,8 @@ class DividendController extends Controller
             ->map(function (mixed $item) {
                 return [
                     'period' => $item->period,
-                    'distribution_date' => \Carbon\Carbon::parse($item->distribution_date)->toDateString(),
-                    'total_pool' => round((float)$item->total_pool, 2),
+                    'distribution_date' => Carbon::parse($item->distribution_date)->toDateString(),
+                    'total_pool' => round((float) $item->total_pool, 2),
                     'member_count' => $item->member_count,
                     'status' => 'completed',
                 ];

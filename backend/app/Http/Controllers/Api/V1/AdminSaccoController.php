@@ -73,7 +73,7 @@ class AdminSaccoController extends Controller
             $search = (string) $request->query('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('registration_number', 'like', "%{$search}%");
+                    ->orWhere('registration_number', 'like', "%{$search}%");
             });
         }
 
@@ -100,7 +100,7 @@ class AdminSaccoController extends Controller
             $search = (string) $request->query('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('registration_number', 'like', "%{$search}%");
+                    ->orWhere('registration_number', 'like', "%{$search}%");
             });
         }
 

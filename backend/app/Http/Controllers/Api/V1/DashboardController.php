@@ -8,7 +8,6 @@ use App\Models\Loan;
 use App\Models\LoanSchedule;
 use App\Models\SavingsTransaction;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -96,19 +95,19 @@ class DashboardController extends Controller
             ->count();
 
         // 2. Savings
-        $deposits = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+        $deposits = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
             $q->where('sacco_id', $saccoId);
         })->where('type', 'deposit')->sum('amount');
-        $withdrawals = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+        $withdrawals = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
             $q->where('sacco_id', $saccoId);
         })->where('type', 'withdraw')->sum('amount');
         $totalSavings = $deposits - $withdrawals;
 
-        $newDeposits = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+        $newDeposits = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
             $q->where('sacco_id', $saccoId);
         })->where('type', 'deposit')->where('created_at', '>=', $startOfMonth)->sum('amount');
-        
-        $newWithdrawals = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+
+        $newWithdrawals = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
             $q->where('sacco_id', $saccoId);
         })->where('type', 'withdraw')->where('created_at', '>=', $startOfMonth)->sum('amount');
         $newSavings = $newDeposits - $newWithdrawals;
@@ -145,20 +144,20 @@ class DashboardController extends Controller
                 'change' => $newMembers,
             ],
             'total_savings' => [
-                'value' => round((float)$totalSavings, 2),
-                'change' => round((float)$newSavings, 2),
+                'value' => round((float) $totalSavings, 2),
+                'change' => round((float) $newSavings, 2),
             ],
             'active_loans' => [
                 'count' => $activeLoans,
-                'outstanding' => round((float)$outstandingAmount, 2),
+                'outstanding' => round((float) $outstandingAmount, 2),
             ],
             'overdue_repayments' => [
                 'count' => $overdueCount,
-                'amount' => round((float)$overdueAmount, 2),
+                'amount' => round((float) $overdueAmount, 2),
             ],
             'share_capital' => [
                 'shares' => $totalShares,
-                'value' => round((float)$shareCapital, 2),
+                'value' => round((float) $shareCapital, 2),
             ]
         ], 'Metrics retrieved successfully.');
     }
@@ -166,34 +165,34 @@ class DashboardController extends Controller
     public function charts(Request $request): JsonResponse
     {
         $saccoId = $request->user()->sacco_id;
-        
+
         // 1. Savings & Loans Trend (last 6 months)
         $months = [];
         $trend = [];
-        
+
         for ($i = 5; $i >= 0; $i--) {
             $monthStart = now()->subMonths($i)->startOfMonth();
             $monthEnd = now()->subMonths($i)->endOfMonth();
             $monthName = $monthStart->format('M');
-            
-            $deposits = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+
+            $deposits = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
                 $q->where('sacco_id', $saccoId);
             })->where('type', 'deposit')->whereBetween('transaction_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->sum('amount');
-            
-            $withdrawals = SavingsTransaction::whereHas('user', function($q) use ($saccoId) {
+
+            $withdrawals = SavingsTransaction::whereHas('user', function ($q) use ($saccoId) {
                 $q->where('sacco_id', $saccoId);
             })->where('type', 'withdraw')->whereBetween('transaction_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->sum('amount');
-            
+
             // For loans, sum of disbursed amounts
             $loans = Loan::where('sacco_id', $saccoId)
                 ->whereIn('status', ['active', 'closed'])
                 ->whereBetween('disbursed_at', [$monthStart, $monthEnd])
                 ->sum('principal_amount');
-                
+
             $trend[] = [
                 'month' => $monthName,
-                'savings' => round((float)($deposits - $withdrawals), 2),
-                'loans' => round((float)$loans, 2),
+                'savings' => round((float) ($deposits - $withdrawals), 2),
+                'loans' => round((float) $loans, 2),
             ];
         }
 
@@ -203,7 +202,7 @@ class DashboardController extends Controller
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get();
-            
+
         return $this->success([
             'trend' => $trend,
             'loan_distribution' => $loanStatuses
@@ -213,17 +212,17 @@ class DashboardController extends Controller
     public function activity(Request $request): JsonResponse
     {
         $saccoId = $request->user()->sacco_id;
-        
+
         $savings = DB::table('savings_transactions')
             ->join('users', 'users.id', '=', 'savings_transactions.member_id')
             ->where('users.sacco_id', $saccoId)
             ->select('savings_transactions.id', 'savings_transactions.transaction_date as date', 'users.name as member', 'savings_transactions.type as category', 'savings_transactions.description', 'savings_transactions.amount', DB::raw("'completed' as status"), 'savings_transactions.created_at');
-            
+
         $loans = DB::table('loans')
             ->join('users', 'users.id', '=', 'loans.member_id')
             ->where('loans.sacco_id', $saccoId)
             ->select('loans.id', DB::raw('DATE(loans.created_at) as date'), 'users.name as member', DB::raw("'loan' as category"), 'loans.purpose as description', 'loans.principal_amount as amount', 'loans.status', 'loans.created_at');
-            
+
         $repayments = DB::table('repayments')
             ->join('loans', 'loans.id', '=', 'repayments.loan_id')
             ->join('users', 'users.id', '=', 'loans.member_id')
@@ -236,7 +235,7 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($activities as $act) {
-            $act->amount = round((float)$act->amount, 2);
+            $act->amount = round((float) $act->amount, 2);
         }
 
         return $this->success($activities, 'Recent activity retrieved successfully.');

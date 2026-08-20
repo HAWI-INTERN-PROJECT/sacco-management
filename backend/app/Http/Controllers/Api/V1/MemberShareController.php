@@ -8,6 +8,7 @@ use App\Http\Resources\V1\UserResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class MemberShareController extends Controller
 {
@@ -40,10 +41,10 @@ class MemberShareController extends Controller
     /**
      * Get share capital summary for the SACCO.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return JsonResponse
      */
-    public function summary(\Illuminate\Http\Request $request): JsonResponse
+    public function summary(Request $request): JsonResponse
     {
         $admin = $request->user();
         $sacco = $admin->sacco;
@@ -54,7 +55,7 @@ class MemberShareController extends Controller
 
         $query = User::where('sacco_id', $admin->sacco_id)
             ->where('role', 'member');
-            
+
         if ($request->sort === 'lowest') {
             $query->orderBy('num_shares', 'asc');
         } elseif ($request->sort === 'name') {
@@ -68,22 +69,23 @@ class MemberShareController extends Controller
             ->through(function ($member) use ($totalShares, $shareValue) {
                 $shares = (int) ($member->num_shares ?? 0);
                 $pct = $totalShares > 0 ? round(($shares / $totalShares) * 100, 2) : 0;
+
                 return [
                     'id' => $member->id,
                     'name' => $member->name,
-                    'member_id' => 'MEM-'.str_pad((string)$member->id, 3, '0', STR_PAD_LEFT),
+                    'member_id' => 'MEM-'.str_pad((string) $member->id, 3, '0', STR_PAD_LEFT),
                     'shares' => $shares,
-                    'share_value' => round((float)$shareValue, 2),
-                    'total_capital' => round((float)($shares * $shareValue), 2),
+                    'share_value' => round((float) $shareValue, 2),
+                    'total_capital' => round((float) ($shares * $shareValue), 2),
                     'ownership_pct' => $pct,
                 ];
             });
 
         return $this->success([
             'summary' => [
-                'share_value' => round((float)$shareValue, 2),
+                'share_value' => round((float) $shareValue, 2),
                 'total_shares' => $totalShares,
-                'total_capital' => round((float)$totalShareCapital, 2),
+                'total_capital' => round((float) $totalShareCapital, 2),
             ],
             'members' => $members
         ], 'Share capital summary retrieved successfully.');

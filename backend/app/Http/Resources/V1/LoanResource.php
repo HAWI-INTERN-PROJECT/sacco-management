@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,11 +18,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read float|null $total_repayable
  * @property-read float|null $monthly_installment
  * @property-read string|null $rejection_reason
- * @property-read \Carbon\Carbon|null $approved_at
- * @property-read \Carbon\Carbon|null $disbursed_at
+ * @property-read Carbon|null $approved_at
+ * @property-read Carbon|null $disbursed_at
  * @property-read int|null $approved_by
- * @property-read \Carbon\Carbon|null $created_at
- * @property-read \Carbon\Carbon|null $updated_at
+ * @property-read Carbon|null $created_at
+ * @property-read Carbon|null $updated_at
  * @property-read mixed $user
  * @property-read mixed $schedules
  * @property-read mixed $repayments

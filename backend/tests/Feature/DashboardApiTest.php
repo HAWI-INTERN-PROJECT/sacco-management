@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Loan;
 use App\Models\Sacco;
 use App\Models\SavingsTransaction;
 use App\Models\User;
@@ -60,9 +59,9 @@ class DashboardApiTest extends TestCase
     public function test_admin_can_view_dashboard_charts()
     {
         $this->actingAs($this->admin);
-        
+
         $response = $this->getJson('/api/v1/dashboard/charts');
-        
+
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',
@@ -72,13 +71,13 @@ class DashboardApiTest extends TestCase
                 ]
             ]);
     }
-    
+
     public function test_admin_can_view_dashboard_activity()
     {
         $this->actingAs($this->admin);
-        
+
         $response = $this->getJson('/api/v1/dashboard/activity');
-        
+
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',

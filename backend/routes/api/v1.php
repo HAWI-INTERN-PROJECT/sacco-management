@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AdminSaccoController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DividendController;
+use App\Http\Controllers\Api\V1\LoanController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MemberSavingsController;
-use App\Http\Controllers\Api\V1\SaccoRegistrationController;
-use App\Http\Controllers\Api\V1\LoanController;
+use App\Http\Controllers\Api\V1\MemberShareController;
 use App\Http\Controllers\Api\V1\RepaymentController;
+use App\Http\Controllers\Api\V1\SaccoRegistrationController;
+use App\Http\Controllers\Api\V1\SaccoSettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,7 +67,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
         ->name('verification.send');
 
     // Member dividends history
-    Route::get('me/dividends', [\App\Http\Controllers\Api\V1\DividendController::class, 'memberHistory'])->name('api.v1.me.dividends');
+    Route::get('me/dividends', [DividendController::class, 'memberHistory'])->name('api.v1.me.dividends');
 });
 
 // Password reset routes (public with rate limiting)
@@ -92,25 +96,25 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
 // Protected by auth + role:admin middleware
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
     ->group(function (): void {
-        Route::get('dashboard', [\App\Http\Controllers\Api\V1\DashboardController::class, 'index'])->name('api.v1.dashboard');
-        Route::get('dashboard/metrics', [\App\Http\Controllers\Api\V1\DashboardController::class, 'metrics'])->name('api.v1.dashboard.metrics');
-        Route::get('dashboard/charts', [\App\Http\Controllers\Api\V1\DashboardController::class, 'charts'])->name('api.v1.dashboard.charts');
-        Route::get('dashboard/activity', [\App\Http\Controllers\Api\V1\DashboardController::class, 'activity'])->name('api.v1.dashboard.activity');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('api.v1.dashboard');
+        Route::get('dashboard/metrics', [DashboardController::class, 'metrics'])->name('api.v1.dashboard.metrics');
+        Route::get('dashboard/charts', [DashboardController::class, 'charts'])->name('api.v1.dashboard.charts');
+        Route::get('dashboard/activity', [DashboardController::class, 'activity'])->name('api.v1.dashboard.activity');
 
         Route::apiResource('members', MemberController::class)->names('api.v1.members');
 
-        Route::post('dividends/calculate', [\App\Http\Controllers\Api\V1\DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
-        Route::post('dividends/distribute', [\App\Http\Controllers\Api\V1\DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
-        Route::get('dividends', [\App\Http\Controllers\Api\V1\DividendController::class, 'adminHistory'])->name('api.v1.dividends.index');
+        Route::post('dividends/calculate', [DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
+        Route::post('dividends/distribute', [DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
+        Route::get('dividends', [DividendController::class, 'adminHistory'])->name('api.v1.dividends.index');
 
-        Route::get('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'show'])->name('api.v1.settings.show');
-        Route::put('settings', [\App\Http\Controllers\Api\V1\SaccoSettingsController::class, 'update'])->name('api.v1.settings.update');
+        Route::get('settings', [SaccoSettingsController::class, 'show'])->name('api.v1.settings.show');
+        Route::put('settings', [SaccoSettingsController::class, 'update'])->name('api.v1.settings.update');
 
-        Route::get('shares/summary', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'summary'])->name('api.v1.shares.summary');
-        Route::patch('members/{member}/shares', [\App\Http\Controllers\Api\V1\MemberShareController::class, 'update'])->name('api.v1.members.shares.update');
+        Route::get('shares/summary', [MemberShareController::class, 'summary'])->name('api.v1.shares.summary');
+        Route::patch('members/{member}/shares', [MemberShareController::class, 'update'])->name('api.v1.members.shares.update');
 
-        Route::post('repayments', [\App\Http\Controllers\Api\V1\RepaymentController::class, 'store'])->name('api.v1.repayments.store');
-        Route::get('repayments/overdue', [\App\Http\Controllers\Api\V1\RepaymentController::class, 'overdue'])->name('api.v1.repayments.overdue');
+        Route::post('repayments', [RepaymentController::class, 'store'])->name('api.v1.repayments.store');
+        Route::get('repayments/overdue', [RepaymentController::class, 'overdue'])->name('api.v1.repayments.overdue');
     });
 
 // ─── Loan Endpoints ──────────────────────────────────────────────────
