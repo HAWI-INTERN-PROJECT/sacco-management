@@ -65,8 +65,8 @@ export default function RegisterPage() {
       })
       toast.success('Account created successfully')
       navigate('/dashboard')
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Registration failed'
+    } catch (error: any) {
+      const message = error.response?.data?.message || (error instanceof Error ? error.message : 'Registration failed')
       toast.error(message)
     }
   }

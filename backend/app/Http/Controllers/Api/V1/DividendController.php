@@ -111,6 +111,38 @@ class DividendController extends Controller
     }
 
     /**
+     * Get dividend history for the SACCO admin.
+     *
+     * @param  Request  $request
+     * @return JsonResponse
+     */
+    public function adminHistory(Request $request): JsonResponse
+    {
+        $admin = $request->user();
+
+        $history = DB::table('dividends')
+            ->where('sacco_id', $admin->sacco_id)
+            ->select('period', 'total_pool', DB::raw('MIN(created_at) as distribution_date'), DB::raw('COUNT(user_id) as member_count'))
+            ->groupBy('period', 'total_pool')
+            ->orderByDesc('distribution_date')
+            ->get()
+            ->map(function (mixed $item) {
+                return [
+                    'period' => $item->period,
+                    'distribution_date' => \Carbon\Carbon::parse($item->distribution_date)->toDateString(),
+                    'total_pool' => round((float)$item->total_pool, 2),
+                    'member_count' => $item->member_count,
+                    'status' => 'completed',
+                ];
+            });
+
+        return $this->success(
+            $history,
+            'Dividend history retrieved successfully.'
+        );
+    }
+
+    /**
      * Get dividend history for the authenticated member.
      *
      * @param  Request  $request

@@ -17,10 +17,19 @@ class UserTest extends TestCase
     {
         $user = new User();
 
-        $this->assertEquals(
-            ['role', 'sacco_id', 'name', 'email', 'username', 'password', 'num_shares'],
-            $user->getFillable()
-        );
+        $expected = [
+            'role',
+            'sacco_id',
+            'name',
+            'email',
+            'phone',
+            'username',
+            'password',
+            'num_shares',
+            'is_active',
+        ];
+
+        $this->assertEquals($expected, $user->getFillable());
     }
 
     public function test_user_has_hidden_attributes(): void

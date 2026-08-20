@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read mixed $user
  * @property-read mixed $schedules
  * @property-read mixed $repayments
+ * @property-read string $loan_number
  */
 class LoanResource extends JsonResource
 {
@@ -37,6 +38,7 @@ class LoanResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'loan_number' => $this->loan_number,
             'sacco_id' => $this->sacco_id,
             'user_id' => $this->member_id,
             'amount' => (float) $this->principal_amount,
