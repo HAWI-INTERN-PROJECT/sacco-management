@@ -31,9 +31,9 @@ class RepaymentApiTest extends TestCase
         ]);
         $this->loan = Loan::factory()->create([
             'sacco_id' => $this->sacco->id,
-            'user_id' => $this->member->id,
+            'member_id' => $this->member->id,
             'status' => 'active',
-            'amount' => 1000,
+            'principal_amount' => 1000,
         ]);
     }
 
@@ -45,20 +45,22 @@ class RepaymentApiTest extends TestCase
             'loan_id' => $this->loan->id,
             'installment_number' => 1,
             'due_date' => now()->addDays(30),
-            'amount_due' => 100,
-            'paid_amount' => 0,
+            'principal_due' => 100,
+            'interest_due' => 0,
+            'total_due' => 100,
+            'amount_paid' => 0,
             'status' => 'pending',
         ]);
 
-        $response = $this->postJson('/api/v1/repayments', [
-            'loan_schedule_id' => $schedule->id,
-            'amount' => 100,
+        $response = $this->postJson("/api/v1/loans/{$this->loan->id}/repayments", [
+            'schedule_id' => $schedule->id,
+            'amount_paid' => 100,
             'payment_date' => now()->toDateString(),
             'notes' => 'Full payment',
         ]);
 
         $response->dump();
-        $response->assertStatus(200);
+        $response->assertStatus(201);
 
         $this->assertDatabaseHas('repayments', [
             'loan_schedule_id' => $schedule->id,
@@ -68,7 +70,7 @@ class RepaymentApiTest extends TestCase
         $this->assertDatabaseHas('loan_schedules', [
             'id' => $schedule->id,
             'status' => 'paid',
-            'paid_amount' => 100,
+            'amount_paid' => 100,
         ]);
     }
 
@@ -80,14 +82,16 @@ class RepaymentApiTest extends TestCase
             'loan_id' => $this->loan->id,
             'installment_number' => 1,
             'due_date' => now()->subDays(5),
-            'amount_due' => 100,
-            'paid_amount' => 0,
+            'principal_due' => 100,
+            'interest_due' => 0,
+            'total_due' => 100,
+            'amount_paid' => 0,
             'status' => 'pending',
         ]);
 
         $response = $this->getJson('/api/v1/repayments/overdue');
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.count', 1);
+            ->assertJsonCount(1, 'data');
     }
 }

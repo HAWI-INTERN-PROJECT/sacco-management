@@ -98,9 +98,9 @@ class ComprehensiveSeeder extends Seeder
 
             $loan = Loan::create([
                 'sacco_id' => $sacco->id,
-                'user_id' => $member->id,
+                'member_id' => $member->id,
                 'loan_number' => 'LN-' . date('Y') . '-' . str_pad((string)($i + 1), 3, '0', STR_PAD_LEFT),
-                'amount' => $amount,
+                'principal_amount' => $amount,
                 'purpose' => ['Business expansion', 'Home renovation', 'School fees', 'Medical emergency'][rand(0, 3)],
                 'status' => $status,
                 'interest_rate' => in_array($status, ['pending', 'rejected']) ? null : $interest,
@@ -116,7 +116,7 @@ class ComprehensiveSeeder extends Seeder
             // Schedules and Repayments
             if (in_array($status, ['active', 'closed'])) {
                 $installment = $loan->monthly_installment;
-                $principalPart = $loan->amount / $term;
+                $principalPart = $loan->principal_amount / $term;
                 
                 $paidInstallments = $status === 'closed' ? $term : rand(1, $term - 2);
                 
@@ -131,19 +131,22 @@ class ComprehensiveSeeder extends Seeder
                         'loan_id' => $loan->id,
                         'installment_number' => $m,
                         'due_date' => $dueDate->toDateString(),
-                        'amount_due' => $installment,
-                        'paid_amount' => $isPaid ? $installment : 0,
+                        'principal_due' => $principalPart,
+                        'interest_due' => $installment - $principalPart,
+                        'total_due' => $installment,
+                        'amount_paid' => $isPaid ? $installment : 0,
                         'status' => $schedStatus,
                     ]);
 
                     if ($isPaid) {
                         Repayment::create([
+                            'sacco_id' => $sacco->id,
                             'loan_id' => $loan->id,
-                            'user_id' => $member->id,
+                            'recorded_by' => $member->id,
                             'loan_schedule_id' => $schedule->id,
                             'amount' => $installment,
-                            'payment_date' => $dueDate->subDays(rand(0, 5))->toDateString(),
-                            'notes' => 'Regular monthly payment',
+                            'paid_at' => $dueDate->subDays(rand(0, 5))->toDateString(),
+                            'method' => 'manual',
                         ]);
                     }
                 }

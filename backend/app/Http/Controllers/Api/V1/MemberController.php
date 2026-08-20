@@ -22,7 +22,7 @@ class MemberController extends Controller
      * Get a query builder scoped to members of the admin's SACCO.
      *
      * @param  Request  $request
-     * @return Builder
+     * @return Builder<User>
      */
     private function getScopedMemberQuery(Request $request): Builder
     {

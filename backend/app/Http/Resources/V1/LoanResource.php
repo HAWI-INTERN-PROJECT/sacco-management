@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read mixed $user
  * @property-read mixed $schedules
  * @property-read mixed $repayments
+ * @property-read string $loan_number
  */
 class LoanResource extends JsonResource
 {
