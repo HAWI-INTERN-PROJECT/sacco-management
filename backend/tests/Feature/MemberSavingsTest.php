@@ -35,7 +35,9 @@ class MemberSavingsTest extends TestCase
                 'data' => [
                     'balance',
                     'transactions' => [
-                        ['id', 'type', 'amount', 'balance_after', 'description', 'date'],
+                        'data' => [
+                            ['id', 'type', 'amount', 'balance_after', 'description', 'date'],
+                        ],
                     ],
                 ],
             ]);
@@ -98,7 +100,9 @@ class MemberSavingsTest extends TestCase
                 'data' => [
                     'balance',
                     'transactions' => [
-                        ['id', 'type', 'amount', 'balance_after', 'description', 'date'],
+                        'data' => [
+                            ['id', 'type', 'amount', 'balance_after', 'description', 'date'],
+                        ],
                     ],
                 ],
             ]);

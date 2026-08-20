@@ -101,3 +101,88 @@ export interface PaginatedResponse<T> {
   meta?: PaginationMeta
 }
 
+export interface SavingsTransaction {
+  id: number
+  sacco_id: number
+  member_id: number
+  type: 'deposit' | 'withdrawal' | 'dividend' | 'fee'
+  amount: number
+  balance_after: number
+  description: string
+  reference_number?: string
+  recorded_by?: number
+  created_at: string
+}
+
+export interface Loan {
+  id: number
+  sacco_id: number
+  member_id: number
+  loan_number: string
+  amount: number
+  purpose: string
+  interest_rate: number
+  term_months: number
+  status: 'pending' | 'approved' | 'active' | 'rejected' | 'closed'
+  created_at: string
+  member?: User
+  user?: User
+}
+
+export interface LoanSchedule {
+  id: number
+  loan_id: number
+  installment_number: number
+  due_date: string
+  amount_due: number
+  principal_component: number
+  interest_component: number
+  status: 'pending' | 'paid' | 'overdue'
+}
+
+export interface Repayment {
+  id: number
+  sacco_id: number
+  loan_id: number
+  loan_schedule_id: number
+  member_id: number
+  amount: number
+  payment_date: string
+  payment_method: string
+  reference_number: string
+  status: 'completed' | 'pending'
+}
+
+export interface Dividend {
+  id: number
+  sacco_id: number
+  user_id: number
+  period: string
+  amount: number
+  shares_held: number
+  ownership_percentage: number
+  status: 'pending' | 'credited'
+}
+
+export interface AdminDashboardMetrics {
+  total_members: {
+    value: number
+    change: number
+  }
+  total_savings: {
+    value: number
+    change: number
+  }
+  active_loans: {
+    value: number
+    outstanding_amount: number
+  }
+  overdue_repayments: {
+    count: number
+    amount: number
+  }
+  share_capital: {
+    value: number
+    total_shares: number
+  }
+}

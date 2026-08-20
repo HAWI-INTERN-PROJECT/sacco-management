@@ -39,11 +39,13 @@ export default function LoginPage() {
 
       if (isSuperAdmin) {
         navigate('/super-admin')
+      } else if (loggedInUser?.role === 'admin') {
+        navigate('/admin')
       } else {
         navigate('/dashboard')
       }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Login failed'
+    } catch (error: any) {
+      const message = error.response?.data?.message || (error instanceof Error ? error.message : 'Login failed')
       toast.error(message)
     }
   }
