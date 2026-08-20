@@ -12,7 +12,9 @@ use App\Models\Loan;
 use App\Models\LoanSchedule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class LoanController extends Controller
 {
@@ -22,9 +24,9 @@ class LoanController extends Controller
      * List all loans belonging to the authenticated admin's SACCO.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Loan::where('sacco_id', $request->user()->sacco_id)->with('user');
 
@@ -51,7 +53,7 @@ class LoanController extends Controller
         $loan = Loan::create([
             'sacco_id' => $request->user()->sacco_id,
             'member_id' => $request->user()->id,
-            'loan_number' => 'LN-' . strtoupper(\Illuminate\Support\Str::random(8)),
+            'loan_number' => 'LN-' . strtoupper(Str::random(8)),
             'principal_amount' => $request->amount,
             'purpose' => $request->purpose,
             'status' => 'pending',
@@ -230,9 +232,9 @@ class LoanController extends Controller
      * Return only the authenticated member's loans.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function myLoans(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function myLoans(Request $request): AnonymousResourceCollection
     {
         $loans = Loan::where('member_id', $request->user()->id)->latest()->paginate(15);
 

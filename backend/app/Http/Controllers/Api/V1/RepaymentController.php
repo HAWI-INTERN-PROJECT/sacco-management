@@ -15,6 +15,7 @@ use App\Models\Repayment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RepaymentController extends Controller
 {
@@ -68,7 +69,7 @@ class RepaymentController extends Controller
                 ->first();
 
             if (! $schedule) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'schedule_id' => [
                         'The selected schedule entry does not belong to this loan.'
                     ]
@@ -86,7 +87,7 @@ class RepaymentController extends Controller
              * amount for this installment.
              */
             if ($amountPaid > $remaining) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'amount_paid' => [
                         'The repayment amount exceeds the remaining amount due for this installment.'
                     ]
@@ -117,8 +118,7 @@ class RepaymentController extends Controller
             if ((float) $schedule->amount_paid >= (float) $schedule->total_due) {
                 $schedule->amount_paid = $schedule->total_due;
                 $schedule->status = 'paid';
-            } 
-            elseif ((float) $schedule->amount_paid > 0) {
+            } elseif ((float) $schedule->amount_paid > 0) {
                 if ($schedule->due_date->lt(now()->toDateString())) {
                     $schedule->status = 'overdue';
                 } else {

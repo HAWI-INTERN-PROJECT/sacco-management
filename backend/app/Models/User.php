@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -57,9 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_active' => 'boolean',
         ];
     }
+
     /**
-    * Get the SACCO this user belongs to.
-    */
+     * Get the SACCO this user belongs to.
+     */
     public function sacco(): BelongsTo
     {
         return $this->belongsTo(Sacco::class);
@@ -76,14 +78,12 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new ResetPasswordNotification($token));
     }
 
-   
-
     /**
      * Get the loans for the user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     * @return HasMany<Loan, $this>
      */
-    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function loans(): HasMany
     {
         return $this->hasMany(Loan::class, 'member_id');
     }
@@ -91,9 +91,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the repayments for the user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Repayment, $this>
+     * @return HasMany<Repayment, $this>
      */
-    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function repayments(): HasMany
     {
         return $this->hasMany(Repayment::class);
     }
@@ -105,7 +105,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'superadmin';
     }
- 
+
     /**
      * Check if user is a SACCO admin.
      */
@@ -113,7 +113,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'admin';
     }
- 
+
     /**
      * Check if user is a regular member.
      */

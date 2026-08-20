@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Database\Factories\LoanFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,19 +22,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float|null $total_repayable
  * @property float|null $monthly_installment
  * @property string|null $rejection_reason
- * @property \Carbon\Carbon|null $approved_at
- * @property \Carbon\Carbon|null $disbursed_at
+ * @property Carbon|null $approved_at
+ * @property Carbon|null $disbursed_at
  * @property int|null $approved_by
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Sacco $sacco
- * @property-read \App\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LoanSchedule> $schedules
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Repayment> $repayments
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Sacco $sacco
+ * @property-read User $user
+ * @property-read Collection<int, LoanSchedule> $schedules
+ * @property-read Collection<int, Repayment> $repayments
  */
 class Loan extends Model
 {
-    /** @use HasFactory<\Database\Factories\LoanFactory> */
+    /** @use HasFactory<LoanFactory> */
     use HasFactory;
 
     /**

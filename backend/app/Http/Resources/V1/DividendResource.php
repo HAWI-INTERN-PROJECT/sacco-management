@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,8 +15,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read float $share_pct
  * @property-read float $amount
  * @property-read float $total_pool
- * @property-read \Carbon\Carbon|null $created_at
- * @property-read \Carbon\Carbon|null $updated_at
+ * @property-read Carbon|null $created_at
+ * @property-read Carbon|null $updated_at
  */
 class DividendResource extends JsonResource
 {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,15 +12,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $loan_id
  * @property int $loan_schedule_id
  * @property float $amount
- * @property \Carbon\Carbon $paid_at
+ * @property Carbon $paid_at
  * @property string $method
  * @property int $recorded_by
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Sacco $sacco
- * @property-read \App\Models\Loan $loan
- * @property-read \App\Models\LoanSchedule $loanSchedule
- * @property-read \App\Models\User $recordedByUser
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Sacco $sacco
+ * @property-read Loan $loan
+ * @property-read LoanSchedule $loanSchedule
+ * @property-read User $recordedByUser
  */
 class Repayment extends Model
 {

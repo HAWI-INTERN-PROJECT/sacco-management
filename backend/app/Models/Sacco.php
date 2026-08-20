@@ -43,7 +43,7 @@ class Sacco extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\User, $this>
+     * @return HasMany<User, $this>
      */
     public function users(): HasMany
     {
@@ -51,7 +51,7 @@ class Sacco extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\User, $this>
+     * @return HasMany<User, $this>
      */
     public function members(): HasMany
     {
@@ -59,7 +59,7 @@ class Sacco extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\SavingsTransaction, \App\Models\User, $this>
+     * @return HasManyThrough<SavingsTransaction, User, $this>
      */
     public function savingsTransactions(): HasManyThrough
     {
@@ -67,17 +67,17 @@ class Sacco extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     * @return HasMany<Loan, $this>
      */
-    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function loans(): HasMany
     {
         return $this->hasMany(Loan::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
+     * @return HasMany<Dividend, $this>
      */
-    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function dividends(): HasMany
     {
         return $this->hasMany(Dividend::class);
     }
