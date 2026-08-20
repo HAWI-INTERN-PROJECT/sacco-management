@@ -63,5 +63,53 @@
   "language": {
     "en": "English",
     "am": "Amharic"
+  },
+
+  "member": {
+    "member_id": "Member ID: #{{id}}",
+    "quick_payment": "Quick Payment",
+    "logout": "Logout",
+    "nav": {
+      "make_payment": "Make Payment",
+      "statements": "Statements",
+      "notifications": "Notifications",
+      "savings": "Savings",
+      "apply_loan": "Apply loan",
+      "loans": "loans",
+      "dividends": "dividends",
+      "logout": "Logout",
+      "profile": "Profile",
+      "support": "Support",
+      "dashboard": "dashboard"
+    },
+    "dashboard": {
+      "title": "Member Dashboard",
+      "subtitle": "Welcome back, {{name}}. Here's a summary of your account.",
+      "outstanding_loans": "Outstanding Loans",
+      "total_dividends": "Total Dividends",
+      "next_installment": "Next Installment Due",
+      "installment_notice": "Your next loan repayment is due soon. Please ensure sufficient funds are available.",
+      "no_installment_due": "You have no upcoming installments.",
+      "due": "Due",
+      "pay_now": "Pay Now",
+      "edit_profile": "Edit Profile",
+      "description": "Description",
+      "reference": "Reference",
+      "status": "Status",
+      "status_completed": "Completed",
+      "status_processing": "Processing",
+      "status_failed": "Failed",
+      "quick_actions": "Quick Actions",
+      "apply_for_loan": "Apply for Loan",
+      "view_savings": "View Savings",
+      "view_all": "View All",
+      "share_capital": "Share capital",
+      "savings_balance": "Savings balance",
+      "amount": "Amount",
+      "date": "date",
+      "recent_transactions": "Recent Transactions",
+      "loans_count": "Loans count",
+      "shares_total": "Shares total"
+    }
   }
 }

@@ -39,6 +39,14 @@ export default function LoginPage() {
 
       if (isSuperAdmin) {
         navigate('/super-admin')
+      } else if (
+        loggedInUser?.role === 'member' ||
+        loggedInUser?.username === 'member' ||
+        loggedInUser?.email === 'member@example.com' ||
+        data.login === 'member' ||
+        data.login === 'member@example.com'
+      ) {
+        navigate('/member')
       } else {
         navigate('/dashboard')
       }
