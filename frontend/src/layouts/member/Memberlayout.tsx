@@ -42,9 +42,9 @@ export const MemberLayout: React.FC = () => {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  /**if (user.role !== "member") {
+  if (user.role !== "member") {
     return <Navigate to="/unauthorized" replace />;
-  }**/
+  }
 
   const handleLogout = async () => {
     try {
