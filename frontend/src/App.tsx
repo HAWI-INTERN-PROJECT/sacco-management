@@ -28,6 +28,16 @@ import Payments from "./pages/member/Payments";
 import Statements from "./pages/member/Statements";
 //import ApplayLoan from "./pages/member/ApplayLoan";
 
+import { AdminLayout } from "./layouts/admin/AdminLayout";
+import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import { MembersPage } from "./pages/admin/MembersPage";
+import { SavingsPage } from "./pages/admin/SavingsPage";
+import { LoansPage } from "./pages/admin/LoansPage";
+import { RepaymentsPage } from "./pages/admin/RepaymentsPage";
+import { SharesPage } from "./pages/admin/SharesPage";
+import { DividendsPage } from "./pages/admin/DividendsPage";
+import { SettingsPage } from "./pages/admin/SettingsPage";
+
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -39,6 +49,14 @@ function MemberRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role !== "member") {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <>{children}</>;
+}
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, user } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== "admin") {
     return <Navigate to="/dashboard" replace />;
   }
   return <>{children}</>;
@@ -65,11 +83,10 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
     ) {
       return <Navigate to="/super-admin" replace />;
     }
-    if (
-      user?.role === "member" ||
-      user?.username === "member" ||
-      user?.email === "member@example.com"
-    ) {
+    if (user?.role === "admin") {
+      return <Navigate to="/admin" replace />;
+    }
+    if (user?.role === "member") {
       return <Navigate to="/member" replace />;
     }
     return <Navigate to="/dashboard" replace />;
@@ -147,6 +164,25 @@ export default function App() {
               }
             />
 
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="members" element={<MembersPage />} />
+              <Route path="savings" element={<SavingsPage />} />
+              <Route path="loans" element={<LoansPage />} />
+              <Route path="repayments" element={<RepaymentsPage />} />
+              <Route path="shares" element={<SharesPage />} />
+              <Route path="dividends" element={<DividendsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+
             {/* Super Admin Routes */}
             <Route
               path="/super-admin"
@@ -184,7 +220,6 @@ export default function App() {
               <Route path="dividends" element={<Dividends />} />
               <Route path="notifications" element={<Notifications />} />
               <Route path="payments" element={<Payments />} />
-              <Route path="statements" element={<Statements />} />
               <Route path="statements" element={<Statements />} />
               {/**<Route path="profile" element={<pr/>} /> **/}
             </Route>

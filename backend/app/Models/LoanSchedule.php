@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -55,5 +56,13 @@ class LoanSchedule extends Model
     public function loan(): BelongsTo
     {
         return $this->belongsTo(Loan::class);
+    }
+
+    /**
+     * @return HasMany<Repayment, $this>
+     */
+    public function repayments(): HasMany
+    {
+        return $this->hasMany(Repayment::class);
     }
 }

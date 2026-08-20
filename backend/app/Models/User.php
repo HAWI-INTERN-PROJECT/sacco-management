@@ -26,9 +26,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'sacco_id',
         'name',
         'email',
+        'phone',
         'username',
         'password',
         'num_shares',
+        'is_active',
     ];
 
     /**
@@ -52,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'num_shares' => 'integer',
+            'is_active' => 'boolean',
         ];
     }
     /**
@@ -69,6 +72,36 @@ class User extends Authenticatable implements MustVerifyEmail
      * @return void
      */
     public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+   
+
+    /**
+     * Get the loans for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     */
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Loan::class, 'member_id');
+    }
+
+    /**
+     * Get the repayments for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Repayment, $this>
+     */
+    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Repayment::class);
+    }
+
+    /**
+     * Check if user is a superadmin.
+     */
+    public function isSuperAdmin(): bool
     {
         return $this->role === 'superadmin';
     }

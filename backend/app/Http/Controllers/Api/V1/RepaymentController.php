@@ -28,137 +28,138 @@ class RepaymentController extends Controller
      * @return JsonResponse
      */
     public function store(StoreRepaymentRequest $request, Loan $loan): JsonResponse
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    if ($loan->sacco_id !== $user->sacco_id) {
-        return $this->forbidden(
-            'You do not have permission to record repayments for this loan.'
-        );
-    }
+        if ($loan->sacco_id !== $user->sacco_id) {
+            return $this->forbidden(
+                'You do not have permission to record repayments for this loan.'
+            );
+        }
 
-    $amountPaid = round((float) $request->validated('amount_paid'), 2);
+        $amountPaid = round((float) $request->validated('amount_paid'), 2);
 
-    if ($amountPaid <= 0) {
-        return $this->error(
-            'The repayment amount must be greater than zero.',
-            422,
-            [
-                'amount_paid' => [
-                    'The repayment amount must be greater than zero.'
+        if ($amountPaid <= 0) {
+            return $this->error(
+                'The repayment amount must be greater than zero.',
+                422,
+                [
+                    'amount_paid' => [
+                        'The repayment amount must be greater than zero.'
+                    ]
                 ]
-            ]
-        );
-    }
+            );
+        }
 
-    [$repayment, $schedule] = DB::transaction(function () use (
-        $loan,
-        $amountPaid,
-        $request,
-        $user
-    ) {
-        /*
-         * Lock the schedule row before reading amount_paid.
-         * This prevents concurrent repayments from using
-         * the same remaining balance.
-         */
-        $schedule = LoanSchedule::where('id', $request->validated('schedule_id'))
-            ->where('loan_id', $loan->id)
-            ->lockForUpdate()
-            ->first();
+        [$repayment, $schedule] = DB::transaction(function () use (
+            $loan,
+            $amountPaid,
+            $request,
+            $user
+        ) {
+            /*
+             * Lock the schedule row before reading amount_paid.
+             * This prevents concurrent repayments from using
+             * the same remaining balance.
+             */
+            $schedule = LoanSchedule::where('id', $request->validated('schedule_id'))
+                ->where('loan_id', $loan->id)
+                ->lockForUpdate()
+                ->first();
 
-        if (! $schedule) {
-    throw \Illuminate\Validation\ValidationException::withMessages([
-        'schedule_id' => [
-            'The selected schedule entry does not belong to this loan.'
-            ]
-        ]);
-    }
+            if (! $schedule) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'schedule_id' => [
+                        'The selected schedule entry does not belong to this loan.'
+                    ]
+                ]);
+            }
 
-        $remaining = round(
-            (float) $schedule->total_due -
-            (float) $schedule->amount_paid,
-            2
-        );
+            $remaining = round(
+                (float) $schedule->total_due -
+                (float) $schedule->amount_paid,
+                2
+            );
 
-        /*
-         * Never allow repayment to exceed the remaining
-         * amount for this installment.
-         */
-        if ($amountPaid > $remaining) {
-    throw \Illuminate\Validation\ValidationException::withMessages([
-        'amount_paid' => [
-            'The repayment amount exceeds the remaining amount due for this installment.'
-            ]
-        ]);
-    }
+            /*
+             * Never allow repayment to exceed the remaining
+             * amount for this installment.
+             */
+            if ($amountPaid > $remaining) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'amount_paid' => [
+                        'The repayment amount exceeds the remaining amount due for this installment.'
+                    ]
+                ]);
+            }
 
-        $repayment = Repayment::create([
-            'sacco_id' => $loan->sacco_id,
-            'loan_id' => $loan->id,
-            'loan_schedule_id' => $schedule->id,
-            'amount' => $amountPaid,
-            'paid_at' => $request->validated('payment_date'),
-            'method' => $request->validated('method') ?? 'manual',
-            'recorded_by' => $user->id,
-        ]);
+            $repayment = Repayment::create([
+                'sacco_id' => $loan->sacco_id,
+                'loan_id' => $loan->id,
+                'loan_schedule_id' => $schedule->id,
+                'amount' => $amountPaid,
+                'paid_at' => $request->validated('payment_date'),
+                'method' => $request->validated('method') ?? 'manual',
+                'recorded_by' => $user->id,
+            ]);
 
-        /*
-         * Update schedule balance atomically.
-         */
-        $schedule->amount_paid = round(
-            (float) $schedule->amount_paid + $amountPaid,
-            2
-        );
+            /*
+             * Update schedule balance atomically.
+             */
+            $schedule->amount_paid = round(
+                (float) $schedule->amount_paid + $amountPaid,
+                2
+            );
 
-        /*
-         * Determine the schedule status.
-         */
-        if ((float) $schedule->amount_paid >= (float) $schedule->total_due) {
-            $schedule->amount_paid = $schedule->total_due;
-            $schedule->status = 'paid';
-        } 
-        elseif ((float) $schedule->amount_paid > 0) {
-            if ($schedule->due_date->lt(now()->toDateString())) {
+            /*
+             * Determine the schedule status.
+             */
+            if ((float) $schedule->amount_paid >= (float) $schedule->total_due) {
+                $schedule->amount_paid = $schedule->total_due;
+                $schedule->status = 'paid';
+            } 
+            elseif ((float) $schedule->amount_paid > 0) {
+                if ($schedule->due_date->lt(now()->toDateString())) {
+                    $schedule->status = 'overdue';
+                } else {
+                    $schedule->status = 'partial';
+                }
+            } elseif ($schedule->due_date->lt(now()->toDateString())) {
                 $schedule->status = 'overdue';
             } else {
-                $schedule->status = 'partial';
+                $schedule->status = 'pending';
             }
-        } elseif ($schedule->due_date->lt(now()->toDateString())) {
-            $schedule->status = 'overdue';
-        } else {
-            $schedule->status = 'pending';
-        }
 
-        $schedule->save();
+            $schedule->save();
 
-        /*
-         * Automatically complete the loan when every
-         * installment has been fully paid.
-         */
-        $allPaid = ! $loan->schedules()
-            ->where('status', '!=', 'paid')
-            ->exists();
+            /*
+             * Automatically complete the loan when every
+             * installment has been fully paid.
+             */
+            $allPaid = ! $loan->schedules()
+                ->where('status', '!=', 'paid')
+                ->exists();
 
-        if ($allPaid) {
-            $loan->update([
-                'status' => 'completed',
-            ]);
-        }
+            if ($allPaid) {
+                $loan->update([
+                    'status' => 'completed',
+                ]);
+            }
 
-        return [$repayment, $schedule];
-    });
+            return [$repayment, $schedule];
+        });
 
-    return $this->created(
-        [
-            'repayment' => RepaymentResource::make($repayment),
-            'updated_schedule_entry' => LoanScheduleResource::make(
-                $schedule->fresh()
-            ),
-        ],
-        'Repayment recorded successfully.'
-    );
-}
+        return $this->created(
+            [
+                'repayment' => RepaymentResource::make($repayment),
+                'updated_schedule_entry' => LoanScheduleResource::make(
+                    $schedule->fresh()
+                ),
+            ],
+            'Repayment recorded successfully.'
+        );
+    }
+
     /**
      * List all repayments belonging to a specific loan.
      *

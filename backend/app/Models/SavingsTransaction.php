@@ -33,7 +33,7 @@ class SavingsTransaction extends Model
      * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
-{
-    return $this->belongsTo(User::class, 'member_id');
-}
+    {
+        return $this->belongsTo(User::class, 'member_id');
+    }
 }
