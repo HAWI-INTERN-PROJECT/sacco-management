@@ -1,3 +1,3 @@
-export default function () {
+export default function Dividends() {
   return <h1>Dividends page</h1>;
 }
