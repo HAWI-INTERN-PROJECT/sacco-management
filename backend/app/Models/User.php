@@ -54,6 +54,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'num_shares' => 'integer',
         ];
     }
+    /**
+    * Get the SACCO this user belongs to.
+    */
+    public function sacco(): BelongsTo
+    {
+        return $this->belongsTo(Sacco::class);
+    }
 
     /**
      * Send the password reset notification.
