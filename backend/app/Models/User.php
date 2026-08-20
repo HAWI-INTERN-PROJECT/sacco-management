@@ -60,8 +60,8 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the SACCO this user belongs to.
-     */
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
+ */
     public function sacco(): BelongsTo
     {
         return $this->belongsTo(Sacco::class);
