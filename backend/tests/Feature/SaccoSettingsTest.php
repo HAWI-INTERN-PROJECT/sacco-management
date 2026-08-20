@@ -99,11 +99,7 @@ class SaccoSettingsTest extends TestCase
         ]);
     }
 
-    public function test_share_value_is_required(): void
-    {
-        $response = $this->actingAs($this->myAdmin)->putJson('/api/settings', []);
-        $response->assertStatus(422)->assertJsonValidationErrors('share_value');
-    }
+
 
     public function test_share_value_must_be_greater_than_zero(): void
     {

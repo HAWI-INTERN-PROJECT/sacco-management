@@ -12,6 +12,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string $email
  * @property-read string $username
  * @property-read Carbon|null $email_verified_at
+ * @property-read string|null $phone
+ * @property-read string $role
+ * @property-read int $sacco_id
+ * @property-read int|null $num_shares
+ * @property-read float|null $savings_balance
+ * @property-read bool $is_active
+ * @property-read Carbon|null $email_verified_at
  * @property-read Carbon|null $created_at
  * @property-read Carbon|null $updated_at
  */
@@ -28,8 +35,13 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'phone' => $this->phone,
             'username' => $this->username,
+            'role' => $this->role,
+            'sacco_id' => $this->sacco_id,
             'num_shares' => (int) ($this->num_shares ?? 0),
+            'savings_balance' => (float) ($this->savings_balance ?? 0),
+            'is_active' => (bool) ($this->is_active ?? true),
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),

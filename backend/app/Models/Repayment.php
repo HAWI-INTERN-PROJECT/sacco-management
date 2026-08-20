@@ -80,4 +80,12 @@ class Repayment extends Model
     {
         return $this->belongsTo(User::class, 'recorded_by');
     }
+
+    /**
+     * @return BelongsTo<LoanSchedule, $this>
+     */
+    public function schedule(): BelongsTo
+    {
+        return $this->belongsTo(LoanSchedule::class, 'loan_schedule_id');
+    }
 }

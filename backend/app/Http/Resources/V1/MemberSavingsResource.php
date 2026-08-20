@@ -16,7 +16,7 @@ class MemberSavingsResource extends JsonResource
 
         return [
             'balance' => (float) ($this->balance ?? 0),
-            'transactions' => SavingsTransactionResource::collection($transactions),
+            'transactions' => SavingsTransactionResource::collection($transactions)->response()->getData(true),
         ];
     }
 }

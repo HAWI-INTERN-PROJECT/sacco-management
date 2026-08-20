@@ -18,6 +18,16 @@ import AboutPage from './pages/AboutPage'
 import ServicesPage from './pages/ServicesPage'
 import ContactPage from './pages/ContactPage'
 
+import { AdminLayout } from './layouts/admin/AdminLayout'
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
+import { MembersPage } from './pages/admin/MembersPage'
+import { SavingsPage } from './pages/admin/SavingsPage'
+import { LoansPage } from './pages/admin/LoansPage'
+import { RepaymentsPage } from './pages/admin/RepaymentsPage'
+import { SharesPage } from './pages/admin/SharesPage'
+import { DividendsPage } from './pages/admin/DividendsPage'
+import { SettingsPage } from './pages/admin/SettingsPage'
+
 const queryClient = new QueryClient()
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -35,6 +45,9 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
       user?.email === 'superadmin@example.com'
     ) {
       return <Navigate to="/super-admin" replace />
+    }
+    if (user?.role === 'admin') {
+      return <Navigate to="/admin" replace />
     }
     return <Navigate to="/dashboard" replace />
   }
@@ -56,6 +69,18 @@ export default function App() {
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="members" element={<MembersPage />} />
+              <Route path="savings" element={<SavingsPage />} />
+              <Route path="loans" element={<LoansPage />} />
+              <Route path="repayments" element={<RepaymentsPage />} />
+              <Route path="shares" element={<SharesPage />} />
+              <Route path="dividends" element={<DividendsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
 
             {/* Super Admin Routes */}
             <Route path="/super-admin" element={<SuperAdminLayout />}>

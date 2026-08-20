@@ -40,6 +40,7 @@ class Loan extends Model
     protected $fillable = [
         'sacco_id',
         'member_id',
+        'loan_number',
         'principal_amount',
         'purpose',
         'status',

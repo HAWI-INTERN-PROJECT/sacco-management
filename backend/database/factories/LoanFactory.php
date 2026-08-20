@@ -23,6 +23,7 @@ class LoanFactory extends Factory
         return [
             'sacco_id' => 1,
             'member_id' => User::factory(),
+            'loan_number' => 'LN-' . strtoupper(\Illuminate\Support\Str::random(8)),
             'principal_amount' => 1000.00,
             'purpose' => 'Business expansion',
             'status' => 'pending',

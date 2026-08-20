@@ -36,4 +36,56 @@ class MemberShareController extends Controller
             'Member shares updated successfully.'
         );
     }
+
+    /**
+     * Get share capital summary for the SACCO.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return JsonResponse
+     */
+    public function summary(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $admin = $request->user();
+        $sacco = $admin->sacco;
+
+        $totalShares = User::where('sacco_id', $admin->sacco_id)->where('role', 'member')->sum('num_shares');
+        $shareValue = $sacco->share_value ?? 0;
+        $totalShareCapital = $totalShares * $shareValue;
+
+        $query = User::where('sacco_id', $admin->sacco_id)
+            ->where('role', 'member');
+            
+        if ($request->sort === 'lowest') {
+            $query->orderBy('num_shares', 'asc');
+        } elseif ($request->sort === 'name') {
+            $query->orderBy('name', 'asc');
+        } else {
+            // default highest
+            $query->orderByDesc('num_shares');
+        }
+
+        $members = $query->paginate(15)
+            ->through(function ($member) use ($totalShares, $shareValue) {
+                $shares = (int) ($member->num_shares ?? 0);
+                $pct = $totalShares > 0 ? round(($shares / $totalShares) * 100, 2) : 0;
+                return [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'member_id' => 'MEM-'.str_pad((string)$member->id, 3, '0', STR_PAD_LEFT),
+                    'shares' => $shares,
+                    'share_value' => round((float)$shareValue, 2),
+                    'total_capital' => round((float)($shares * $shareValue), 2),
+                    'ownership_pct' => $pct,
+                ];
+            });
+
+        return $this->success([
+            'summary' => [
+                'share_value' => round((float)$shareValue, 2),
+                'total_shares' => $totalShares,
+                'total_capital' => round((float)$totalShareCapital, 2),
+            ],
+            'members' => $members
+        ], 'Share capital summary retrieved successfully.');
+    }
 }

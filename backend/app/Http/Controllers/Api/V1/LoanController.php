@@ -51,6 +51,7 @@ class LoanController extends Controller
         $loan = Loan::create([
             'sacco_id' => $request->user()->sacco_id,
             'member_id' => $request->user()->id,
+            'loan_number' => 'LN-' . strtoupper(\Illuminate\Support\Str::random(8)),
             'principal_amount' => $request->amount,
             'purpose' => $request->purpose,
             'status' => 'pending',
