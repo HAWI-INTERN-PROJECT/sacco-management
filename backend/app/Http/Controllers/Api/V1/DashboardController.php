@@ -17,6 +17,72 @@ class DashboardController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Get dashboard statistics for the authenticated admin's SACCO.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $saccoId = $request->user()->sacco_id;
+
+        // Total members in this SACCO.
+        $totalMembers = User::where('sacco_id', $saccoId)
+            ->where('role', 'member')
+            ->count();
+
+        // Total savings deposits minus withdrawals.
+        $totalDeposits = SavingsTransaction::whereHas('user', function ($query) use ($saccoId): void {
+            $query->where('sacco_id', $saccoId);
+        })
+            ->where('type', 'deposit')
+            ->sum('amount');
+
+        $totalWithdrawals = SavingsTransaction::whereHas('user', function ($query) use ($saccoId): void {
+            $query->where('sacco_id', $saccoId);
+        })
+            ->where('type', 'withdraw')
+            ->sum('amount');
+
+        $totalSavings = $totalDeposits - $totalWithdrawals;
+
+        // Active loans belonging to this SACCO.
+        $activeLoans = Loan::where('sacco_id', $saccoId)
+            ->where('status', 'active')
+            ->count();
+
+        // Outstanding balance from active loans.
+        $outstandingBalance = Loan::where('sacco_id', $saccoId)
+            ->where('status', 'active')
+            ->sum('total_repayable');
+
+        // Number of overdue loan schedules.
+        $overdueCount = LoanSchedule::whereHas('loan', function ($query) use ($saccoId): void {
+            $query->where('sacco_id', $saccoId);
+        })
+            ->where('status', 'overdue')
+            ->count();
+
+        // Total share capital.
+        $totalShares = User::where('sacco_id', $saccoId)
+            ->where('role', 'member')
+            ->sum('num_shares');
+
+        $shareValue = $request->user()->sacco->share_value ?? 0;
+
+        $totalShareCapital = $totalShares * $shareValue;
+
+        return $this->success(
+            [
+                'total_members' => $totalMembers,
+                'total_savings' => $totalSavings,
+                'active_loans' => $activeLoans,
+                'outstanding_balance' => $outstandingBalance,
+                'overdue_count' => $overdueCount,
+                'total_share_capital' => $totalShareCapital,
+            ],
+            'Dashboard statistics retrieved successfully.'
+        );
+    }
+
     public function metrics(Request $request): JsonResponse
     {
         $saccoId = $request->user()->sacco_id;
@@ -122,7 +188,7 @@ class DashboardController extends Controller
             $loans = Loan::where('sacco_id', $saccoId)
                 ->whereIn('status', ['active', 'closed'])
                 ->whereBetween('disbursed_at', [$monthStart, $monthEnd])
-                ->sum('amount');
+                ->sum('principal_amount');
                 
             $trend[] = [
                 'month' => $monthName,
@@ -154,15 +220,15 @@ class DashboardController extends Controller
             ->select('savings_transactions.id', 'savings_transactions.transaction_date as date', 'users.name as member', 'savings_transactions.type as category', 'savings_transactions.description', 'savings_transactions.amount', DB::raw("'completed' as status"), 'savings_transactions.created_at');
             
         $loans = DB::table('loans')
-            ->join('users', 'users.id', '=', 'loans.user_id')
+            ->join('users', 'users.id', '=', 'loans.member_id')
             ->where('loans.sacco_id', $saccoId)
-            ->select('loans.id', DB::raw('DATE(loans.created_at) as date'), 'users.name as member', DB::raw("'loan' as category"), 'loans.purpose as description', 'loans.amount', 'loans.status', 'loans.created_at');
+            ->select('loans.id', DB::raw('DATE(loans.created_at) as date'), 'users.name as member', DB::raw("'loan' as category"), 'loans.purpose as description', 'loans.principal_amount as amount', 'loans.status', 'loans.created_at');
             
         $repayments = DB::table('repayments')
-            ->join('users', 'users.id', '=', 'repayments.user_id')
             ->join('loans', 'loans.id', '=', 'repayments.loan_id')
+            ->join('users', 'users.id', '=', 'loans.member_id')
             ->where('loans.sacco_id', $saccoId)
-            ->select('repayments.id', 'repayments.payment_date as date', 'users.name as member', DB::raw("'repayment' as category"), DB::raw("'Loan Repayment' as description"), 'repayments.amount', DB::raw("'completed' as status"), 'repayments.created_at');
+            ->select('repayments.id', 'repayments.paid_at as date', 'users.name as member', DB::raw("'repayment' as category"), DB::raw("'Loan Repayment' as description"), 'repayments.amount', DB::raw("'completed' as status"), 'repayments.created_at');
 
         $activities = $savings->unionAll($loans)->unionAll($repayments)
             ->orderBy('created_at', 'desc')

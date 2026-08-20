@@ -54,9 +54,9 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_can_list_loans_in_their_sacco(): void
     {
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA2->id, 'status' => 'approved']);
-        Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'user_id' => $this->memberB->id, 'status' => 'pending']);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA2->id, 'status' => 'approved']);
+        Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'member_id' => $this->memberB->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->getJson('/api/v1/loans');
 
@@ -66,8 +66,8 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_can_filter_loans_by_status(): void
     {
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA2->id, 'status' => 'approved']);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA2->id, 'status' => 'approved']);
 
         $response = $this->actingAs($this->adminA)->getJson('/api/v1/loans?status=pending');
 
@@ -108,8 +108,8 @@ class LoanEndpointsTest extends TestCase
 
         $this->assertDatabaseHas('loans', [
             'sacco_id' => $this->saccoA->id,
-            'user_id' => $this->memberA1->id,
-            'amount' => 5000.00,
+            'member_id' => $this->memberA1->id,
+            'principal_amount' => 5000.00,
             'status' => 'pending',
         ]);
     }
@@ -147,7 +147,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_can_view_loan_in_their_sacco(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id]);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id]);
 
         $response = $this->actingAs($this->adminA)->getJson("/api/v1/loans/{$loan->id}");
 
@@ -157,7 +157,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_cannot_view_loan_in_another_sacco(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'user_id' => $this->memberB->id]);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'member_id' => $this->memberB->id]);
 
         $response = $this->actingAs($this->adminA)->getJson("/api/v1/loans/{$loan->id}");
 
@@ -166,7 +166,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_member_can_view_their_own_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id]);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id]);
 
         $response = $this->actingAs($this->memberA1)->getJson("/api/v1/loans/{$loan->id}");
 
@@ -176,7 +176,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_member_cannot_view_another_members_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA2->id]);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA2->id]);
 
         $response = $this->actingAs($this->memberA1)->getJson("/api/v1/loans/{$loan->id}");
 
@@ -189,8 +189,8 @@ class LoanEndpointsTest extends TestCase
     {
         $loan = Loan::factory()->create([
             'sacco_id' => $this->saccoA->id,
-            'user_id' => $this->memberA1->id,
-            'amount' => 12000.00,
+            'member_id' => $this->memberA1->id,
+            'principal_amount' => 12000.00,
             'status' => 'pending',
         ]);
 
@@ -217,7 +217,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_approve_validates_required_fields(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/approve", []);
 
@@ -227,7 +227,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_cannot_approve_non_pending_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'rejected']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'rejected']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/approve", [
             'interest_rate' => 10.00,
@@ -239,7 +239,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_cannot_approve_loan_of_other_sacco(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'user_id' => $this->memberB->id, 'status' => 'pending']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'member_id' => $this->memberB->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/approve", [
             'interest_rate' => 10.00,
@@ -253,7 +253,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_can_reject_pending_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/reject", [
             'rejection_reason' => 'Insufficient credit score',
@@ -272,7 +272,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_reject_validates_rejection_reason(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/reject", []);
 
@@ -282,7 +282,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_cannot_reject_non_pending_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'approved']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'approved']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/reject", [
             'rejection_reason' => 'Already approved loan',
@@ -297,8 +297,8 @@ class LoanEndpointsTest extends TestCase
     {
         $loan = Loan::factory()->create([
             'sacco_id' => $this->saccoA->id,
-            'user_id' => $this->memberA1->id,
-            'amount' => 12000.00,
+            'member_id' => $this->memberA1->id,
+            'principal_amount' => 12000.00,
             'status' => 'approved',
             'interest_rate' => 10.00,
             'term_months' => 6,
@@ -321,14 +321,14 @@ class LoanEndpointsTest extends TestCase
         $this->assertDatabaseHas('loan_schedules', [
             'loan_id' => $loan->id,
             'installment_number' => 1,
-            'amount_due' => 2100.00,
+            'total_due' => 2100.00,
             'status' => 'pending',
         ]);
     }
 
     public function test_cannot_disburse_unapproved_loan(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id, 'status' => 'pending']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id, 'status' => 'pending']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/disburse");
 
@@ -337,7 +337,7 @@ class LoanEndpointsTest extends TestCase
 
     public function test_admin_cannot_disburse_loan_of_other_sacco(): void
     {
-        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'user_id' => $this->memberB->id, 'status' => 'approved']);
+        $loan = Loan::factory()->create(['sacco_id' => $this->saccoB->id, 'member_id' => $this->memberB->id, 'status' => 'approved']);
 
         $response = $this->actingAs($this->adminA)->patchJson("/api/v1/loans/{$loan->id}/disburse");
 
@@ -348,9 +348,9 @@ class LoanEndpointsTest extends TestCase
 
     public function test_member_can_list_their_own_loans(): void
     {
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id]);
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA1->id]);
-        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'user_id' => $this->memberA2->id]);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id]);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA1->id]);
+        Loan::factory()->create(['sacco_id' => $this->saccoA->id, 'member_id' => $this->memberA2->id]);
 
         $response = $this->actingAs($this->memberA1)->getJson('/api/v1/me/loans');
 

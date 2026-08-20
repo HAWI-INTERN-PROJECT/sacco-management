@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sacco_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained('users')->cascadeOnDelete();
             $table->string('loan_number')->unique();
-            $table->decimal('amount', 12, 2);
+            $table->decimal('principal_amount', 12, 2);
             $table->text('purpose');
             $table->string('status')->default('pending');
             $table->decimal('interest_rate', 5, 2)->nullable();
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->text('rejection_reason')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('disbursed_at')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
