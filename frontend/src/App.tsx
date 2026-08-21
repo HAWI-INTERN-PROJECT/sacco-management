@@ -12,6 +12,10 @@ import { SuperAdminLayout } from './layouts/super-admin/SuperAdminLayout'
 import { SuperAdminDashboardPage } from './pages/super-admin/SuperAdminDashboardPage'
 import { ManageSaccosPage } from './pages/super-admin/ManageSaccosPage'
 import { SaccoDetailsPage } from './pages/super-admin/SaccoDetailsPage'
+import { AllUsersPage } from './pages/super-admin/AllUsersPage'
+import { PlatformReportsPage } from './pages/super-admin/PlatformReportsPage'
+import { PlatformSettingsPage } from './pages/super-admin/PlatformSettingsPage'
+
 import PublicLayout from './components/PublicLayout'
 import LandingPage from './pages/LandingPage'
 import AboutPage from './pages/AboutPage'
@@ -57,18 +61,23 @@ export default function App() {
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
 
-            {/* Super Admin Routes */}
-            <Route path="/super-admin" element={<SuperAdminLayout />}>
+            {/* Protected Super Admin Routes */}
+            <Route
+              path="/super-admin"
+              element={
+                <ProtectedRoute>
+                  <SuperAdminLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<SuperAdminDashboardPage />} />
               <Route path="saccos" element={<ManageSaccosPage />} />
               <Route path="saccos/:id" element={<SaccoDetailsPage />} />
-              <Route path="members" element={<ManageSaccosPage />} />
-              <Route path="loans" element={<ManageSaccosPage />} />
-              <Route path="savings" element={<ManageSaccosPage />} />
-              <Route path="accounts" element={<ManageSaccosPage />} />
-              <Route path="reports" element={<ManageSaccosPage />} />
-              <Route path="settings" element={<SuperAdminDashboardPage />} />
-              <Route path="support" element={<SuperAdminDashboardPage />} />
+              <Route path="users" element={<AllUsersPage />} />
+              <Route path="members" element={<AllUsersPage />} />
+              <Route path="reports" element={<PlatformReportsPage />} />
+              <Route path="settings" element={<PlatformSettingsPage />} />
+              <Route path="support" element={<PlatformSettingsPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />
