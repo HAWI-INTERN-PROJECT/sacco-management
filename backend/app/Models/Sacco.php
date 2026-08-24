@@ -18,6 +18,7 @@ class Sacco extends Model
         'email',
         'phone',
         'address',
+        'region',
         'default_interest_rate',
         'max_loan_amount',
         'max_loan_term',

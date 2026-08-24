@@ -10,9 +10,12 @@ use App\Http\Controllers\Api\V1\LoanController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MemberSavingsController;
 use App\Http\Controllers\Api\V1\MemberShareController;
+use App\Http\Controllers\Api\V1\PlatformSettingsController;
 use App\Http\Controllers\Api\V1\RepaymentController;
 use App\Http\Controllers\Api\V1\SaccoRegistrationController;
 use App\Http\Controllers\Api\V1\SaccoSettingsController;
+use App\Http\Controllers\Api\V1\SuperadminReportsController;
+use App\Http\Controllers\Api\V1\SuperadminUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -83,13 +86,36 @@ Route::middleware('throttle:6,1')->group(function (): void {
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
     ->prefix('admin')
     ->group(function (): void {
+        // Dashboard
         Route::get('dashboard/stats', [AdminSaccoController::class, 'stats'])->name('api.v1.admin.dashboard.stats');
+        Route::get('dashboard/sacco-growth', [AdminSaccoController::class, 'saccoGrowth'])->name('api.v1.admin.dashboard.sacco-growth');
+
+        // SACCO Management
         Route::get('saccos/export', [AdminSaccoController::class, 'export'])->name('api.v1.admin.saccos.export');
         Route::get('saccos', [AdminSaccoController::class, 'index'])->name('api.v1.admin.saccos.index');
         Route::get('saccos/{sacco}', [AdminSaccoController::class, 'show'])->name('api.v1.admin.saccos.show');
         Route::get('saccos/{sacco}/details', [AdminSaccoController::class, 'details'])->name('api.v1.admin.saccos.details');
         Route::patch('saccos/{sacco}/approve', [AdminSaccoController::class, 'approve'])->name('api.v1.admin.saccos.approve');
         Route::patch('saccos/{sacco}/reject', [AdminSaccoController::class, 'reject'])->name('api.v1.admin.saccos.reject');
+        Route::patch('saccos/{sacco}/suspend', [AdminSaccoController::class, 'suspend'])->name('api.v1.admin.saccos.suspend');
+        Route::patch('saccos/{sacco}/reactivate', [AdminSaccoController::class, 'reactivate'])->name('api.v1.admin.saccos.reactivate');
+
+        // All Users (platform-wide)
+        Route::get('users/export', [SuperadminUserController::class, 'export'])->name('api.v1.admin.users.export');
+        Route::get('users', [SuperadminUserController::class, 'index'])->name('api.v1.admin.users.index');
+        Route::get('users/{user}', [SuperadminUserController::class, 'show'])->name('api.v1.admin.users.show');
+        Route::patch('users/{user}/suspend', [SuperadminUserController::class, 'suspend'])->name('api.v1.admin.users.suspend');
+        Route::patch('users/{user}/activate', [SuperadminUserController::class, 'activate'])->name('api.v1.admin.users.activate');
+
+        // Platform Reports
+        Route::get('reports/overview', [SuperadminReportsController::class, 'overview'])->name('api.v1.admin.reports.overview');
+        Route::get('reports/sacco-comparison', [SuperadminReportsController::class, 'saccoComparison'])->name('api.v1.admin.reports.sacco-comparison');
+        Route::get('reports/growth-trends', [SuperadminReportsController::class, 'growthTrends'])->name('api.v1.admin.reports.growth-trends');
+        Route::get('reports/geographic-distribution', [SuperadminReportsController::class, 'geographicDistribution'])->name('api.v1.admin.reports.geographic-distribution');
+
+        // Platform Settings
+        Route::get('platform-settings', [PlatformSettingsController::class, 'show'])->name('api.v1.admin.platform-settings.show');
+        Route::put('platform-settings', [PlatformSettingsController::class, 'update'])->name('api.v1.admin.platform-settings.update');
     });
 
 // ─── SACCO Admin Routes ──────────────────────────────────────────────
