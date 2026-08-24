@@ -1,0 +1,295 @@
+import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import {
+  XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+  BarChart, Bar, Cell, Area, AreaChart
+} from 'recharts'
+import {
+  TrendingUp,
+  Wallet,
+  CreditCard,
+  Users,
+  Download,
+  Filter,
+} from 'lucide-react'
+import { superAdminReportsService } from '../../services/superAdminReportsService'
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+export const PlatformReportsPage: React.FC = () => {
+  const [period, setPeriod] = useState('1Y')
+  const [sort, setSort] = useState('savings_desc')
+
+  const { data: overview, isLoading: _loadingOverview } = useQuery({
+    queryKey: ['reports-overview'],
+    queryFn: superAdminReportsService.getOverview,
+  })
+
+  const { data: trends, isLoading: loadingTrends } = useQuery({
+    queryKey: ['reports-trends', period],
+    queryFn: () => superAdminReportsService.getGrowthTrends(period),
+  })
+
+  const { data: comparison, isLoading: loadingComparison } = useQuery({
+    queryKey: ['reports-comparison', sort],
+    queryFn: () => superAdminReportsService.getSaccoComparison(sort),
+  })
+
+  const { data: geography, isLoading: loadingGeography } = useQuery({
+    queryKey: ['reports-geography'],
+    queryFn: superAdminReportsService.getGeographicDistribution,
+  })
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Platform Reports
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Aggregate analytics and performance comparison across all registered SACCOs.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors shadow-sm">
+            <Download className="w-4 h-4" />
+            <span>Export Report</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Savings */}
+        <div className="bg-white rounded-xl border border-slate-200/60 p-5 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+              <Wallet className="w-6 h-6 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Total Savings</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                {overview?.data?.total_savings ? formatCurrency(overview.data.total_savings) : '$0'}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Loans */}
+        <div className="bg-white rounded-xl border border-slate-200/60 p-5 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+              <CreditCard className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Loans Disbursed</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                {overview?.data?.total_loans_disbursed ? formatCurrency(overview.data.total_loans_disbursed) : '$0'}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Repayments */}
+        <div className="bg-white rounded-xl border border-slate-200/60 p-5 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+              <TrendingUp className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Repayments</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                {overview?.data?.total_repayments_collected ? formatCurrency(overview.data.total_repayments_collected) : '$0'}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Growth */}
+        <div className="bg-white rounded-xl border border-slate-200/60 p-5 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+              <Users className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Member Growth</p>
+              <h3 className="text-2xl font-bold text-slate-900 flex items-baseline gap-2">
+                {overview?.data?.platform_growth || 0}%
+                <span className="text-xs font-medium text-emerald-600">This Month</span>
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Growth Trends Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/60 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Platform Growth Trends</h3>
+              <p className="text-sm text-slate-500">Cumulative savings and loans over time</p>
+            </div>
+            <div className="flex bg-slate-100 p-1 rounded-lg">
+              {['3M', '6M', '1Y', 'All'].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                    period === p ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-[300px] w-full">
+            {loadingTrends ? (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">Loading chart...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trends?.data || []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorSavings" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorLoans" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis 
+                    dataKey="month_short" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748B', fontSize: 12 }} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748B', fontSize: 12 }}
+                    tickFormatter={(value) => `$${value >= 1000 ? (value/1000).toFixed(0) + 'k' : value}`}
+                  />
+                  <RechartsTooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    formatter={(value: any) => formatCurrency(value)}
+                  />
+                  <Area type="monotone" dataKey="savings" name="Savings" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorSavings)" />
+                  <Area type="monotone" dataKey="loans" name="Loans" stroke="#3B82F6" strokeWidth={2} fillOpacity={1} fill="url(#colorLoans)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Geographic Distribution */}
+        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm p-5">
+          <h3 className="text-base font-bold text-slate-900 mb-1">Geographic Distribution</h3>
+          <p className="text-sm text-slate-500 mb-6">SACCOs by region</p>
+          
+          <div className="h-[260px] w-full">
+            {loadingGeography ? (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">Loading...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={geography?.data || []} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E2E8F0" />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 12 }} width={80} />
+                  <RechartsTooltip 
+                    cursor={{fill: 'transparent'}}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="count" name="SACCOs" radius={[0, 4, 4, 0]} barSize={20}>
+                    {geography?.data?.map((_entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#F59E0B' : '#94A3B8'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* SACCO Comparison Table */}
+      <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="text-base font-bold text-slate-900">SACCO Performance Comparison</h3>
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-slate-400" />
+            <select
+              className="text-sm font-medium text-slate-700 bg-transparent outline-none cursor-pointer"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="savings_desc">Highest Savings</option>
+              <option value="savings_asc">Lowest Savings</option>
+              <option value="members_desc">Most Members</option>
+              <option value="repayment_desc">Best Repayment Rate</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-600">
+            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+              <tr>
+                <th className="px-5 py-3">SACCO Name</th>
+                <th className="px-5 py-3 text-right">Members</th>
+                <th className="px-5 py-3 text-right">Total Savings</th>
+                <th className="px-5 py-3 text-right">Active Loans</th>
+                <th className="px-5 py-3 text-right">Repayment Rate</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {loadingComparison ? (
+                 <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">Loading data...</td>
+                </tr>
+              ) : comparison?.data?.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">No data available</td>
+                </tr>
+              ) : (
+                comparison?.data?.map((sacco: any) => (
+                  <tr key={sacco.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-5 py-4 font-medium text-slate-900">{sacco.name}</td>
+                    <td className="px-5 py-4 text-right">{sacco.members_count}</td>
+                    <td className="px-5 py-4 text-right font-semibold text-emerald-600">{formatCurrency(sacco.total_savings)}</td>
+                    <td className="px-5 py-4 text-right">{sacco.active_loans_count}</td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full ${sacco.repayment_rate >= 90 ? 'bg-emerald-500' : sacco.repayment_rate >= 75 ? 'bg-amber-500' : 'bg-rose-500'}`} 
+                            style={{ width: `${sacco.repayment_rate}%` }}
+                          />
+                        </div>
+                        <span className="font-medium text-slate-700 w-9">{sacco.repayment_rate}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  )
+}

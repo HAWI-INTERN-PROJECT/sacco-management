@@ -17,21 +17,27 @@ import { MetricCard } from '../../components/super-admin/MetricCard'
 import { toast } from 'sonner'
 import { adminSaccoService } from '../../services/adminSaccoService'
 import type { Sacco, DashboardStats } from '../../types'
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts'
 
 export const SuperAdminDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [pendingList, setPendingList] = useState<Sacco[]>([])
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [growthData, setGrowthData] = useState<any[]>([])
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
 
   const fetchDashboardData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const [statsRes, pendingRes] = await Promise.all([
+      const [statsRes, pendingRes, growthRes] = await Promise.all([
         adminSaccoService.getDashboardStats(),
         adminSaccoService.getSaccos({ status: 'pending' }),
+        adminSaccoService.getSaccoGrowth(),
       ])
 
       if (statsRes.data) {
@@ -40,6 +46,11 @@ export const SuperAdminDashboardPage: React.FC = () => {
 
       if (pendingRes) {
         setPendingList(pendingRes.data || [])
+      }
+
+      if (growthRes.data) {
+        // Reverse array to show oldest to newest left to right
+        setGrowthData([...growthRes.data].reverse())
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load dashboard data.'
@@ -133,6 +144,107 @@ export const SuperAdminDashboardPage: React.FC = () => {
           icon={FileText}
           accentColor="purple"
         />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        {/* SACCO Growth Area Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5">
+          <div className="mb-4">
+            <h2 className="text-base font-bold text-slate-900">SACCO Growth</h2>
+            <p className="text-sm text-slate-500">Cumulative registered SACCOs over the last 12 months</p>
+          </div>
+          <div className="h-[300px] w-full">
+            {loading ? (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">Loading chart...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={growthData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis 
+                    dataKey="month_short" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748B', fontSize: 12 }} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748B', fontSize: 12 }}
+                  />
+                  <RechartsTooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Area type="monotone" dataKey="cumulative" name="Total SACCOs" stroke="#F59E0B" strokeWidth={3} fillOpacity={1} fill="url(#colorCumulative)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* SACCO Status Donut Chart */}
+        <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 flex flex-col">
+          <div className="mb-2">
+            <h2 className="text-base font-bold text-slate-900">SACCO Status</h2>
+            <p className="text-sm text-slate-500">Current application distribution</p>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {loading ? (
+              <div className="text-slate-400">Loading...</div>
+            ) : (
+              <>
+                <div className="h-[220px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Approved', value: stats?.approved_saccos || 0, color: '#10B981' },
+                          { name: 'Pending', value: stats?.pending_saccos || 0, color: '#F59E0B' },
+                          { name: 'Rejected', value: stats?.rejected_saccos || 0, color: '#F43F5E' },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {
+                          [
+                            { name: 'Approved', value: stats?.approved_saccos || 0, color: '#10B981' },
+                            { name: 'Pending', value: stats?.pending_saccos || 0, color: '#F59E0B' },
+                            { name: 'Rejected', value: stats?.rejected_saccos || 0, color: '#F43F5E' },
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))
+                        }
+                      </Pie>
+                      <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex flex-wrap justify-center gap-4 mt-2">
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                    <span className="w-3 h-3 rounded-full bg-[#10B981]"></span> Approved
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                    <span className="w-3 h-3 rounded-full bg-[#F59E0B]"></span> Pending
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                    <span className="w-3 h-3 rounded-full bg-[#F43F5E]"></span> Rejected
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Pending SACCO Approvals Section */}

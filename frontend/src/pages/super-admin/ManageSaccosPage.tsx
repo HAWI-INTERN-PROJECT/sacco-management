@@ -8,13 +8,15 @@ import type { Sacco, PaginationMeta } from '../../types'
 
 export const ManageSaccosPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const statusParam = searchParams.get('status') as 'pending' | 'approved' | 'rejected' | null
+  const statusParam = searchParams.get('status') as 'pending' | 'approved' | 'rejected' | 'suspended' | null
   const searchParam = searchParams.get('search') || ''
 
-  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>(
-    statusParam && ['pending', 'approved', 'rejected'].includes(statusParam) ? statusParam : 'all'
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'suspended'>(
+    statusParam && ['pending', 'approved', 'rejected', 'suspended'].includes(statusParam) ? statusParam : 'all'
   )
   const [searchQuery, setSearchQuery] = useState<string>(searchParam)
+  const [regionFilter, setRegionFilter] = useState<string>('')
+  const [sortFilter, setSortFilter] = useState<string>('newest')
 
   const [loading, setLoading] = useState<boolean>(true)
   const [exporting, setExporting] = useState<boolean>(false)
@@ -34,7 +36,7 @@ export const ManageSaccosPage: React.FC = () => {
 
   // Sync tab with URL search params if updated externally
   useEffect(() => {
-    if (statusParam && ['pending', 'approved', 'rejected'].includes(statusParam)) {
+    if (statusParam && ['pending', 'approved', 'rejected', 'suspended'].includes(statusParam)) {
       setActiveTab(statusParam)
     } else if (!statusParam) {
       setActiveTab('all')
@@ -50,6 +52,8 @@ export const ManageSaccosPage: React.FC = () => {
       const response = await adminSaccoService.getSaccos({
         status: statusArg,
         search: searchQuery.trim() || undefined,
+        region: regionFilter || undefined,
+        sort: sortFilter,
         page: currentPage,
       })
 
@@ -70,7 +74,7 @@ export const ManageSaccosPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [activeTab, searchQuery, currentPage])
+  }, [activeTab, searchQuery, regionFilter, sortFilter, currentPage])
 
   useEffect(() => {
     fetchSaccos()
@@ -99,7 +103,7 @@ export const ManageSaccosPage: React.FC = () => {
     fetchCounts()
   }, [])
 
-  const handleTabChange = (tab: 'all' | 'pending' | 'approved' | 'rejected') => {
+  const handleTabChange = (tab: 'all' | 'pending' | 'approved' | 'rejected' | 'suspended') => {
     setActiveTab(tab)
     setCurrentPage(1)
     if (tab === 'all') {
@@ -166,6 +170,36 @@ export const ManageSaccosPage: React.FC = () => {
     }
   }
 
+  const handleSuspend = async (sacco: Sacco) => {
+    if (!window.confirm(`Are you sure you want to suspend ${sacco.name}?`)) return
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.suspendSacco(sacco.id)
+      toast.success(`${sacco.name} has been suspended.`)
+      fetchSaccos()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to suspend SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
+
+  const handleReactivate = async (sacco: Sacco) => {
+    if (!window.confirm(`Are you sure you want to reactivate ${sacco.name}?`)) return
+    setActionLoadingId(sacco.id)
+    try {
+      await adminSaccoService.reactivateSacco(sacco.id)
+      toast.success(`${sacco.name} has been reactivated.`)
+      fetchSaccos()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to reactivate SACCO.'
+      toast.error(msg)
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
+
   const renderPageNumbers = () => {
     if (!meta || meta.last_page <= 1) return null
     const pages = []
@@ -221,56 +255,61 @@ export const ManageSaccosPage: React.FC = () => {
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="bg-[#0B1727] hover:bg-[#0B1727]/90 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-2xs transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+            className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            <span>Export Report</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="border-b border-slate-200 flex items-center gap-6 overflow-x-auto pb-0.5">
-        <button
-          onClick={() => handleTabChange('all')}
-          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
-            activeTab === 'all'
-              ? 'text-slate-900 border-b-2 border-slate-900'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          All {tabCounts.all !== undefined ? `(${tabCounts.all})` : ''}
-        </button>
-        <button
-          onClick={() => handleTabChange('pending')}
-          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
-            activeTab === 'pending'
-              ? 'text-slate-900 border-b-2 border-slate-900'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Pending {tabCounts.pending !== undefined ? `(${tabCounts.pending})` : ''}
-        </button>
-        <button
-          onClick={() => handleTabChange('approved')}
-          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
-            activeTab === 'approved'
-              ? 'text-slate-900 border-b-2 border-slate-900'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Approved {tabCounts.approved !== undefined ? `(${tabCounts.approved})` : ''}
-        </button>
-        <button
-          onClick={() => handleTabChange('rejected')}
-          className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${
-            activeTab === 'rejected'
-              ? 'text-slate-900 border-b-2 border-slate-900'
-              : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Rejected {tabCounts.rejected !== undefined ? `(${tabCounts.rejected})` : ''}
-        </button>
+      {/* Filters Row */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
+          {['all', 'pending', 'approved', 'rejected', 'suspended'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => handleTabChange(tab as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap ${
+                activeTab === tab
+                  ? 'bg-slate-900 text-amber-400'
+                  : 'bg-transparent text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {tab} {tabCounts[tab as keyof typeof tabCounts] !== undefined && activeTab === tab ? `(${tabCounts[tab as keyof typeof tabCounts]})` : ''}
+            </button>
+          ))}
+        </div>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <select
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none"
+            value={regionFilter}
+            onChange={(e) => {
+              setRegionFilter(e.target.value)
+              setCurrentPage(1)
+            }}
+          >
+            <option value="">All Regions</option>
+            <option value="Addis Ababa">Addis Ababa</option>
+            <option value="Oromia">Oromia</option>
+            <option value="Amhara">Amhara</option>
+          </select>
+          <select
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none"
+            value={sortFilter}
+            onChange={(e) => {
+              setSortFilter(e.target.value)
+              setCurrentPage(1)
+            }}
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="members_desc">Most Members</option>
+            <option value="name_asc">Name (A-Z)</option>
+          </select>
+        </div>
       </div>
 
       {/* Data Table Container */}
@@ -341,31 +380,53 @@ export const ManageSaccosPage: React.FC = () => {
                       {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-4 px-6 text-center">
-                      {sacco.status === 'pending' ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <button
+                      <div className="flex items-center justify-center gap-2">
+                        {sacco.status === 'pending' && (
+                          <>
+                            <button
+                              disabled={actionLoadingId === sacco.id}
+                              onClick={() => handleApprove(sacco)}
+                              className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              disabled={actionLoadingId === sacco.id}
+                              onClick={() => handleReject(sacco)}
+                              className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        
+                        {sacco.status === 'approved' && (
+                           <button
                             disabled={actionLoadingId === sacco.id}
-                            onClick={() => handleApprove(sacco)}
-                            className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            onClick={() => handleSuspend(sacco)}
+                            className="px-3.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
                           >
-                            Approve
+                            Suspend
                           </button>
-                          <button
+                        )}
+
+                        {sacco.status === 'suspended' && (
+                           <button
                             disabled={actionLoadingId === sacco.id}
-                            onClick={() => handleReject(sacco)}
-                            className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            onClick={() => handleReactivate(sacco)}
+                            className="px-3.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
                           >
-                            Reject
+                            Reactivate
                           </button>
-                        </div>
-                      ) : (
+                        )}
+
                         <Link
                           to={`/super-admin/saccos/${sacco.id}`}
-                          className="text-xs font-semibold text-sky-400 hover:text-sky-600 transition-colors"
+                          className="px-3.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition-colors"
                         >
                           View
                         </Link>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))
