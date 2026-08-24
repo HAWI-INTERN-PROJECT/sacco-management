@@ -23,6 +23,8 @@ import { MemberDashboardPage } from "./pages/member/Memberdashboardpage";
 import Savings from "./pages/member/Savings";
 import Dividends from "./pages/member/Dividends";
 import Loans from "./pages/member/Loans";
+import LoanDetails from "./pages/member/LoanDetails";
+import ApplyLoan from "./pages/member/ApplyLoan";
 import Notifications from "./pages/member/Notifications";
 import Payments from "./pages/member/Payments";
 import Statements from "./pages/member/Statements";
@@ -217,6 +219,8 @@ export default function App() {
               {/* Add these as you build them: */}
               <Route path="savings" element={<Savings />} />
               <Route path="loans" element={<Loans />} />
+              <Route path="loans/apply" element={<ApplyLoan />} />
+              <Route path="loans/:id" element={<LoanDetails />} />
               <Route path="dividends" element={<Dividends />} />
               <Route path="notifications" element={<Notifications />} />
               <Route path="payments" element={<Payments />} />
