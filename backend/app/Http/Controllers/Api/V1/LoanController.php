@@ -50,8 +50,9 @@ class LoanController extends Controller
     {
         $loan = Loan::create([
             'sacco_id' => $request->user()->sacco_id,
-            'user_id' => $request->user()->id,
-            'amount' => $request->amount,
+            'member_id' => $request->user()->id,
+            'loan_number' => 'LN-' . strtoupper(\Illuminate\Support\Str::random(8)),
+            'principal_amount' => $request->amount,
             'purpose' => $request->purpose,
             'status' => 'pending',
         ]);
@@ -74,7 +75,7 @@ class LoanController extends Controller
         $user = $request->user();
 
         if ($user->isMember()) {
-            if ($loan->user_id !== $user->id) {
+            if ($loan->member_id !== $user->id) {
                 return $this->forbidden('You do not have permission to view this loan.');
             }
         } elseif ($user->isAdmin() || in_array($user->role, ['admin', 'sacco_admin'], true)) {
@@ -112,8 +113,8 @@ class LoanController extends Controller
 
         $interestRate = (float) $request->interest_rate;
         $termMonths = (int) $request->term_months;
-        $totalInterest = round(((float) $loan->amount) * ($interestRate / 100) * ($termMonths / 12), 2);
-        $totalRepayable = round(((float) $loan->amount) + $totalInterest, 2);
+        $totalInterest = round(((float) $loan->principal_amount) * ($interestRate / 100) * ($termMonths / 12), 2);
+        $totalRepayable = round(((float) $loan->principal_amount) + $totalInterest, 2);
         $monthlyInstallment = round($totalRepayable / $termMonths, 2);
 
         $loan->update([
@@ -123,6 +124,7 @@ class LoanController extends Controller
             'total_repayable' => $totalRepayable,
             'monthly_installment' => $monthlyInstallment,
             'approved_at' => now(),
+            'approved_by' => $request->user()->id,
         ]);
 
         return $this->success(
@@ -185,24 +187,34 @@ class LoanController extends Controller
             $loan->schedules()->delete();
 
             $termMonths = (int) $loan->term_months;
+            $principalAmount = (float) $loan->principal_amount;
             $totalRepayable = (float) $loan->total_repayable;
-            $monthlyInstallment = (float) $loan->monthly_installment;
+            $totalInterest = round($totalRepayable - $principalAmount, 2);
 
-            $accumulated = 0.00;
+            $principalPerInstallment = round($principalAmount / $termMonths, 2);
+            $interestPerInstallment = round($totalInterest / $termMonths, 2);
+
+            $accumulatedPrincipal = 0.00;
+            $accumulatedInterest = 0.00;
             for ($i = 1; $i <= $termMonths; $i++) {
                 if ($i === $termMonths) {
-                    $installmentAmount = round($totalRepayable - $accumulated, 2);
+                    $principalDue = round($principalAmount - $accumulatedPrincipal, 2);
+                    $interestDue = round($totalInterest - $accumulatedInterest, 2);
                 } else {
-                    $installmentAmount = $monthlyInstallment;
-                    $accumulated += $installmentAmount;
+                    $principalDue = $principalPerInstallment;
+                    $interestDue = $interestPerInstallment;
+                    $accumulatedPrincipal += $principalDue;
+                    $accumulatedInterest += $interestDue;
                 }
 
                 LoanSchedule::create([
                     'loan_id' => $loan->id,
                     'installment_number' => $i,
                     'due_date' => now()->addMonths($i)->toDateString(),
-                    'amount_due' => $installmentAmount,
-                    'paid_amount' => 0.00,
+                    'principal_due' => $principalDue,
+                    'interest_due' => $interestDue,
+                    'total_due' => round($principalDue + $interestDue, 2),
+                    'amount_paid' => 0.00,
                     'status' => 'pending',
                 ]);
             }
@@ -222,7 +234,7 @@ class LoanController extends Controller
      */
     public function myLoans(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $loans = Loan::where('user_id', $request->user()->id)->latest()->paginate(15);
+        $loans = Loan::where('member_id', $request->user()->id)->latest()->paginate(15);
 
         return LoanResource::collection($loans);
     }

@@ -23,12 +23,17 @@ class MemberController extends Controller
      *
      * @param  Request  $request
      * @return Builder<User>
-     * @return \Illuminate\Database\Eloquent\Builder<\App\Models\User>
      */
     private function getScopedMemberQuery(Request $request): Builder
     {
         return User::where('sacco_id', $request->user()->sacco_id)
-            ->where('role', 'member');
+            ->where('role', 'member')
+            ->addSelect([
+                'savings_balance' => \App\Models\SavingsTransaction::select('balance_after')
+                    ->whereColumn('member_id', 'users.id')
+                    ->latest('id')
+                    ->limit(1)
+            ]);
     }
 
     /**
@@ -36,11 +41,37 @@ class MemberController extends Controller
      *
      * @param  Request  $request
      * @return AnonymousResourceCollection
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $members = $this->getScopedMemberQuery($request)->latest()->paginate(15);
+        $query = $this->getScopedMemberQuery($request);
+
+        if ($request->filled('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                  ->orWhere('email', 'like', $searchTerm)
+                  ->orWhere('phone', 'like', $searchTerm);
+            });
+        }
+
+        // Status filter: 'active', 'inactive', or 'all'
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+            // 'all' => no filter
+        }
+
+        if ($request->sort === 'name') {
+            $query->orderBy('name', 'asc');
+        } else {
+            $query->latest();
+        }
+
+        $members = $query->paginate(15);
 
         return UserResource::collection($members);
     }

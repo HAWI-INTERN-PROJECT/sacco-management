@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
  * @property int $loan_id
  * @property int $installment_number
  * @property \Carbon\Carbon $due_date
- * @property float $amount_due
- * @property float $paid_amount
+ * @property float $principal_due
+ * @property float $interest_due
+ * @property float $total_due
+ * @property float $amount_paid
  * @property string $status
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
@@ -26,8 +29,10 @@ class LoanSchedule extends Model
         'loan_id',
         'installment_number',
         'due_date',
-        'amount_due',
-        'paid_amount',
+        'principal_due',
+        'interest_due',
+        'total_due',
+        'amount_paid',
         'status',
     ];
 
@@ -38,8 +43,10 @@ class LoanSchedule extends Model
     {
         return [
             'due_date' => 'date',
-            'amount_due' => 'decimal:2',
-            'paid_amount' => 'decimal:2',
+            'principal_due' => 'decimal:2',
+            'interest_due' => 'decimal:2',
+            'total_due' => 'decimal:2',
+            'amount_paid' => 'decimal:2',
         ];
     }
 
@@ -49,5 +56,13 @@ class LoanSchedule extends Model
     public function loan(): BelongsTo
     {
         return $this->belongsTo(Loan::class);
+    }
+
+    /**
+     * @return HasMany<Repayment, $this>
+     */
+    public function repayments(): HasMany
+    {
+        return $this->hasMany(Repayment::class);
     }
 }

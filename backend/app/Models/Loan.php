@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property int $sacco_id
- * @property int $user_id
- * @property float $amount
+ * @property int $member_id
+ * @property float $principal_amount
  * @property string $purpose
  * @property string $status
  * @property float|null $interest_rate
@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $rejection_reason
  * @property \Carbon\Carbon|null $approved_at
  * @property \Carbon\Carbon|null $disbursed_at
+ * @property int|null $approved_by
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\Sacco $sacco
@@ -38,8 +39,9 @@ class Loan extends Model
      */
     protected $fillable = [
         'sacco_id',
-        'user_id',
-        'amount',
+        'member_id',
+        'loan_number',
+        'principal_amount',
         'purpose',
         'status',
         'interest_rate',
@@ -49,6 +51,7 @@ class Loan extends Model
         'rejection_reason',
         'approved_at',
         'disbursed_at',
+        'approved_by',
     ];
 
     /**
@@ -57,7 +60,7 @@ class Loan extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:2',
+            'principal_amount' => 'decimal:2',
             'interest_rate' => 'decimal:2',
             'total_repayable' => 'decimal:2',
             'monthly_installment' => 'decimal:2',
@@ -75,11 +78,22 @@ class Loan extends Model
     }
 
     /**
+     * The member (user) that owns this loan. Kept as `user()` for backward
+     * compatibility with existing call sites; maps to the `member_id` column.
+     *
      * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'member_id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     /**
