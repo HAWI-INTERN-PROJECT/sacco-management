@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Loan>
@@ -23,7 +24,7 @@ class LoanFactory extends Factory
         return [
             'sacco_id' => 1,
             'member_id' => User::factory(),
-            'loan_number' => 'LN-' . strtoupper(\Illuminate\Support\Str::random(8)),
+            'loan_number' => 'LN-' . strtoupper(Str::random(8)),
             'principal_amount' => 1000.00,
             'purpose' => 'Business expansion',
             'status' => 'pending',

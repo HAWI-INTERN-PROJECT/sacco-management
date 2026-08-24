@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom'
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
@@ -15,47 +15,52 @@ import {
   Plus,
   Menu,
   X,
-} from 'lucide-react'
-import { useAuthStore } from '../../stores/auth'
+} from "lucide-react";
+import { useAuthStore } from "../../stores/auth";
 
 export const SuperAdminLayout: React.FC = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await logout()
-      navigate('/login')
+      await logout();
+      navigate("/login");
     } catch {
-      navigate('/login')
+      navigate("/login");
     }
-  }
+  };
 
-  const isDashboard = location.pathname === '/super-admin' || location.pathname === '/super-admin/'
+  const isDashboard =
+    location.pathname === "/super-admin" ||
+    location.pathname === "/super-admin/";
 
   const mainNavItems = [
-    { label: 'Dashboard', path: '/super-admin', icon: LayoutDashboard },
-    { label: 'SACCOs', path: '/super-admin/saccos', icon: Building2 },
-    { label: 'Members', path: '/super-admin/members', icon: Users },
-    { label: 'Loans', path: '/super-admin/loans', icon: CreditCard },
-    { label: 'Savings', path: '/super-admin/savings', icon: Wallet },
-    { label: 'Accounts', path: '/super-admin/accounts', icon: Landmark },
-    { label: 'Reports', path: '/super-admin/reports', icon: BarChart3 },
-  ]
+    { label: "Dashboard", path: "/super-admin", icon: LayoutDashboard },
+    { label: "SACCOs", path: "/super-admin/saccos", icon: Building2 },
+    { label: "Members", path: "/super-admin/members", icon: Users },
+    { label: "Loans", path: "/super-admin/loans", icon: CreditCard },
+    { label: "Savings", path: "/super-admin/savings", icon: Wallet },
+    { label: "Accounts", path: "/super-admin/accounts", icon: Landmark },
+    { label: "Reports", path: "/super-admin/reports", icon: BarChart3 },
+  ];
 
   const bottomNavItems = [
-    { label: 'Settings', path: '/super-admin/settings', icon: Settings },
-    { label: 'Support', path: '/super-admin/support', icon: HelpCircle },
-  ]
+    { label: "Settings", path: "/super-admin/settings", icon: Settings },
+    { label: "Support", path: "/super-admin/support", icon: HelpCircle },
+  ];
 
   const isActive = (path: string) => {
-    if (path === '/super-admin') {
-      return location.pathname === '/super-admin' || location.pathname === '/super-admin/'
+    if (path === "/super-admin") {
+      return (
+        location.pathname === "/super-admin" ||
+        location.pathname === "/super-admin/"
+      );
     }
-    return location.pathname.startsWith(path)
-  }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <div className="min-h-screen bg-[#F4F6F9] flex flex-col md:flex-row font-sans text-slate-900">
@@ -66,9 +71,11 @@ export const SuperAdminLayout: React.FC = () => {
             <Building2 className="w-5 h-5 text-amber-500" />
           </div>
           <div>
-            <div className="font-extrabold text-base leading-tight tracking-wide">SACCO MS</div>
+            <div className="font-extrabold text-base leading-tight tracking-wide">
+              SACCO MS
+            </div>
             <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">
-              {isDashboard ? 'PLATFORM ADMIN' : 'Management System'}
+              {isDashboard ? "PLATFORM ADMIN" : "Management System"}
             </div>
           </div>
         </div>
@@ -77,15 +84,19 @@ export const SuperAdminLayout: React.FC = () => {
           className="p-2 rounded-md hover:bg-slate-800 text-slate-300"
           aria-label="Toggle Navigation"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </button>
       </div>
 
       {/* Desktop & Mobile Sidebar */}
       <aside
         className={`${
-          mobileMenuOpen ? 'block' : 'hidden'
-        } md:block w-full md:w-64 bg-[#0B1727] text-slate-300 flex-shrink-0 flex flex-col justify-between z-40 select-none`}
+          mobileMenuOpen ? "block" : "hidden"
+        } md:block w-full md:w-64 bg-[#0B1727] text-slate-300 shrink-0 flex flex-col justify-between z-40 select-none`}
       >
         <div>
           {/* Brand Logo Header */}
@@ -94,9 +105,11 @@ export const SuperAdminLayout: React.FC = () => {
               <Building2 className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <div className="font-extrabold text-lg text-white leading-snug tracking-wide">SACCO MS</div>
+              <div className="font-extrabold text-lg text-white leading-snug tracking-wide">
+                SACCO MS
+              </div>
               <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">
-                {isDashboard ? 'PLATFORM ADMIN' : 'Management System'}
+                {isDashboard ? "PLATFORM ADMIN" : "Management System"}
               </div>
             </div>
           </div>
@@ -115,8 +128,8 @@ export const SuperAdminLayout: React.FC = () => {
           {/* Main Navigation */}
           <nav className="px-3 py-1 space-y-1">
             {mainNavItems.map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
+              const Icon = item.icon;
+              const active = isActive(item.path);
               return (
                 <Link
                   key={item.path}
@@ -124,14 +137,16 @@ export const SuperAdminLayout: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     active
-                      ? 'bg-[#9A7B1C] text-white font-semibold shadow-2xs'
-                      : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                      ? "bg-[#9A7B1C] text-white font-semibold shadow-2xs"
+                      : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon
+                    className={`w-5 h-5 ${active ? "text-white" : "text-slate-400"}`}
+                  />
                   <span>{item.label}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
         </div>
@@ -139,8 +154,8 @@ export const SuperAdminLayout: React.FC = () => {
         {/* Bottom Navigation & User Profile */}
         <div className="p-3 border-t border-slate-800/80 space-y-1">
           {bottomNavItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.path)
+            const Icon = item.icon;
+            const active = isActive(item.path);
             return (
               <Link
                 key={item.path}
@@ -148,14 +163,14 @@ export const SuperAdminLayout: React.FC = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   active
-                    ? 'bg-[#9A7B1C] text-white font-semibold shadow-2xs'
-                    : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                    ? "bg-[#9A7B1C] text-white font-semibold shadow-2xs"
+                    : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
                 }`}
               >
                 <Icon className="w-5 h-5 text-slate-400" />
                 <span>{item.label}</span>
               </Link>
-            )
+            );
           })}
         </div>
       </aside>
@@ -167,10 +182,10 @@ export const SuperAdminLayout: React.FC = () => {
           {/* Left Title & Badge */}
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-lg font-bold text-slate-900 truncate">
-              {isDashboard ? 'Platform Superadmin' : 'SACCO Management System'}
+              {isDashboard ? "Platform Superadmin" : "SACCO Management System"}
             </h1>
             <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-[#F3E8FF] text-[#9333EA] shrink-0">
-              {isDashboard ? 'Superadmin' : 'Platform Superadmin'}
+              {isDashboard ? "Superadmin" : "Platform Superadmin"}
             </span>
           </div>
 
@@ -209,7 +224,7 @@ export const SuperAdminLayout: React.FC = () => {
               {isDashboard && (
                 <div className="hidden md:block text-right">
                   <div className="text-xs font-bold text-slate-900 leading-tight">
-                    {user?.name || 'Admin User'}
+                    {user?.name || "Admin User"}
                   </div>
                   <div className="text-[10px] text-slate-500 font-medium">
                     System Administrator
@@ -238,6 +253,5 @@ export const SuperAdminLayout: React.FC = () => {
         </main>
       </div>
     </div>
-  )
-}
-
+  );
+};

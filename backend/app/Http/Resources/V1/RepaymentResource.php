@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,11 +12,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read int $loan_id
  * @property-read int $loan_schedule_id
  * @property-read float $amount
- * @property-read \Carbon\Carbon $paid_at
+ * @property-read Carbon $paid_at
  * @property-read string $method
  * @property-read int $recorded_by
- * @property-read \Carbon\Carbon|null $created_at
- * @property-read \Carbon\Carbon|null $updated_at
+ * @property-read Carbon|null $created_at
+ * @property-read Carbon|null $updated_at
  */
 class RepaymentResource extends JsonResource
 {

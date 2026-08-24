@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,15 +11,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property int $loan_id
  * @property int $installment_number
- * @property \Carbon\Carbon $due_date
+ * @property Carbon $due_date
  * @property float $principal_due
  * @property float $interest_due
  * @property float $total_due
  * @property float $amount_paid
  * @property string $status
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Loan $loan
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Loan $loan
  */
 class LoanSchedule extends Model
 {

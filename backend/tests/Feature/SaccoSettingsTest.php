@@ -99,8 +99,6 @@ class SaccoSettingsTest extends TestCase
         ]);
     }
 
-
-
     public function test_share_value_must_be_greater_than_zero(): void
     {
         $responseZero = $this->actingAs($this->myAdmin)->putJson('/api/settings', [

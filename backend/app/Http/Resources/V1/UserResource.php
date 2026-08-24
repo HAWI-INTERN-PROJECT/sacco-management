@@ -11,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string $name
  * @property-read string $email
  * @property-read string $username
+ * @property-read string|null $role
+ * @property-read int|null $sacco_id
  * @property-read Carbon|null $email_verified_at
  * @property-read string|null $phone
  * @property-read string $role

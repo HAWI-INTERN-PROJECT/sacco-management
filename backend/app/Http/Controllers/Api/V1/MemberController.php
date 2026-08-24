@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\StoreMemberRequest;
 use App\Http\Requests\Api\V1\UpdateMemberRequest;
 use App\Http\Resources\V1\UserResource;
 use App\Http\Traits\ApiResponse;
+use App\Models\SavingsTransaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,7 @@ class MemberController extends Controller
         return User::where('sacco_id', $request->user()->sacco_id)
             ->where('role', 'member')
             ->addSelect([
-                'savings_balance' => \App\Models\SavingsTransaction::select('balance_after')
+                'savings_balance' => SavingsTransaction::select('balance_after')
                     ->whereColumn('member_id', 'users.id')
                     ->latest('id')
                     ->limit(1)
@@ -50,8 +51,8 @@ class MemberController extends Controller
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                  ->orWhere('email', 'like', $searchTerm)
-                  ->orWhere('phone', 'like', $searchTerm);
+                    ->orWhere('email', 'like', $searchTerm)
+                    ->orWhere('phone', 'like', $searchTerm);
             });
         }
 
