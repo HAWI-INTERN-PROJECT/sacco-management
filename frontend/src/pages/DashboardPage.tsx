@@ -35,6 +35,12 @@ export default function DashboardPage() {
       user.email === 'superadmin@example.com'
     ) {
       navigate('/super-admin', { replace: true })
+    } else if (
+      user.role === 'member' ||
+      user.username === 'member' ||
+      user.email === 'member@example.com'
+    ) {
+      navigate('/member', { replace: true })
     }
   }, [user, getProfile, navigate])
 

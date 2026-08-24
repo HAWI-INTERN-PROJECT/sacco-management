@@ -63,5 +63,53 @@
   "language": {
     "en": "English",
     "am": "አማርኛ"
+  },
+
+  "member": {
+    "member_id": "የአባል መታወቂያ: #{{id}}",
+    "quick_payment": "ፈጣን ክፍያ",
+    "logout": "ውጣ",
+    "nav": {
+      "make_payment": "ክፍያ ፈጽም",
+      "statements": "መግለጫዎች",
+      "notifications": "ማሳወቂያዎች",
+      "savings": "ቁጠባ",
+      "apply_loan": "ብድር ያመልክቱ",
+      "loans": "ብድሮች",
+      "dividends": "ትርፍ ድርሻ",
+      "profile": "መገለጫ",
+      "support": "ድጋፍ",
+      "dashboard": "ዳሽቦርድ",
+      "logout": "ውጣ"
+    },
+    "dashboard": {
+      "title": "የአባል ዳሽቦርድ",
+      "subtitle": "እንኳን ደህና መጡ፣ {{name}}። የመለያዎ ማጠቃለያ ይኸውና።",
+      "outstanding_loans": "ያልተከፈለ ብድር",
+      "total_dividends": "ጠቅላላ ትርፍ ድርሻ",
+      "next_installment": "ቀጣይ የመክፈያ ጊዜ",
+      "installment_notice": "የቀጣይ ብድር ክፍያዎ በቅርቡ ይደርሳል። እባክዎ በቂ ገንዘብ መኖሩን ያረጋግጡ።",
+      "no_installment_due": "ምንም ቀጣይ ክፍያ የለብዎትም።",
+      "due": "የመክፈያ ቀን",
+      "pay_now": "አሁን ይክፈሉ",
+      "edit_profile": "መገለጫ ያስተካክሉ",
+      "description": "መግለጫ",
+      "reference": "ማጣቀሻ",
+      "status": "ሁኔታ",
+      "status_completed": "ተጠናቋል",
+      "status_processing": "በሂደት ላይ",
+      "status_failed": "አልተሳካም",
+      "quick_actions": "ፈጣን ተግባራት",
+      "apply_for_loan": "ብድር ያመልክቱ",
+      "view_savings": "ቁጠባ ይመልከቱ",
+      "view_all": "ሁሉንም ይመልከቱ",
+      "share_capital": "የአክሲዮን ካፒታል",
+      "savings_balance": "የቁጠባ ቀሪ ሂሳብ",
+      "amount": "መጠን",
+      "date": "ቀን",
+      "recent_transactions": "የቅርብ ጊዜ ግብይቶች",
+      "loans_count": "የብድር ብዛት",
+      "shares_total": "ጠቅላላ አክሲዮን"
+    }
   }
 }

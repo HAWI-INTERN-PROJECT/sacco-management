@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -59,6 +60,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
+ */
+    public function sacco(): BelongsTo
+    {
+        return $this->belongsTo(Sacco::class);
+    }
+
+    /**
      * Send the password reset notification.
      *
      * @param  string  $token
@@ -70,21 +79,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the SACCO the user belongs to.
-     *
-     * @return BelongsTo<Sacco, $this>
-     */
-    public function sacco(): BelongsTo
-    {
-        return $this->belongsTo(Sacco::class);
-    }
-
-    /**
      * Get the loans for the user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
+     * @return HasMany<Loan, $this>
      */
-    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function loans(): HasMany
     {
         return $this->hasMany(Loan::class, 'member_id');
     }
@@ -92,9 +91,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the repayments for the user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Repayment, $this>
+     * @return HasMany<Repayment, $this>
      */
-    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function repayments(): HasMany
     {
         return $this->hasMany(Repayment::class);
     }
