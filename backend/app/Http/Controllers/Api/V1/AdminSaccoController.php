@@ -10,6 +10,7 @@ use App\Models\Loan;
 use App\Models\Sacco;
 use App\Models\SavingsTransaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -64,8 +65,13 @@ class AdminSaccoController extends Controller
         $query = Sacco::withCount('users');
 
         // Filter by status if provided
-        if ($request->has('status') && in_array($request->query('status'), ['pending', 'approved', 'rejected'], true)) {
+        if ($request->has('status') && in_array($request->query('status'), ['pending', 'approved', 'rejected', 'suspended'], true)) {
             $query->where('status', $request->query('status'));
+        }
+
+        // Filter by region if provided
+        if ($request->filled('region')) {
+            $query->where('region', $request->query('region'));
         }
 
         // Search by name or registration number if provided
@@ -77,7 +83,16 @@ class AdminSaccoController extends Controller
             });
         }
 
-        $saccos = $query->latest()->paginate(15);
+        // Sort support
+        $sort = $request->query('sort', 'newest');
+        $query = match ($sort) {
+            'oldest' => $query->oldest(),
+            'members_desc' => $query->orderByDesc('users_count'),
+            'name_asc' => $query->orderBy('name', 'asc'),
+            default => $query->latest(),
+        };
+
+        $saccos = $query->paginate(15);
 
         return SaccoResource::collection($saccos);
     }
@@ -240,6 +255,87 @@ class AdminSaccoController extends Controller
         return $this->success(
             SaccoResource::make($sacco->loadCount('users')),
             'SACCO has been rejected.'
+        );
+    }
+
+    /**
+     * Get monthly SACCO registration data for the growth chart.
+     *
+     * Returns the number of SACCOs registered per month for the last 12 months.
+     *
+     * @return JsonResponse
+     */
+    public function saccoGrowth(): JsonResponse
+    {
+        $months = 12;
+        $data = collect();
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $count = Sacco::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+
+            $cumulative = Sacco::where('created_at', '<=', $date->copy()->endOfMonth())->count();
+
+            $data->push([
+                'month' => $date->format('M Y'),
+                'month_short' => $date->format('M'),
+                'new_saccos' => $count,
+                'cumulative' => $cumulative,
+            ]);
+        }
+
+        return $this->success($data, 'SACCO growth data retrieved successfully.');
+    }
+
+    /**
+     * Suspend an approved SACCO.
+     *
+     * Changes the SACCO status from "approved" to "suspended".
+     *
+     * @param  Sacco  $sacco
+     * @return JsonResponse
+     */
+    public function suspend(Sacco $sacco): JsonResponse
+    {
+        if ($sacco->status !== 'approved') {
+            return $this->error(
+                "Cannot suspend a SACCO that is currently '{$sacco->status}'. Only approved SACCOs can be suspended.",
+                422
+            );
+        }
+
+        $sacco->update(['status' => 'suspended']);
+
+        return $this->success(
+            SaccoResource::make($sacco->loadCount('users')),
+            'SACCO has been suspended.'
+        );
+    }
+
+    /**
+     * Reactivate a suspended SACCO.
+     *
+     * Changes the SACCO status from "suspended" back to "approved".
+     *
+     * @param  Sacco  $sacco
+     * @return JsonResponse
+     */
+    public function reactivate(Sacco $sacco): JsonResponse
+    {
+        if ($sacco->status !== 'suspended') {
+            return $this->error(
+                "Cannot reactivate a SACCO that is currently '{$sacco->status}'. Only suspended SACCOs can be reactivated.",
+                422
+            );
+        }
+
+        $sacco->update(['status' => 'approved']);
+
+        return $this->success(
+            SaccoResource::make($sacco->loadCount('users')),
+            'SACCO has been reactivated.'
         );
     }
 }
