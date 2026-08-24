@@ -78,7 +78,7 @@ class SuperadminReportsController extends Controller
             }])
             ->get();
 
-        $comparison = $saccos->map(function ($sacco) {
+        $comparison = $saccos->map(function (Sacco $sacco) {
             $memberIds = $sacco->users()->pluck('id');
 
             // Calculate savings
@@ -104,7 +104,7 @@ class SuperadminReportsController extends Controller
                 'status' => $sacco->status,
                 'members_count' => $sacco->members_count,
                 'total_savings' => $savings,
-                'active_loans_count' => $sacco->active_loans_count,
+                'active_loans_count' => (int) $sacco->active_loans_count,
                 'repayment_rate' => $repaymentRate,
             ];
         });
@@ -192,10 +192,10 @@ class SuperadminReportsController extends Controller
             ->groupBy('region')
             ->orderByDesc('count')
             ->get()
-            ->map(function ($item) {
+            ->map(function (Sacco $item) {
                 return [
                     'region' => $item->region,
-                    'count' => $item->count,
+                    'count' => (int) $item->getAttribute('count'),
                 ];
             });
 
@@ -209,15 +209,15 @@ class SuperadminReportsController extends Controller
         // Also include SACCOs with no region set
         $noRegionCount = Sacco::whereNull('region')->count();
         if ($noRegionCount > 0) {
-            $grandTotal = $total + $noRegionCount;
+            $grandTotal = (int) ($total + $noRegionCount);
             $distribution->push([
                 'region' => 'Unspecified',
                 'count' => $noRegionCount,
                 'percentage' => round(($noRegionCount / $grandTotal) * 100, 1),
             ]);
             // Recalculate percentages with grand total
-            $distribution = $distribution->map(function ($item) use ($grandTotal) {
-                $item['percentage'] = $grandTotal > 0 ? round(($item['count'] / $grandTotal) * 100, 1) : 0;
+            $distribution = $distribution->map(function (array $item) use ($grandTotal) {
+                $item['percentage'] = round(((int) $item['count'] / $grandTotal) * 100, 1);
                 return $item;
             });
         }

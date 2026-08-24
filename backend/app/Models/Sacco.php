@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
+/**
+ * @property string $status
+ * @property int $id
+ * @property string $name
+ * @property string|null $region
+ * @property-read int|null $members_count
+ * @property-read int|null $active_loans_count
+ */
 class Sacco extends Model
 {
     protected $fillable = [
