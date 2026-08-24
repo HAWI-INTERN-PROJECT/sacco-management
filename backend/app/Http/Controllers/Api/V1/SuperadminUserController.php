@@ -179,7 +179,7 @@ class SuperadminUserController extends Controller
                         $user->username,
                         $user->email,
                         $user->role,
-                        $user->sacco?->name ?? 'N/A',
+                        $user->sacco->name ?? 'N/A',
                         $user->is_active ? 'Active' : 'Suspended',
                         $user->created_at?->toDateTimeString() ?? '',
                     ]);
