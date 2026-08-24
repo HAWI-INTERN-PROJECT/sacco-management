@@ -4,9 +4,6 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  CreditCard,
-  Wallet,
-  Landmark,
   BarChart3,
   Settings,
   HelpCircle,
@@ -40,16 +37,9 @@ export const SuperAdminLayout: React.FC = () => {
   const mainNavItems = [
     { label: "Dashboard", path: "/super-admin", icon: LayoutDashboard },
     { label: "SACCOs", path: "/super-admin/saccos", icon: Building2 },
-    { label: "Members", path: "/super-admin/members", icon: Users },
-    { label: "Loans", path: "/super-admin/loans", icon: CreditCard },
-    { label: "Savings", path: "/super-admin/savings", icon: Wallet },
-    { label: "Accounts", path: "/super-admin/accounts", icon: Landmark },
-    { label: "Reports", path: "/super-admin/reports", icon: BarChart3 },
-  ];
-
-  const bottomNavItems = [
-    { label: "Settings", path: "/super-admin/settings", icon: Settings },
-    { label: "Support", path: "/super-admin/support", icon: HelpCircle },
+    { label: "All Users", path: "/super-admin/users", icon: Users },
+    { label: "Platform Reports", path: "/super-admin/reports", icon: BarChart3 },
+    { label: "Platform Settings", path: "/super-admin/settings", icon: Settings },
   ];
 
   const isActive = (path: string) => {
@@ -65,10 +55,10 @@ export const SuperAdminLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F4F6F9] flex flex-col md:flex-row font-sans text-slate-900">
       {/* Mobile Top Header */}
-      <div className="md:hidden bg-[#0B1727] text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
+      <div className="md:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
         <div className="flex items-center gap-3">
           <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700/60">
-            <Building2 className="w-5 h-5 text-amber-500" />
+            <Building2 className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="font-extrabold text-base leading-tight tracking-wide">
@@ -96,13 +86,13 @@ export const SuperAdminLayout: React.FC = () => {
       <aside
         className={`${
           mobileMenuOpen ? "block" : "hidden"
-        } md:block w-full md:w-64 bg-[#0B1727] text-slate-300 shrink-0 flex flex-col justify-between z-40 select-none`}
+        } md:block w-full md:w-[260px] bg-[#0F172A] text-slate-300 shrink-0 flex flex-col justify-between z-40 select-none`}
       >
         <div>
           {/* Brand Logo Header */}
           <div className="hidden md:flex items-center gap-3 px-6 py-5 border-b border-slate-800/80">
             <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-700/60 shadow-xs shrink-0">
-              <Building2 className="w-6 h-6 text-amber-500" />
+              <Building2 className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="font-extrabold text-lg text-white leading-snug tracking-wide">
@@ -118,7 +108,7 @@ export const SuperAdminLayout: React.FC = () => {
           <div className="px-4 py-4">
             <Link
               to="/super-admin/saccos"
-              className="w-full flex items-center justify-center gap-2 bg-[#9A7B1C] hover:bg-[#856816] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Application</span>
@@ -137,12 +127,12 @@ export const SuperAdminLayout: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#9A7B1C] text-white font-semibold shadow-2xs"
-                      : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
+                      ? "bg-slate-800/80 text-[#F59E0B] font-semibold shadow-2xs border-l-4 border-[#F59E0B]"
+                      : "text-slate-300 hover:bg-slate-800/60 hover:text-white border-l-4 border-transparent"
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${active ? "text-white" : "text-slate-400"}`}
+                    className={`w-5 h-5 ${active ? "text-[#F59E0B]" : "text-slate-400"}`}
                   />
                   <span>{item.label}</span>
                 </Link>
@@ -152,26 +142,29 @@ export const SuperAdminLayout: React.FC = () => {
         </div>
 
         {/* Bottom Navigation & User Profile */}
-        <div className="p-3 border-t border-slate-800/80 space-y-1">
-          {bottomNavItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  active
-                    ? "bg-[#9A7B1C] text-white font-semibold shadow-2xs"
-                    : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
-                }`}
-              >
-                <Icon className="w-5 h-5 text-slate-400" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+        <div className="p-4 border-t border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <img
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80"
+              alt="Admin Avatar"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-700 shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-white truncate">
+                {user?.name || "Admin User"}
+              </div>
+              <div className="text-[10px] text-[#F59E0B] font-bold uppercase tracking-wide">
+                Superadmin
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+              title="Logout"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -182,11 +175,8 @@ export const SuperAdminLayout: React.FC = () => {
           {/* Left Title & Badge */}
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-lg font-bold text-slate-900 truncate">
-              {isDashboard ? "Platform Superadmin" : "SACCO Management System"}
+              Platform Admin
             </h1>
-            <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-[#F3E8FF] text-[#9333EA] shrink-0">
-              {isDashboard ? "Superadmin" : "Platform Superadmin"}
-            </span>
           </div>
 
           {/* Right Header Search & Actions */}
@@ -221,28 +211,14 @@ export const SuperAdminLayout: React.FC = () => {
 
             {/* Profile User Info */}
             <div className="flex items-center gap-3">
-              {isDashboard && (
-                <div className="hidden md:block text-right">
-                  <div className="text-xs font-bold text-slate-900 leading-tight">
-                    {user?.name || "Admin User"}
-                  </div>
-                  <div className="text-[10px] text-slate-500 font-medium">
-                    System Administrator
-                  </div>
-                </div>
-              )}
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-[#F59E0B] text-white shrink-0">
+                Platform Admin
+              </span>
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80"
                 alt="Admin Avatar"
                 className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-200 shrink-0"
               />
-              <button
-                onClick={handleLogout}
-                className="text-xs font-semibold text-slate-600 hover:text-rose-600 transition-colors ml-1"
-                title="Logout"
-              >
-                Logout
-              </button>
             </div>
           </div>
         </header>
