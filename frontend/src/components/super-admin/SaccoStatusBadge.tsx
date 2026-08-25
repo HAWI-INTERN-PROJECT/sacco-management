@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type SaccoStatus = 'pending' | 'approved' | 'rejected' | 'Pending' | 'Approved' | 'Rejected'
+export type SaccoStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'Pending' | 'Approved' | 'Rejected' | 'Suspended'
 
 interface SaccoStatusBadgeProps {
   status: SaccoStatus
@@ -8,7 +8,7 @@ interface SaccoStatusBadgeProps {
 }
 
 export const SaccoStatusBadge: React.FC<SaccoStatusBadgeProps> = ({ status, className = '' }) => {
-  const normalized = status.toLowerCase() as 'pending' | 'approved' | 'rejected'
+  const normalized = status.toLowerCase() as 'pending' | 'approved' | 'rejected' | 'suspended'
 
   switch (normalized) {
     case 'pending':
@@ -33,6 +33,14 @@ export const SaccoStatusBadge: React.FC<SaccoStatusBadgeProps> = ({ status, clas
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#FEE2E2] text-[#B91C1C] ${className}`}
         >
           Rejected
+        </span>
+      )
+    case 'suspended':
+      return (
+        <span
+          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#FEF3C7] text-[#92400E] border border-amber-300 ${className}`}
+        >
+          Suspended
         </span>
       )
     default:
