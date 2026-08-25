@@ -123,9 +123,14 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_a
     Route::patch('loans/{loan}/approve', [LoanController::class, 'approve'])->name('api.v1.loans.approve');
     Route::patch('loans/{loan}/reject', [LoanController::class, 'reject'])->name('api.v1.loans.reject');
     Route::patch('loans/{loan}/disburse', [LoanController::class, 'disburse'])->name('api.v1.loans.disburse');
-    Route::post('loans/{loan}/repayments', [RepaymentController::class, 'store'])->name('api.v1.loans.repayments.store');
     Route::get('repayments/overdue', [RepaymentController::class, 'overdue'])->name('api.v1.repayments.overdue');
 });
+
+// Both SACCO administrators and the loan owner may record a manual repayment.
+// The controller performs the ownership/SACCO checks for the bound loan.
+Route::post('loans/{loan}/repayments', [RepaymentController::class, 'store'])
+    ->middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_admin,member'])
+    ->name('api.v1.loans.repayments.store');
 
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:member'])->group(function (): void {
     Route::post('loans', [LoanController::class, 'store'])->name('api.v1.loans.store');
