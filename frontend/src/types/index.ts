@@ -47,7 +47,7 @@ export interface Sacco {
   id: number
   name: string
   registration_number: string
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'suspended'
   rejection_reason?: string | null
   members_count?: number
   created_at: string
@@ -185,4 +185,55 @@ export interface AdminDashboardMetrics {
     value: number
     total_shares: number
   }
+}
+
+export interface PlatformSetting {
+  id?: number
+  auto_approve_saccos: boolean
+  require_registration_verification: boolean
+  max_saccos_allowed: number | null
+  default_interest_rate: number
+  default_share_value: number
+  default_loan_to_savings_ratio: number
+  notify_new_sacco_registration: boolean
+  notify_sacco_milestone: boolean
+  weekly_platform_summary: boolean
+  platform_name: string
+  support_email: string | null
+  terms_of_service_url: string | null
+  privacy_policy_url: string | null
+}
+
+export interface GrowthTrend {
+  month: string
+  month_short: string
+  members: number
+  savings: number
+  loans: number
+  new_saccos?: number
+  cumulative?: number
+}
+
+export interface GeographicDistribution {
+  region: string
+  count: number
+  percentage: number
+}
+
+export interface SaccoComparison {
+  id: number
+  name: string
+  status: string
+  members_count: number
+  total_savings: number
+  active_loans_count: number
+  repayment_rate: number
+}
+
+export interface PlatformOverview {
+  total_savings: number
+  total_loans_disbursed: number
+  total_repayments_collected: number
+  platform_growth: number
+  total_members: number
 }

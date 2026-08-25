@@ -2,8 +2,10 @@ import api from '../lib/api'
 import type { Sacco, PaginatedResponse, DashboardStats, ExtendedSaccoDetails } from '../types'
 
 export interface GetSaccosParams {
-  status?: 'pending' | 'approved' | 'rejected' | string
+  status?: 'pending' | 'approved' | 'rejected' | 'suspended' | string
   search?: string
+  region?: string
+  sort?: string
   page?: number
 }
 
@@ -58,6 +60,21 @@ export const adminSaccoService = {
       `/admin/saccos/${id}/reject`,
       payload
     )
+    return response.data
+  },
+
+  suspendSacco: async (id: string | number): Promise<{ success?: boolean; message?: string; data: Sacco }> => {
+    const response = await api.patch<{ success?: boolean; message?: string; data: Sacco }>(`/admin/saccos/${id}/suspend`)
+    return response.data
+  },
+
+  reactivateSacco: async (id: string | number): Promise<{ success?: boolean; message?: string; data: Sacco }> => {
+    const response = await api.patch<{ success?: boolean; message?: string; data: Sacco }>(`/admin/saccos/${id}/reactivate`)
+    return response.data
+  },
+
+  getSaccoGrowth: async (): Promise<{ success?: boolean; data: any[] }> => {
+    const response = await api.get<{ success?: boolean; data: any[] }>('/admin/dashboard/sacco-growth')
     return response.data
   },
 }
