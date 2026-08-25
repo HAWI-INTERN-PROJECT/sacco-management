@@ -64,7 +64,6 @@
     "en": "English",
     "am": "አማርኛ"
   },
-
   "member": {
     "member_id": "የአባል መታወቂያ: #{{id}}",
     "quick_payment": "ፈጣን ክፍያ",
@@ -160,7 +159,8 @@
       "load_error": "የትርፍ ድርሻዎን መጫን አልተቻለም",
       "load_error_description": "እባክዎ ግንኙነትዎን ያረጋግጡ እና እንደገና ይሞክሩ።",
       "try_again": "እንደገና ይሞክሩ"
-    },    "loan_details": {
+    },
+    "loan_details": {
       "title": "የብድር ዝርዝር",
       "subtitle": "የብድር መረጃዎን፣ የክፍያ መርሃ ግብርዎን እና ክፍያዎችዎን ይመልከቱ።",
       "back_to_loans": "ወደ የእኔ ብድሮች ተመለስ",
@@ -248,6 +248,42 @@
       "recent_transactions": "የቅርብ ጊዜ ግብይቶች",
       "loans_count": "የብድር ብዛት",
       "shares_total": "ጠቅላላ አክሲዮን"
+    },
+    "payments": {
+      "title": "ክፍያዎች",
+      "subtitle": "ለአንዱ የብድር ክፍያ መርሃ ግብር በእጅ ክፍያ ይመዝግቡ።",
+      "refresh": "አድስ",
+      "make_payment": "ክፍያ ያድርጉ",
+      "loan": "ብድር",
+      "choose_loan": "ብድር ይምረጡ",
+      "installment": "የክፍያ ዙር",
+      "installment_number": "ክፍያ {{number}}",
+      "due_date": "የመክፈያ ቀን",
+      "total_due": "ጠቅላላ የሚከፈል",
+      "amount_paid": "የተከፈለ መጠን",
+      "remaining": "ቀሪ ሂሳብ",
+      "amount": "የክፍያ መጠን",
+      "amount_required": "የክፍያ መጠን ያስፈልጋል።",
+      "amount_invalid": "ከዜሮ የሚበልጥ መጠን ያስገቡ።",
+      "amount_exceeds": "መጠኑ ከቀሪ ሂሳብ መብለጥ አይችልም።",
+      "method": "የክፍያ ዘዴ",
+      "method_cash": "ጥሬ ገንዘብ",
+      "method_bank_transfer": "የባንክ ዝውውር",
+      "method_mobile_money": "ሞባይል ገንዘብ",
+      "method_manual": "በእጅ",
+      "submit": "ክፍያ ይመዝግቡ",
+      "submitting": "ክፍያ በመመዝገብ ላይ...",
+      "success": "የብድር ክፍያ በተሳካ ሁኔታ ተመዝግቧል።",
+      "submit_error": "ክፍያውን መመዝገብ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+      "history": "የክፍያ ታሪክ",
+      "no_history": "ለዚህ ብድር ገና ምንም ክፍያ አልተመዘገበም።",
+      "empty_title": "ምንም ክፍያ የለም",
+      "empty_description": "ክፍያ ለመመዝገብ ያልተከፈለ ክፍያ ያለው ንቁ ብድር ያስፈልጋል።",
+      "no_installments": "ይህ ብድር ያልተከፈለ የክፍያ ዙር የለውም።",
+      "load_error": "ክፍያዎችን መጫን አልተቻለም",
+      "loan_load_error": "ይህን ብድር መጫን አልተቻለም",
+      "load_error_description": "እባክዎ ግንኙነትዎን ያረጋግጡ እና እንደገና ይሞክሩ።",
+      "try_again": "እንደገና ይሞክሩ"
     }
   }
 }

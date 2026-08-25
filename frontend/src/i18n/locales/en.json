@@ -64,7 +64,6 @@
     "en": "English",
     "am": "Amharic"
   },
-
   "member": {
     "member_id": "Member ID: #{{id}}",
     "quick_payment": "Quick Payment",
@@ -249,6 +248,42 @@
       "recent_transactions": "Recent Transactions",
       "loans_count": "Loans count",
       "shares_total": "Shares total"
+    },
+    "payments": {
+      "title": "Payments",
+      "subtitle": "Record a manual repayment for one of your loan installments.",
+      "refresh": "Refresh",
+      "make_payment": "Make a payment",
+      "loan": "Loan",
+      "choose_loan": "Choose a loan",
+      "installment": "Installment",
+      "installment_number": "Installment {{number}}",
+      "due_date": "Due date",
+      "total_due": "Total due",
+      "amount_paid": "Amount already paid",
+      "remaining": "Remaining balance",
+      "amount": "Payment amount",
+      "amount_required": "A payment amount is required.",
+      "amount_invalid": "Enter an amount greater than zero.",
+      "amount_exceeds": "The amount cannot exceed the remaining balance.",
+      "method": "Payment method",
+      "method_cash": "Cash",
+      "method_bank_transfer": "Bank transfer",
+      "method_mobile_money": "Mobile money",
+      "method_manual": "Manual",
+      "submit": "Record payment",
+      "submitting": "Recording payment...",
+      "success": "Repayment recorded successfully.",
+      "submit_error": "Unable to record the payment. Please try again.",
+      "history": "Payment history",
+      "no_history": "No payments have been recorded for this loan yet.",
+      "empty_title": "No payments are available",
+      "empty_description": "You need an active loan with unpaid installments before you can record a payment.",
+      "no_installments": "This loan has no unpaid installments.",
+      "load_error": "Unable to load payments",
+      "loan_load_error": "Unable to load this loan",
+      "load_error_description": "Please check your connection and try again.",
+      "try_again": "Try again"
     }
   }
 }
