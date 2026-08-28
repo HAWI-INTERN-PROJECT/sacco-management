@@ -116,6 +116,35 @@ class RepaymentEndpointsTest extends TestCase
         ]);
     }
 
+    public function test_member_can_record_a_repayment_for_their_own_loan(): void
+    {
+        [$loan, $schedule] = $this->createActiveLoanWithSchedule($this->memberA1, $this->saccoA, 1000.00);
+
+        $response = $this->actingAs($this->memberA1)->postJson("/api/v1/loans/{$loan->id}/repayments", [
+            'schedule_id' => $schedule->id,
+            'amount_paid' => 400.00,
+            'payment_date' => '2026-08-16',
+            'method' => 'cash',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.repayment.recorded_by', $this->memberA1->id)
+            ->assertJsonPath('data.updated_schedule_entry.amount_paid', 400);
+    }
+
+    public function test_member_cannot_record_a_repayment_for_another_members_loan(): void
+    {
+        [$loan, $schedule] = $this->createActiveLoanWithSchedule($this->memberA1, $this->saccoA);
+
+        $response = $this->actingAs($this->memberA2)->postJson("/api/v1/loans/{$loan->id}/repayments", [
+            'schedule_id' => $schedule->id,
+            'amount_paid' => 100.00,
+            'payment_date' => '2026-08-16',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseCount('repayments', 0);
+    }
     public function test_repayment_requires_schedule_id(): void
     {
         [$loan, $schedule] = $this->createActiveLoanWithSchedule($this->memberA1, $this->saccoA);
