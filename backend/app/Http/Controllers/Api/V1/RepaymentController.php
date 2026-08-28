@@ -32,7 +32,17 @@ class RepaymentController extends Controller
     {
         $user = $request->user();
 
-        if ($loan->sacco_id !== $user->sacco_id) {
+        if ($user->isMember()) {
+            if ($loan->member_id !== $user->id) {
+                return $this->forbidden(
+                    'You do not have permission to record repayments for this loan.'
+                );
+            }
+        } elseif (($user->isAdmin() || $user->role === 'sacco_admin') && $loan->sacco_id !== $user->sacco_id) {
+            return $this->forbidden(
+                'You do not have permission to record repayments for this loan.'
+            );
+        } elseif (! $user->isAdmin() && $user->role !== 'sacco_admin') {
             return $this->forbidden(
                 'You do not have permission to record repayments for this loan.'
             );
