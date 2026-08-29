@@ -28,9 +28,11 @@ import Dividends from "./pages/member/Dividends";
 import Loans from "./pages/member/Loans";
 import LoanDetails from "./pages/member/LoanDetails";
 import ApplyLoan from "./pages/member/ApplyLoan";
-import Notifications from "./pages/member/Notifications";
+import NotificationsPage from "./pages/member/NotificationsPage";
 import Payments from "./pages/member/Payments";
-import Statements from "./pages/member/Statements";
+import StatementsPage from "./pages/member/StatementsPage";
+import ProfilePage from "./pages/member/ProfilePage";
+import HelpSupportPage from "./pages/member/HelpSupportPage";
 //import ApplayLoan from "./pages/member/ApplayLoan";
 
 import { AdminLayout } from "./layouts/admin/AdminLayout";
@@ -221,10 +223,11 @@ export default function App() {
               <Route path="loans/apply" element={<ApplyLoan />} />
               <Route path="loans/:id" element={<LoanDetails />} />
               <Route path="dividends" element={<Dividends />} />
-              <Route path="notifications" element={<Notifications />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="payments" element={<Payments />} />
-              <Route path="statements" element={<Statements />} />
-              {/**<Route path="profile" element={<pr/>} /> **/}
+              <Route path="statements" element={<StatementsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="help-support" element={<HelpSupportPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />
