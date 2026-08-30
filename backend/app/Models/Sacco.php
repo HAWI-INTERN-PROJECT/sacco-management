@@ -32,6 +32,7 @@ class Sacco extends Model
         'max_loan_term',
         'loan_to_savings_ratio',
         'min_shares_per_member',
+        'loan_savings_multiplier',
     ];
 
     /**
