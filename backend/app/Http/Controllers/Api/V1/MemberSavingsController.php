@@ -25,6 +25,10 @@ class MemberSavingsController extends Controller
 
     public function show(ShowSavingsRequest $request, User $member): MemberSavingsResource|JsonResponse
     {
+        if ($member->sacco_id !== $request->user()->sacco_id || $member->role !== 'member') {
+            return $this->forbidden('You do not have permission to view savings for this member.');
+        }
+
         $payload = $this->buildSavingsPayload($member);
 
         ActivityLogger::log('view_savings', "Viewed savings for member {$member->id}", $request, ['member_id' => $member->id]);
@@ -49,6 +53,10 @@ class MemberSavingsController extends Controller
 
         if (! $member) {
             return $this->notFound(__('auth.user_not_found'));
+        }
+
+        if ($member->sacco_id !== $request->user()->sacco_id || $member->role !== 'member') {
+            return $this->forbidden('You do not have permission to modify savings for this member.');
         }
 
         $currentBalance = $this->calculateBalance($member->id);
@@ -89,6 +97,10 @@ class MemberSavingsController extends Controller
 
         if (! $member) {
             return $this->notFound(__('auth.user_not_found'));
+        }
+
+        if ($member->sacco_id !== $request->user()->sacco_id || $member->role !== 'member') {
+            return $this->forbidden('You do not have permission to modify savings for this member.');
         }
 
         $currentBalance = $this->calculateBalance($member->id);

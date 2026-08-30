@@ -1,5 +1,6 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
   Users, Wallet, CreditCard, AlertTriangle, PieChart,
@@ -11,6 +12,7 @@ import {
 } from 'recharts'
 import { adminService } from '../../services/adminService'
 import { useAuthStore } from '../../stores/auth'
+import { exportToCSV } from '../../utils/exportToCSV'
 import { format } from 'date-fns'
 
 const fadeInUp = {
@@ -25,6 +27,7 @@ const staggerContainer = {
 
 export const AdminDashboardPage: React.FC = () => {
   const { user } = useAuthStore()
+  const navigate = useNavigate()
   
   // Fetch Metrics
   const { data: metrics } = useQuery({
@@ -62,6 +65,29 @@ export const AdminDashboardPage: React.FC = () => {
     rejected: '#EF4444'
   }
 
+  const handleExportReport = () => {
+    if (!metrics) {
+      alert('No dashboard metrics available to export.')
+      return
+    }
+
+    const rows = [
+      { metric: 'Total Members', value: metrics.total_members?.value || 0, details: `+${metrics.total_members?.change || 0} this month` },
+      { metric: 'Total Savings', value: `ETB ${metrics.total_savings?.value || 0}`, details: `+ETB ${metrics.total_savings?.change || 0} this month` },
+      { metric: 'Active Loans', value: metrics.active_loans?.value || 0, details: `ETB ${metrics.active_loans?.outstanding_amount || 0} outstanding` },
+      { metric: 'Overdue Repayments', value: metrics.overdue_repayments?.count || 0, details: `ETB ${metrics.overdue_repayments?.amount || 0} total overdue` },
+      { metric: 'Share Capital', value: `ETB ${metrics.share_capital?.value || 0}`, details: `${metrics.share_capital?.total_shares || 0} total shares` },
+    ]
+
+    const columns = [
+      { header: 'Metric', accessor: (row: any) => row.metric },
+      { header: 'Value', accessor: (row: any) => row.value },
+      { header: 'Details', accessor: (row: any) => row.details },
+    ]
+
+    exportToCSV('sacco-dashboard-report.csv', columns, rows)
+  }
+
   return (
     <motion.div 
       className="space-y-6 max-w-7xl mx-auto"
@@ -78,11 +104,17 @@ export const AdminDashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <button 
+            onClick={handleExportReport}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
             <Download className="w-4 h-4" />
             Export Report
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-[#0B6B3A] text-white rounded-lg text-sm font-medium hover:bg-[#095730] transition-colors shadow-sm">
+          <button 
+            onClick={() => navigate('/admin/savings')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#0B6B3A] text-white rounded-lg text-sm font-medium hover:bg-[#095730] transition-colors shadow-sm cursor-pointer"
+          >
             <TrendingUp className="w-4 h-4" />
             New Transaction
           </button>
