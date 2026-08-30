@@ -31,6 +31,8 @@ import ApplyLoan from "./pages/member/ApplyLoan";
 import Notifications from "./pages/member/Notifications";
 import Payments from "./pages/member/Payments";
 import Statements from "./pages/member/Statements";
+import AcceptInvitePage from "./pages/member/AcceptInvitePage";
+import ProfileSettingsPage from "./pages/member/ProfileSettingsPage";
 //import ApplayLoan from "./pages/member/ApplayLoan";
 
 import { AdminLayout } from "./layouts/admin/AdminLayout";
@@ -143,6 +145,7 @@ export default function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/member/accept-invite" element={<AcceptInvitePage />} />
             </Route>
             <Route
               path="/login"
@@ -224,7 +227,7 @@ export default function App() {
               <Route path="notifications" element={<Notifications />} />
               <Route path="payments" element={<Payments />} />
               <Route path="statements" element={<Statements />} />
-              {/**<Route path="profile" element={<pr/>} /> **/}
+              <Route path="profile" element={<ProfileSettingsPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />
