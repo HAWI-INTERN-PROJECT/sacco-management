@@ -15,6 +15,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\LoanApplicationSubmitted;
+use App\Models\User;
 
 class LoanController extends Controller
 {
@@ -107,6 +110,14 @@ class LoanController extends Controller
             }
             
             DB::commit();
+
+            // Notify SACCO Admins
+            $admins = User::where('sacco_id', $user->sacco_id)
+                          ->where('role', 'admin')
+                          ->get();
+            if ($admins->isNotEmpty()) {
+                Notification::send($admins, new LoanApplicationSubmitted($loan));
+            }
 
             return $this->created(
                 LoanResource::make($loan),
