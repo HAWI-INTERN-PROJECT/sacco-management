@@ -25,6 +25,10 @@ export default function RegisterPage() {
     admin_email: z.string().email('Invalid admin email'),
     password: z.string().min(8, t('auth.passwordMin')),
     password_confirmation: z.string(),
+    national_id: z.string().min(1, 'National ID is required'),
+    region: z.string().min(1, 'Region is required'),
+    zone: z.string().min(1, 'Zone is required'),
+    town: z.string().min(1, 'Town is required'),
   }).refine((data) => data.password === data.password_confirmation, {
     message: t('auth.passwordMatch'),
     path: ['password_confirmation'],
@@ -62,6 +66,10 @@ export default function RegisterPage() {
         admin_username: autoUsername,
         password: data.password,
         password_confirmation: data.password_confirmation,
+        national_id: data.national_id,
+        region: data.region,
+        zone: data.zone,
+        town: data.town,
       })
       toast.success('Account created successfully')
       navigate('/dashboard')
@@ -223,6 +231,52 @@ export default function RegisterPage() {
                     {...register('admin_email')}
                   />
                   {errors.admin_email && <p className="text-sm text-red-500">{errors.admin_email.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">National ID <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 1234567890"
+                    className={`w-full px-4 py-3 rounded-xl border ${errors.national_id ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                    {...register('national_id')}
+                  />
+                  {errors.national_id && <p className="text-sm text-red-500">{errors.national_id.message}</p>}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Region <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Oromia"
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.region ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                      {...register('region')}
+                    />
+                    {errors.region && <p className="text-sm text-red-500">{errors.region.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Zone <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Shewa"
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.zone ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                      {...register('zone')}
+                    />
+                    {errors.zone && <p className="text-sm text-red-500">{errors.zone.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Town/City <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Adama"
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.town ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                      {...register('town')}
+                    />
+                    {errors.town && <p className="text-sm text-red-500">{errors.town.message}</p>}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
