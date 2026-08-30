@@ -1,17 +1,83 @@
 import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Download, Eye, Landmark } from 'lucide-react'
+import { Download, Eye, Landmark, Loader2, X, CheckCircle, XCircle } from 'lucide-react'
+import * as Dialog from '@radix-ui/react-dialog'
 import { adminService } from '../../services/adminService'
 import { exportToCSV } from '../../utils/exportToCSV'
 
 export const LoansPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [page, setPage] = useState(1)
+  const queryClient = useQueryClient()
 
   const { data: loanData, isLoading } = useQuery({
     queryKey: ['adminLoans', activeTab, page],
     queryFn: () => adminService.getLoans(activeTab, page)
+  })
+
+  // Modals state
+  const [reviewLoan, setReviewLoan] = useState<any>(null)
+  const [disburseLoan, setDisburseLoan] = useState<any>(null)
+  const [detailLoan, setDetailLoan] = useState<any>(null)
+
+  // Review Form State
+  const [interestRate, setInterestRate] = useState('')
+  const [termMonths, setTermMonths] = useState('')
+  const [rejectionReason, setRejectionReason] = useState('')
+  
+  const openReviewModal = (loan: any) => {
+    setReviewLoan(loan)
+    setInterestRate(loan.interest_rate?.toString() || '12') // Default 12% if none
+    setTermMonths(loan.term_months?.toString() || '6') // Default from loan request
+    setRejectionReason('')
+  }
+  
+  const handleCloseModals = () => {
+    setReviewLoan(null)
+    setDisburseLoan(null)
+    setDetailLoan(null)
+  }
+
+  // Mutations
+  const approveMutation = useMutation({
+    mutationFn: () => adminService.approveLoan(reviewLoan.id, {
+      interest_rate: Number(interestRate),
+      term_months: Number(termMonths)
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminLoans'] })
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardMetrics'] })
+      handleCloseModals()
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.message || 'Failed to approve loan.')
+    }
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: () => adminService.rejectLoan(reviewLoan.id, {
+      rejection_reason: rejectionReason
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminLoans'] })
+      handleCloseModals()
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.message || 'Failed to reject loan.')
+    }
+  })
+
+  const disburseMutation = useMutation({
+    mutationFn: () => adminService.disburseLoan(disburseLoan.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminLoans'] })
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardMetrics'] })
+      handleCloseModals()
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.message || 'Failed to disburse loan.')
+    }
   })
 
   const tabs = [
@@ -122,7 +188,7 @@ export const LoansPage: React.FC = () => {
                   <td colSpan={7} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">Loading loans...</td>
                 </tr>
               ) : displayLoans.length > 0 ? (
-                displayLoans.map((loan, index) => (
+                displayLoans.map((loan: any, index: number) => (
                   <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <a href="#" className="font-semibold text-[#0B6B3A] dark:text-emerald-400 hover:underline">
@@ -140,7 +206,7 @@ export const LoansPage: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
                         <span className="text-slate-500 dark:text-slate-400 text-xs font-normal mr-1">ETB</span>
-                        {loan.amount.toLocaleString()}
+                        {Number(loan.amount || loan.principal_amount || 0).toLocaleString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400 capitalize">{loan.purpose}</td>
@@ -161,15 +227,15 @@ export const LoansPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {loan.status === 'pending' ? (
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#0B6B3A] dark:border-emerald-500 text-[#0B6B3A] dark:text-emerald-400 rounded-full text-xs font-semibold hover:bg-[#ECFDF5] dark:hover:bg-emerald-500/10 transition-colors">
+                        <button onClick={() => openReviewModal(loan)} className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#0B6B3A] dark:border-emerald-500 text-[#0B6B3A] dark:text-emerald-400 rounded-full text-xs font-semibold hover:bg-[#ECFDF5] dark:hover:bg-emerald-500/10 transition-colors">
                           <Eye className="w-3.5 h-3.5" /> Review
                         </button>
                       ) : loan.status === 'approved' ? (
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0B6B3A] dark:bg-emerald-600 text-white rounded-full text-xs font-semibold hover:bg-[#095730] dark:hover:bg-emerald-700 transition-colors">
+                        <button onClick={() => setDisburseLoan(loan)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0B6B3A] dark:bg-emerald-600 text-white rounded-full text-xs font-semibold hover:bg-[#095730] dark:hover:bg-emerald-700 transition-colors">
                           <Landmark className="w-3.5 h-3.5" /> Disburse
                         </button>
                       ) : (
-                        <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors">
+                        <button onClick={() => setDetailLoan(loan)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors">
                           {loan.status === 'active' ? 'Details' : loan.status === 'closed' ? 'History' : 'Notes'}
                         </button>
                       )}
@@ -211,6 +277,186 @@ export const LoansPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      <Dialog.Root open={!!reviewLoan} onOpenChange={(open) => !open && handleCloseModals()}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+              <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                Review Loan Application
+              </Dialog.Title>
+              <button onClick={handleCloseModals} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              {reviewLoan && (
+                <>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Member</div>
+                        <div className="text-sm font-bold text-slate-900 dark:text-white">{reviewLoan.user?.name || reviewLoan.member?.name}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Requested Amount</div>
+                        <div className="text-sm font-bold text-[#0B6B3A] dark:text-emerald-400">ETB {Number(reviewLoan.amount || reviewLoan.principal_amount).toLocaleString()}</div>
+                      </div>
+                      <div className="col-span-2">
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Purpose</div>
+                        <div className="text-sm text-slate-700 dark:text-slate-300 capitalize">{reviewLoan.purpose}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Interest Rate (%)</label>
+                      <input 
+                        type="number" 
+                        value={interestRate} 
+                        onChange={e => setInterestRate(e.target.value)} 
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A] text-slate-900 dark:text-white" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Term (Months)</label>
+                      <input 
+                        type="number" 
+                        value={termMonths} 
+                        onChange={e => setTermMonths(e.target.value)} 
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A] text-slate-900 dark:text-white" 
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Rejection Reason (if rejecting)</label>
+                    <textarea 
+                      value={rejectionReason} 
+                      onChange={e => setRejectionReason(e.target.value)} 
+                      rows={2}
+                      placeholder="Only required if rejecting the loan"
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 text-slate-900 dark:text-white resize-none" 
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between bg-slate-50/50 dark:bg-slate-800/50">
+              <button 
+                onClick={() => rejectMutation.mutate()} 
+                disabled={rejectMutation.isPending || approveMutation.isPending || !rejectionReason} 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border-2 border-rose-500 text-rose-600 dark:text-rose-400 rounded-lg text-sm font-bold hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+              >
+                {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                Reject
+              </button>
+              <button 
+                onClick={() => approveMutation.mutate()} 
+                disabled={approveMutation.isPending || rejectMutation.isPending || !interestRate || !termMonths} 
+                className="inline-flex items-center gap-2 px-6 py-2 bg-[#0B6B3A] text-white rounded-lg text-sm font-bold hover:bg-[#095730] transition-colors shadow-md disabled:opacity-50"
+              >
+                {approveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                Approve Loan
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Disburse Modal */}
+      <Dialog.Root open={!!disburseLoan} onOpenChange={(open) => !open && handleCloseModals()}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800 p-6 text-center">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Landmark className="w-8 h-8" />
+            </div>
+            <Dialog.Title className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+              Disburse Loan
+            </Dialog.Title>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+              You are about to disburse <strong className="text-slate-900 dark:text-white">ETB {Number(disburseLoan?.amount || disburseLoan?.principal_amount || 0).toLocaleString()}</strong> to <strong className="text-slate-900 dark:text-white">{disburseLoan?.user?.name || disburseLoan?.member?.name}</strong>. This will activate the loan and generate the repayment schedule.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={handleCloseModals} className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                Cancel
+              </button>
+              <button 
+                onClick={() => disburseMutation.mutate()} 
+                disabled={disburseMutation.isPending} 
+                className="flex-1 py-2.5 bg-[#0B6B3A] text-white font-bold rounded-lg hover:bg-[#095730] transition-colors flex items-center justify-center gap-2"
+              >
+                {disburseMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                Disburse Now
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Details Modal */}
+      <Dialog.Root open={!!detailLoan} onOpenChange={(open) => !open && handleCloseModals()}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+              <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                Loan Details
+              </Dialog.Title>
+              <button onClick={handleCloseModals} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              {detailLoan && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-xs text-slate-500 font-medium">Loan Number</div>
+                      <div className="font-bold text-slate-900 dark:text-white">{detailLoan.loan_number}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-medium">Status</div>
+                      <div className="font-bold text-slate-900 dark:text-white capitalize">{detailLoan.status}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-medium">Principal</div>
+                      <div className="font-bold text-slate-900 dark:text-white">ETB {Number(detailLoan.amount || detailLoan.principal_amount).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-medium">Total Repayable</div>
+                      <div className="font-bold text-[#0B6B3A] dark:text-emerald-400">ETB {Number(detailLoan.total_repayable || 0).toLocaleString()}</div>
+                    </div>
+                    {detailLoan.rejection_reason && (
+                      <div className="col-span-2 mt-2 p-3 bg-rose-50 dark:bg-rose-500/10 rounded border border-rose-200 dark:border-rose-900/50">
+                        <div className="text-xs text-rose-600 dark:text-rose-400 font-bold mb-1">Rejection Reason</div>
+                        <div className="text-sm text-rose-700 dark:text-rose-300">{detailLoan.rejection_reason}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      To manage repayments and view the full amortization schedule for this loan, please navigate to the <strong className="text-slate-900 dark:text-white">Repayments</strong> page.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-end bg-slate-50/50 dark:bg-slate-800/50">
+              <button onClick={handleCloseModals} className="px-6 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors">
+                Close
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
     </motion.div>
   )
 }
