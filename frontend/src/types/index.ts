@@ -10,6 +10,7 @@ export interface User {
   region?: string
   zone?: string
   town?: string
+  savings_balance?: number
   email_verified_at: string | null
   created_at: string
   updated_at: string
