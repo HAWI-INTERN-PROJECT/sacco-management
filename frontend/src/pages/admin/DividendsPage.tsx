@@ -9,6 +9,7 @@ export const DividendsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('new')
   const [period, setPeriod] = useState('FY 2025/2026')
   const [poolAmount, setPoolAmount] = useState('500000')
+  const [reservePercentage, setReservePercentage] = useState('20')
   const queryClient = useQueryClient()
   
   const { data: historyData } = useQuery({
@@ -17,11 +18,11 @@ export const DividendsPage: React.FC = () => {
   })
 
   const calculateMutation = useMutation({
-    mutationFn: (data: { period: string, total_pool: number }) => adminService.calculateDividends(data)
+    mutationFn: (data: { period: string, total_pool: number, reserve_percentage: number }) => adminService.calculateDividends(data)
   })
 
   const distributeMutation = useMutation({
-    mutationFn: (data: { period: string, total_pool: number }) => adminService.distributeDividends(data),
+    mutationFn: (data: { period: string, total_pool: number, reserve_percentage: number }) => adminService.distributeDividends(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminDividendsHistory'] })
       alert('Dividends distributed successfully!')
@@ -35,14 +36,16 @@ export const DividendsPage: React.FC = () => {
 
   const handleCalculate = () => {
     const amount = Number(poolAmount.replace(/,/g, ''))
-    if (!amount || isNaN(amount)) return
-    calculateMutation.mutate({ period, total_pool: amount })
+    const reserve = Number(reservePercentage)
+    if (!amount || isNaN(amount) || isNaN(reserve)) return
+    calculateMutation.mutate({ period, total_pool: amount, reserve_percentage: reserve })
   }
 
   const handleCommit = () => {
     if (!calculateMutation.data) return
     const amount = Number(poolAmount.replace(/,/g, ''))
-    distributeMutation.mutate({ period, total_pool: amount })
+    const reserve = Number(reservePercentage)
+    distributeMutation.mutate({ period, total_pool: amount, reserve_percentage: reserve })
   }
 
   const formatCurrency = (amount: number) => {
@@ -138,7 +141,21 @@ export const DividendsPage: React.FC = () => {
                       className="w-full pl-12 pr-4 py-2.5 text-lg font-bold bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A]" 
                     />
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Amount available for distribution after statutory reserves.</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Statutory Reserve (%)</label>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      value={reservePercentage}
+                      onChange={(e) => setReservePercentage(e.target.value)}
+                      min="0" max="100"
+                      className="w-full pl-4 pr-8 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A]" 
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium">%</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Required percentage to hold back before distribution.</p>
                 </div>
 
                 <button 
@@ -163,18 +180,34 @@ export const DividendsPage: React.FC = () => {
                       {formatCurrency(calculationData.total_pool)}
                     </span>
                   </div>
+
+                  <div className="flex justify-between items-center pb-4 border-b border-white/10 dark:border-slate-700">
+                    <span className="text-emerald-100/80 dark:text-slate-400 text-sm">Statutory Reserve ({calculationData.reserve_percentage}%)</span>
+                    <span className="font-bold text-lg dark:text-white text-emerald-200">
+                      -{formatCurrency(calculationData.reserve_amount)}
+                    </span>
+                  </div>
                   
                   <div className="flex justify-between items-center pb-4 border-b border-white/10 dark:border-slate-700">
-                    <span className="text-emerald-100/80 dark:text-slate-400 text-sm">Total Active Shares</span>
-                    <span className="font-bold text-xl dark:text-white">{calculationData.total_shares.toLocaleString()}</span>
+                    <span className="text-emerald-100/80 dark:text-slate-400 text-sm">Distributable</span>
+                    <span className="font-bold text-lg dark:text-white">
+                      {formatCurrency(calculationData.distributable_pool)}
+                    </span>
                   </div>
 
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-emerald-100/80 dark:text-slate-400 text-sm font-medium">Value per Share</span>
-                    <span className="font-bold text-2xl text-emerald-100 dark:text-emerald-400">
-                      <span className="text-sm font-medium text-emerald-200 dark:text-emerald-500 mr-1">ETB</span>
-                      {calculationData.total_shares > 0 ? formatCurrency(calculationData.total_pool / calculationData.total_shares) : '0.00'}
-                    </span>
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div>
+                      <span className="block text-emerald-100/80 dark:text-slate-400 text-xs font-medium mb-1">Share Pool (70%)</span>
+                      <span className="font-bold text-lg text-emerald-100 dark:text-emerald-400">
+                        {formatCurrency(calculationData.share_pool)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="block text-emerald-100/80 dark:text-slate-400 text-xs font-medium mb-1">Savings Pool (30%)</span>
+                      <span className="font-bold text-lg text-emerald-100 dark:text-emerald-400">
+                        {formatCurrency(calculationData.savings_pool)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -208,9 +241,11 @@ export const DividendsPage: React.FC = () => {
                 <thead className="bg-[#F8FAFC] dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] tracking-wider">
                   <tr>
                     <th className="px-6 py-4">Member</th>
-                    <th className="px-6 py-4 text-center">Shares Held</th>
-                    <th className="px-6 py-4 text-center">% Ownership</th>
-                    <th className="px-6 py-4 text-right">Dividend (ETB)</th>
+                    <th className="px-6 py-4 text-center">Shares</th>
+                    <th className="px-6 py-4 text-center">Savings (ETB)</th>
+                    <th className="px-6 py-4 text-right">Share Div</th>
+                    <th className="px-6 py-4 text-right">Sav. Int</th>
+                    <th className="px-6 py-4 text-right">Total (ETB)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -228,18 +263,24 @@ export const DividendsPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-400 font-medium">
-                        {row.shares}
+                        {row.shares} <span className="text-[10px] text-slate-400">({row.share_pct}%)</span>
                       </td>
                       <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
-                        {row.share_pct}%
+                        {formatCurrency(row.savings_balance)} <span className="text-[10px] text-slate-400">({row.savings_pct}%)</span>
                       </td>
-                      <td className="px-6 py-4 text-right font-bold text-slate-900 dark:text-white">
+                      <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-300">
+                        {formatCurrency(row.share_dividend_amount)}
+                      </td>
+                      <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-300">
+                        {formatCurrency(row.savings_interest_amount)}
+                      </td>
+                      <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
                         {formatCurrency(row.amount)}
                       </td>
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
+                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                         Enter total pool amount and click Calculate Distribution to see the preview.
                       </td>
                     </tr>
