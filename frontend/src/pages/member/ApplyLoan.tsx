@@ -52,7 +52,6 @@ export default function ApplyLoan() {
     handleSubmit,
     setError,
     watch,
-    control,
     formState: { errors },
   } = useForm<LoanApplicationForm>({
     defaultValues: { amount: "", purpose: "", loan_type: "Personal", term_months: "12", agree_terms: false },
