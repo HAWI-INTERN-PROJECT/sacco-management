@@ -11,7 +11,7 @@ class LoanApplicationSubmitted extends Notification
 {
     use Queueable;
 
-    public $loan;
+    public Loan $loan;
 
     /**
      * Create a new notification instance.
@@ -23,6 +23,8 @@ class LoanApplicationSubmitted extends Notification
 
     /**
      * Get the notification's delivery channels.
+     *
+     * @return array<string>
      */
     public function via(object $notifiable): array
     {
@@ -31,6 +33,8 @@ class LoanApplicationSubmitted extends Notification
 
     /**
      * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
