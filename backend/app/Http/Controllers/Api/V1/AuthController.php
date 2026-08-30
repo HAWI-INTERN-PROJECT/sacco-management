@@ -75,6 +75,14 @@ class AuthController extends Controller
 
         $user = $request->user();
 
+        // Append savings_balance from latest savings transaction
+        $latestBalance = \App\Models\SavingsTransaction::where('member_id', $user->id)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->value('balance_after');
+
+        $user->savings_balance = (float) ($latestBalance ?? 0);
+
         ActivityLogger::login($request);
 
         return AuthResource::make($user);
@@ -136,7 +144,17 @@ class AuthController extends Controller
      */
     public function profile(Request $request): UserResource
     {
-        return UserResource::make($request->user());
+        $user = $request->user();
+
+        // Append savings_balance from latest savings transaction
+        $latestBalance = \App\Models\SavingsTransaction::where('member_id', $user->id)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->value('balance_after');
+
+        $user->savings_balance = (float) ($latestBalance ?? 0);
+
+        return UserResource::make($user);
     }
 
     /**
