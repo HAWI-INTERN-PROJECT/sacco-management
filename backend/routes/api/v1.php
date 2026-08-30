@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\V1\LoanController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MemberSavingsController;
 use App\Http\Controllers\Api\V1\MemberShareController;
+use App\Http\Controllers\Api\V1\SearchController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PlatformSettingsController;
 use App\Http\Controllers\Api\V1\RepaymentController;
 use App\Http\Controllers\Api\V1\SaccoRegistrationController;
@@ -78,6 +80,18 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
 
     // Member dividends history
     Route::get('me/dividends', [DividendController::class, 'memberHistory'])->name('api.v1.me.dividends');
+
+    /*
+     * Global Search
+     */
+    Route::get('search', [SearchController::class, 'index']);
+
+    /*
+     * Notifications
+     */
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });
 
 // Password reset routes (public with rate limiting)
@@ -97,7 +111,10 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
         Route::get('dashboard/stats', [AdminSaccoController::class, 'stats'])->name('api.v1.admin.dashboard.stats');
         Route::get('dashboard/sacco-growth', [AdminSaccoController::class, 'saccoGrowth'])->name('api.v1.admin.dashboard.sacco-growth');
 
-        // SACCO Management
+
+        /*
+         * SACCO Management Endpoints
+         */
         Route::get('saccos/export', [AdminSaccoController::class, 'export'])->name('api.v1.admin.saccos.export');
         Route::get('saccos', [AdminSaccoController::class, 'index'])->name('api.v1.admin.saccos.index');
         Route::get('saccos/{sacco}', [AdminSaccoController::class, 'show'])->name('api.v1.admin.saccos.show');
