@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('saccos', function (Blueprint $table) {
-            $table->decimal('loan_savings_multiplier', 5, 2)->default(3.00)->after('logo_url');
+            $table->decimal('loan_savings_multiplier', 5, 2)->default(3.00);
         });
     }
 
