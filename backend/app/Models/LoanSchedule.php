@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $interest_due
  * @property float $total_due
  * @property float $amount_paid
+ * @property float $penalty_amount
  * @property string $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -34,6 +35,7 @@ class LoanSchedule extends Model
         'interest_due',
         'total_due',
         'amount_paid',
+        'penalty_amount',
         'status',
     ];
 
@@ -48,6 +50,7 @@ class LoanSchedule extends Model
             'interest_due' => 'decimal:2',
             'total_due' => 'decimal:2',
             'amount_paid' => 'decimal:2',
+            'penalty_amount' => 'decimal:2',
         ];
     }
 

@@ -41,6 +41,7 @@ class SaccoSettingsResource extends JsonResource
             'max_loan_term' => (int) $this->max_loan_term,
             'loan_to_savings_ratio' => (float) $this->loan_to_savings_ratio,
             'min_shares_per_member' => (int) $this->min_shares_per_member,
+            'late_fee_percentage' => (float) ($this->late_fee_percentage ?? 0),
         ];
     }
 }

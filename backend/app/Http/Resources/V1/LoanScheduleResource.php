@@ -37,6 +37,7 @@ class LoanScheduleResource extends JsonResource
             'interest_due' => (float) $this->interest_due,
             'total_due' => (float) $this->total_due,
             'amount_paid' => (float) $this->amount_paid,
+            'penalty_amount' => (float) ($this->penalty_amount ?? 0),
             'status' => $this->status,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
