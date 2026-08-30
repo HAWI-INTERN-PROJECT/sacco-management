@@ -136,5 +136,25 @@ export const adminService = {
   updateSettings: async (data: Record<string, any>) => {
     const response = await api.put('/settings', data)
     return response.data.data
+  },
+
+  // Search
+  search: async (query: string) => {
+    const response = await api.get(`/search?q=${encodeURIComponent(query)}`)
+    return response.data.data
+  },
+
+  // Notifications
+  getNotifications: async () => {
+    const response = await api.get('/notifications')
+    return response.data.data
+  },
+  markNotificationRead: async (id: string) => {
+    const response = await api.patch(`/notifications/${id}/read`)
+    return response.data
+  },
+  markAllNotificationsRead: async () => {
+    const response = await api.post('/notifications/read-all')
+    return response.data
   }
 }
