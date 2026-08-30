@@ -33,6 +33,7 @@ import Payments from "./pages/member/Payments";
 import Statements from "./pages/member/Statements";
 import AcceptInvitePage from "./pages/member/AcceptInvitePage";
 import ProfileSettingsPage from "./pages/member/ProfileSettingsPage";
+import HelpSupportPage from "./pages/member/HelpSupportPage";
 //import ApplayLoan from "./pages/member/ApplayLoan";
 
 import { AdminLayout } from "./layouts/admin/AdminLayout";
@@ -228,6 +229,7 @@ export default function App() {
               <Route path="payments" element={<Payments />} />
               <Route path="statements" element={<Statements />} />
               <Route path="profile" element={<ProfileSettingsPage />} />
+              <Route path="help-support" element={<HelpSupportPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />
