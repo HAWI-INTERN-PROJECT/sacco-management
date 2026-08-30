@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { 
-  UserPlus, Search, Filter, MoreVertical, 
+  UserPlus, Search, Filter, 
   Eye, Edit, Trash2, ChevronLeft, ChevronRight, X, Loader2
 } from 'lucide-react'
 import { adminService } from '../../services/adminService'

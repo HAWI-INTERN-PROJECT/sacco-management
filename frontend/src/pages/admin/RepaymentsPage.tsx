@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Search, CheckCircle2, Download, PlusCircle, Loader2, Calendar, User, DollarSign } from 'lucide-react'
+import { AlertTriangle, Search, CheckCircle2, Download, PlusCircle, Loader2 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { format } from 'date-fns'
 
