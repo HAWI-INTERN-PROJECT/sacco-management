@@ -77,16 +77,16 @@ export const adminService = {
     const response = await api.get(`/loans/${loanId}`)
     return response.data.data
   },
-  approveLoan: async (loanId: number, data: { interest_rate: number, term_months: number, approved_amount: number }) => {
-    const response = await api.post(`/loans/${loanId}/approve`, data)
+  approveLoan: async (loanId: number, data: { interest_rate: number, term_months: number }) => {
+    const response = await api.patch(`/loans/${loanId}/approve`, data)
     return response.data
   },
   rejectLoan: async (loanId: number, data: { rejection_reason: string }) => {
-    const response = await api.post(`/loans/${loanId}/reject`, data)
+    const response = await api.patch(`/loans/${loanId}/reject`, data)
     return response.data
   },
   disburseLoan: async (loanId: number) => {
-    const response = await api.post(`/loans/${loanId}/disburse`)
+    const response = await api.patch(`/loans/${loanId}/disburse`)
     return response.data
   },
 
