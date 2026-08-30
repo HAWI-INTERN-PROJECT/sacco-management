@@ -20,6 +20,9 @@ class Invitation extends Model
         'accepted_at' => 'datetime',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
+     */
     public function sacco(): BelongsTo
     {
         return $this->belongsTo(Sacco::class);

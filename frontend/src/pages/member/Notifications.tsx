@@ -1,4 +1,3 @@
-import React from 'react'
 import { Bell, CheckCircle, AlertCircle, Info, ArrowRight } from 'lucide-react'
 
 export default function Notifications() {

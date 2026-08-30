@@ -20,6 +20,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read int|null $num_shares
  * @property-read float|null $savings_balance
  * @property-read bool $is_active
+ * @property-read string|null $national_id
+ * @property-read string|null $region
+ * @property-read string|null $zone
+ * @property-read string|null $town
  * @property-read Carbon|null $email_verified_at
  * @property-read Carbon|null $created_at
  * @property-read Carbon|null $updated_at

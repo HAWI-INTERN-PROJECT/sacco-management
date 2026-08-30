@@ -59,7 +59,7 @@ class RepaymentApiTest extends TestCase
             'notes' => 'Full payment',
         ]);
 
-        $response->dump();
+
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('repayments', [

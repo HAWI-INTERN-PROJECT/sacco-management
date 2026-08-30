@@ -13,8 +13,8 @@ class MemberInvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $invitation;
-    public $registrationUrl;
+    public Invitation $invitation;
+    public string $registrationUrl;
 
     /**
      * Create a new message instance.
