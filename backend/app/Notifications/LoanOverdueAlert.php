@@ -10,7 +10,7 @@ class LoanOverdueAlert extends Notification
 {
     use Queueable;
 
-    public $schedule;
+    public LoanSchedule $schedule;
 
     /**
      * Create a new notification instance.
@@ -22,6 +22,8 @@ class LoanOverdueAlert extends Notification
 
     /**
      * Get the notification's delivery channels.
+     *
+     * @return array<string>
      */
     public function via(object $notifiable): array
     {
@@ -30,6 +32,8 @@ class LoanOverdueAlert extends Notification
 
     /**
      * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
