@@ -136,6 +136,10 @@ describe('RegisterPage', () => {
     
     await user.type(screen.getByPlaceholderText('Abebe Kebede'), 'Test Admin')
     await user.type(screen.getByPlaceholderText('admin@sacco.com'), 'admin@test.com')
+    await user.type(screen.getByPlaceholderText('e.g. 1234567890'), '1234567890')
+    await user.type(screen.getByPlaceholderText('e.g. Oromia'), 'Oromia')
+    await user.type(screen.getByPlaceholderText('e.g. Shewa'), 'East Shewa')
+    await user.type(screen.getByPlaceholderText('e.g. Adama'), 'Adama')
     
     const passwordInputs = screen.getAllByPlaceholderText('••••••••')
     await user.type(passwordInputs[0], 'password123')
