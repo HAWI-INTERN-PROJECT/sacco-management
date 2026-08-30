@@ -116,13 +116,24 @@ class MemberController extends Controller
      */
     public function store(StoreMemberRequest $request): JsonResponse
     {
+        $username = $request->username ?: explode('@', $request->email)[0];
+        $baseUsername = $username;
+        $counter = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
         $member = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'username' => $username,
+            'password' => Hash::make($request->password ?? 'Password123!'),
+            'num_shares' => $request->num_shares ?? 1,
             'role' => 'member',
             'sacco_id' => $request->user()->sacco_id,
+            'is_active' => true,
         ]);
 
         return $this->created(

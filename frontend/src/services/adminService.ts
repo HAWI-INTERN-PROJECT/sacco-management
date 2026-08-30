@@ -36,6 +36,18 @@ export const adminService = {
     const response = await api.post('/members', data)
     return response.data
   },
+  getMember: async (id: number) => {
+    const response = await api.get<{ data: User }>(`/members/${id}`)
+    return response.data.data
+  },
+  updateMember: async (id: number, data: Partial<User>) => {
+    const response = await api.put(`/members/${id}`, data)
+    return response.data
+  },
+  deleteMember: async (id: number) => {
+    const response = await api.delete(`/members/${id}`)
+    return response.data
+  },
 
   // Savings
   getSavingsTransactions: async (memberId?: number, page = 1) => {
@@ -83,8 +95,8 @@ export const adminService = {
     const response = await api.get('/repayments/overdue')
     return response.data.data
   },
-  recordRepayment: async (data: { loan_schedule_id: number, amount: number, payment_date: string, payment_method: string }) => {
-    const response = await api.post('/repayments', data)
+  recordRepayment: async (loanId: number, data: { schedule_id: number, amount_paid: number, payment_date: string, method?: string }) => {
+    const response = await api.post(`/loans/${loanId}/repayments`, data)
     return response.data
   },
 
