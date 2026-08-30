@@ -32,6 +32,10 @@ class SaccoRegistrationRequest extends FormRequest
             'admin_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'admin_username' => ['required', 'string', 'max:255', 'unique:users,username'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'national_id' => ['required', 'string', 'max:255'],
+            'region' => ['required', 'string', 'max:255'],
+            'zone' => ['required', 'string', 'max:255'],
+            'town' => ['required', 'string', 'max:255'],
         ];
     }
 }
