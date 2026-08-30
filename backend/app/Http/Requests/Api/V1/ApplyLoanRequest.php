@@ -25,6 +25,9 @@ class ApplyLoanRequest extends FormRequest
         return [
             'amount' => ['required', 'numeric', 'gt:0'],
             'purpose' => ['required', 'string'],
+            'loan_type' => ['required', 'string'],
+            'term_months' => ['required', 'integer', 'min:1'],
+            'guarantor_id' => ['nullable', 'integer', 'exists:users,id'],
         ];
     }
 }
