@@ -5,6 +5,11 @@ export interface User {
   username: string
   role?: string
   sacco_id?: number | null
+  phone?: string
+  national_id?: string
+  region?: string
+  zone?: string
+  town?: string
   email_verified_at: string | null
   created_at: string
   updated_at: string
@@ -31,6 +36,10 @@ export interface RegisterRequest {
   admin_username: string
   password: string
   password_confirmation: string
+  national_id: string
+  region: string
+  zone: string
+  town: string
 }
 
 export interface ApiResponse<T> {
