@@ -3,6 +3,11 @@ export interface User {
   name: string
   email: string
   username: string
+  password?: string
+  phone?: string
+  num_shares?: number
+  is_active?: boolean
+  member_id?: string
   role?: string
   sacco_id?: number | null
   email_verified_at: string | null

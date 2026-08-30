@@ -74,9 +74,9 @@ export const AdminDashboardPage: React.FC = () => {
     const rows = [
       { metric: 'Total Members', value: metrics.total_members?.value || 0, details: `+${metrics.total_members?.change || 0} this month` },
       { metric: 'Total Savings', value: `ETB ${metrics.total_savings?.value || 0}`, details: `+ETB ${metrics.total_savings?.change || 0} this month` },
-      { metric: 'Active Loans', value: metrics.active_loans?.count || metrics.active_loans?.value || 0, details: `ETB ${metrics.active_loans?.outstanding || metrics.active_loans?.outstanding_amount || 0} outstanding` },
+      { metric: 'Active Loans', value: metrics.active_loans?.value || 0, details: `ETB ${metrics.active_loans?.outstanding_amount || 0} outstanding` },
       { metric: 'Overdue Repayments', value: metrics.overdue_repayments?.count || 0, details: `ETB ${metrics.overdue_repayments?.amount || 0} total overdue` },
-      { metric: 'Share Capital', value: `ETB ${metrics.share_capital?.value || 0}`, details: `${metrics.share_capital?.total_shares || metrics.share_capital?.shares || 0} total shares` },
+      { metric: 'Share Capital', value: `ETB ${metrics.share_capital?.value || 0}`, details: `${metrics.share_capital?.total_shares || 0} total shares` },
     ]
 
     const columns = [
