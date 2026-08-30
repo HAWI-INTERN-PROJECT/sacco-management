@@ -38,6 +38,9 @@ Route::middleware('throttle:auth')->group(function (): void {
     Route::post('register', [AuthController::class, 'register'])->name('api.v1.register');
     Route::post('login', [AuthController::class, 'login'])->name('api.v1.login');
     Route::post('saccos/register', [SaccoRegistrationController::class, 'register'])->name('api.v1.saccos.register');
+    
+    // Member registration via invite token
+    Route::post('members/register', [\App\Http\Controllers\Api\V1\InvitationController::class, 'register'])->name('api.v1.members.register');
 });
 
 // Email verification
@@ -49,6 +52,7 @@ Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
     Route::post('logout', [AuthController::class, 'logout'])->name('api.v1.logout');
     Route::get('profile', [AuthController::class, 'profile'])->name('api.v1.profile');
+    Route::put('profile', [AuthController::class, 'updateProfile'])->name('api.v1.profile.update');
     // Member savings
     Route::get('members/{member}/savings', [MemberSavingsController::class, 'show'])
         ->name('api.v1.members.savings.show');
@@ -128,6 +132,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
         Route::get('dashboard/activity', [DashboardController::class, 'activity'])->name('api.v1.dashboard.activity');
 
         Route::apiResource('members', MemberController::class)->names('api.v1.members');
+        Route::post('members/invite', [\App\Http\Controllers\Api\V1\InvitationController::class, 'invite'])->name('api.v1.members.invite');
 
         Route::post('dividends/calculate', [DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
         Route::post('dividends/distribute', [DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
