@@ -7,7 +7,6 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -55,22 +54,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'num_shares' => 'integer',
-            'is_active' => 'boolean',
         ];
-    }
-
-    /**
- * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Sacco, $this>
- */
-    public function sacco(): BelongsTo
-    {
-        return $this->belongsTo(Sacco::class);
     }
 
     /**
      * Send the password reset notification.
      *
-     * @param  string  $token
+     * @param string $token
      * @return void
      */
     public function sendPasswordResetNotification($token)
@@ -79,23 +69,43 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the SACCO the user belongs to.
+     *
+     * @return BelongsTo<Sacco, $this>
+     */
+    public function sacco(): BelongsTo
+    {
+        return $this->belongsTo(Sacco::class);
+    }
+
+    /**
      * Get the loans for the user.
      *
-     * @return HasMany<Loan, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Loan, $this>
      */
-    public function loans(): HasMany
+    public function loans(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Loan::class, 'member_id');
+        return $this->hasMany(Loan::class);
     }
 
     /**
      * Get the repayments for the user.
      *
-     * @return HasMany<Repayment, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Repayment, $this>
      */
-    public function repayments(): HasMany
+    public function repayments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Repayment::class);
+    }
+
+    /**
+     * Get the dividends for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dividend, $this>
+     */
+    public function dividends(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Dividend::class);
     }
 
     /**

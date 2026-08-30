@@ -127,6 +127,9 @@ export interface Loan {
   created_at: string
   member?: User
   user?: User
+  repayment_schedule?: LoanSchedule[]
+  schedules?: LoanSchedule[]
+  total_repayable?: number
 }
 
 export interface LoanSchedule {
@@ -134,10 +137,14 @@ export interface LoanSchedule {
   loan_id: number
   installment_number: number
   due_date: string
-  amount_due: number
-  principal_component: number
-  interest_component: number
-  status: 'pending' | 'paid' | 'overdue'
+  amount_due?: number
+  total_due?: number
+  principal_component?: number
+  principal_due?: number
+  interest_component?: number
+  interest_due?: number
+  amount_paid?: number
+  status: 'pending' | 'paid' | 'overdue' | 'partial'
 }
 
 export interface Repayment {
