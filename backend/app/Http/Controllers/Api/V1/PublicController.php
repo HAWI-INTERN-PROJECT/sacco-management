@@ -8,12 +8,12 @@ use App\Models\Sacco;
 use App\Models\User;
 use App\Models\SavingsTransaction;
 use App\Models\ContactInquiry;
-use App\Traits\ApiResponses;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 
 class PublicController extends Controller
 {
-    use ApiResponses;
+    use ApiResponse;
 
     /**
      * Get platform statistics for the public landing page.
