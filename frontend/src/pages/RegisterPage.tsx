@@ -71,8 +71,8 @@ export default function RegisterPage() {
         zone: data.zone,
         town: data.town,
       })
-      toast.success('Account created successfully')
-      navigate('/dashboard')
+      toast.success('Account created successfully! Your SACCO is pending approval.')
+      navigate('/admin')
     } catch (error: any) {
       const message = error.response?.data?.message || (error instanceof Error ? error.message : 'Registration failed')
       toast.error(message)

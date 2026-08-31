@@ -10,6 +10,7 @@ export interface User {
   member_id?: string
   role?: string
   sacco_id?: number | null
+  sacco_status?: string | null
   national_id?: string
   region?: string
   zone?: string

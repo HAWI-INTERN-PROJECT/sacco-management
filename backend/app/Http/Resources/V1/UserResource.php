@@ -45,6 +45,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'role' => $this->role,
             'sacco_id' => $this->sacco_id,
+            'sacco_status' => $this->sacco ? $this->sacco->status : null,
             'national_id' => $this->national_id,
             'region' => $this->region,
             'zone' => $this->zone,
