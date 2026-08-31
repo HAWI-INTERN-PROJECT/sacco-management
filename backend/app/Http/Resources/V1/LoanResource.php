@@ -2,12 +2,14 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Models\Loan;
 use App\Models\SavingsTransaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
+ * @property Loan $resource
  * @property-read int $id
  * @property-read int $sacco_id
  * @property-read int $member_id
@@ -65,7 +67,7 @@ class LoanResource extends JsonResource
         // Guarantors collection
         $guarantorsData = [];
         $allAccepted = true;
-        if ($this->relationLoaded('guarantors')) {
+        if ($this->resource->relationLoaded('guarantors')) {
             foreach ($this->guarantors as $g) {
                 if ($g->status !== 'accepted') {
                     $allAccepted = false;

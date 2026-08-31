@@ -216,7 +216,7 @@ class LoanController extends Controller
 
         $currentSavings = $latestTransaction ? (float) $latestTransaction->balance_after : 0;
         $sacco = $loan->sacco;
-        $multiplier = $sacco ? (float) $sacco->loan_savings_multiplier : 3.0;
+        $multiplier = (float) ($sacco->loan_savings_multiplier ?? 3.0);
         $currentMaxWithoutGuarantor = $currentSavings * $multiplier;
 
         // If current requested amount exceeds current 3x limit, enforce EXACTLY 3 ACCEPTED GUARANTORS
