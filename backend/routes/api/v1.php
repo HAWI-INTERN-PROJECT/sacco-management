@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\SaccoRegistrationController;
 use App\Http\Controllers\Api\V1\SaccoSettingsController;
 use App\Http\Controllers\Api\V1\SuperadminReportsController;
 use App\Http\Controllers\Api\V1\SuperadminUserController;
+use App\Http\Controllers\Api\V1\PublicController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,11 @@ use Illuminate\Support\Facades\Route;
 | Routes for API version 1.
 |
 */
+
+Route::prefix('public')->group(function () {
+    Route::get('/stats', [PublicController::class, 'getStats']);
+    Route::post('/contact', [PublicController::class, 'submitContactForm']);
+});
 
 // Health check
 Route::get('health', fn () => response()->json([

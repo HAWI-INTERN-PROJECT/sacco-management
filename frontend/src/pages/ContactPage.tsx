@@ -1,15 +1,40 @@
 import { MapPin, Phone, Mail, Send, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import ScrollReveal from '../components/ScrollReveal';
+import { publicService, ContactFormData } from '../services/publicService';
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: ContactFormData) => publicService.submitContactForm(data),
+    onSuccess: () => {
+      setIsSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setIsSubmitted(false), 5000);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to submit inquiry.');
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 5000);
+    mutation.mutate(formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -110,6 +135,9 @@ export default function ContactPage() {
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
                         <input 
                           type="text" 
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
                           required
                           placeholder="Abebe Bikila"
                           className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
@@ -119,6 +147,9 @@ export default function ContactPage() {
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
                         <input 
                           type="email" 
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
                           required
                           placeholder="abebe@example.com"
                           className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
@@ -130,8 +161,10 @@ export default function ContactPage() {
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Subject</label>
                       <select 
                         required
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors appearance-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                        defaultValue=""
                       >
                         <option value="" disabled>Select an inquiry type</option>
                         <option value="general">General Inquiry</option>
@@ -145,6 +178,9 @@ export default function ContactPage() {
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Message</label>
                       <textarea 
                         required
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         rows={5}
                         placeholder="How can we help you today?"
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-[#0B6B3A] dark:focus:border-emerald-500 focus:ring-1 focus:ring-[#0B6B3A] outline-none transition-colors resize-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
@@ -153,10 +189,11 @@ export default function ContactPage() {
 
                     <button 
                       type="submit"
-                      className="inline-flex items-center gap-2 px-8 py-4 bg-[#0B6B3A] hover:bg-[#065F46] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+                      disabled={mutation.isPending}
+                      className="inline-flex items-center gap-2 px-8 py-4 bg-[#0B6B3A] hover:bg-[#065F46] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       <Send className="w-5 h-5" />
-                      Send Message
+                      {mutation.isPending ? 'Sending...' : 'Send Message'}
                     </button>
                   </form>
                 </div>

@@ -43,24 +43,11 @@ export default function LoginPage() {
       await login(data);
       toast.success("Logged in successfully");
       const loggedInUser = useAuthStore.getState().user;
-      const isSuperAdmin =
-        loggedInUser?.role === "superadmin" ||
-        loggedInUser?.username === "superadmin" ||
-        loggedInUser?.email === "superadmin@example.com" ||
-        data.login === "superadmin" ||
-        data.login === "superadmin@example.com";
-
-      if (isSuperAdmin) {
+      if (loggedInUser?.role === "superadmin") {
         navigate("/super-admin");
       } else if (loggedInUser?.role === "admin") {
         navigate("/admin");
-      } else if (
-        loggedInUser?.role === "member" ||
-        loggedInUser?.username === "member" ||
-        loggedInUser?.email === "member@example.com" ||
-        data.login === "member" ||
-        data.login === "member@example.com"
-      ) {
+      } else if (loggedInUser?.role === "member") {
         navigate("/member");
       } else {
         navigate("/dashboard");
@@ -240,7 +227,7 @@ export default function LoginPage() {
                 </span>
               </label>
               <Link
-                to="#"
+                to="/forgot-password"
                 className="text-sm font-semibold text-[#0B6B3A] dark:text-emerald-400 hover:text-[#065F46] dark:hover:text-emerald-300 transition-colors"
               >
                 Forgot Password?
