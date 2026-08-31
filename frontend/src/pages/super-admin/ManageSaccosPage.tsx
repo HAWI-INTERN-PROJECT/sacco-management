@@ -216,10 +216,10 @@ export const ManageSaccosPage: React.FC = () => {
         <button
           key={i}
           onClick={() => setCurrentPage(i)}
-          className={`w-7 h-7 rounded flex items-center justify-center font-bold text-xs transition-colors ${
+          className={`w-7 h-7 rounded flex items-center justify-center font-bold text-xs transition-colors cursor-pointer ${
             currentPage === i
-              ? 'bg-[#0B1727] text-white'
-              : 'hover:bg-slate-100 text-slate-700'
+              ? 'bg-[#0B1727] dark:bg-amber-500 dark:text-slate-950 text-white'
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
           }`}
         >
           {i}
@@ -234,28 +234,28 @@ export const ManageSaccosPage: React.FC = () => {
       {/* Header Title Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Manage SACCOs
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Review, approve, and manage registered cooperatives across the platform.
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Search SACCOs..."
-              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all w-48 sm:w-64"
+              className="pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all w-48 sm:w-64"
             />
           </div>
           <button
             onClick={fetchSaccos}
             disabled={loading}
-            className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -263,7 +263,7 @@ export const ManageSaccosPage: React.FC = () => {
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 inline-flex items-center gap-2 cursor-pointer"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             <span>Export CSV</span>
@@ -272,17 +272,17 @@ export const ManageSaccosPage: React.FC = () => {
       </div>
 
       {/* Filters Row */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
           {['all', 'pending', 'approved', 'rejected', 'suspended'].map((tab) => (
             <button
               key={tab}
               onClick={() => handleTabChange(tab as any)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === tab
-                  ? 'bg-slate-900 text-amber-400'
-                  : 'bg-transparent text-slate-600 hover:bg-slate-100'
+                  ? 'bg-slate-900 dark:bg-amber-500/20 text-amber-400 dark:text-amber-400 border border-transparent dark:border-amber-500/40'
+                  : 'bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               {tab} {tabCounts[tab as keyof typeof tabCounts] !== undefined && activeTab === tab ? `(${tabCounts[tab as keyof typeof tabCounts]})` : ''}
@@ -292,7 +292,7 @@ export const ManageSaccosPage: React.FC = () => {
         
         <div className="flex items-center gap-3 w-full md:w-auto">
           <select
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none"
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
             value={regionFilter}
             onChange={(e) => {
               setRegionFilter(e.target.value)
@@ -305,7 +305,7 @@ export const ManageSaccosPage: React.FC = () => {
             <option value="Amhara">Amhara</option>
           </select>
           <select
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none"
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
             value={sortFilter}
             onChange={(e) => {
               setSortFilter(e.target.value)
@@ -321,11 +321,11 @@ export const ManageSaccosPage: React.FC = () => {
       </div>
 
       {/* Data Table Container */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[750px]">
             <thead>
-              <tr className="bg-[#0B1727] text-white text-[11px] uppercase tracking-wider font-bold">
+              <tr className="bg-[#0B1727] dark:bg-slate-950 text-white dark:text-slate-200 text-[11px] uppercase tracking-wider font-bold">
                 <th className="py-4 px-6">SACCO Name</th>
                 <th className="py-4 px-6">Registration #</th>
                 <th className="py-4 px-6">Status</th>
@@ -334,10 +334,10 @@ export const ManageSaccosPage: React.FC = () => {
                 <th className="py-4 px-6 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm text-slate-700 dark:text-slate-300">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
+                  <td colSpan={6} className="py-12 text-center text-slate-500 dark:text-slate-400">
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
                       <span>Loading SACCOs...</span>
@@ -351,7 +351,7 @@ export const ManageSaccosPage: React.FC = () => {
                       <span>{error}</span>
                       <button
                         onClick={fetchSaccos}
-                        className="px-3 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold rounded-md transition-colors"
+                        className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold rounded-md transition-colors"
                       >
                         Retry
                       </button>
@@ -360,22 +360,22 @@ export const ManageSaccosPage: React.FC = () => {
                 </tr>
               ) : saccosList.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
+                  <td colSpan={6} className="py-12 text-center text-slate-500 dark:text-slate-400">
                     No SACCOs match the selected status.
                   </td>
                 </tr>
               ) : (
                 saccosList.map((sacco) => (
-                  <tr key={sacco.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-4 px-6 font-bold text-slate-900">
+                  <tr key={sacco.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                       <Link
                         to={`/super-admin/saccos/${sacco.id}`}
-                        className="hover:text-amber-700 transition-colors"
+                        className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                       >
                         {sacco.name}
                       </Link>
                     </td>
-                    <td className="py-4 px-6 font-mono text-xs font-semibold text-slate-600">
+                    <td className="py-4 px-6 font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
                       {sacco.registration_number}
                     </td>
                     <td className="py-4 px-6">
@@ -384,7 +384,7 @@ export const ManageSaccosPage: React.FC = () => {
                     <td className="py-4 px-6 text-center font-medium">
                       {(sacco.members_count ?? 0).toLocaleString()}
                     </td>
-                    <td className="py-4 px-6 text-slate-500 text-xs font-medium">
+                    <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs font-medium">
                       {sacco.created_at ? new Date(sacco.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-4 px-6 text-center">
@@ -394,14 +394,14 @@ export const ManageSaccosPage: React.FC = () => {
                             <button
                               disabled={actionLoadingId === sacco.id}
                               onClick={() => handleApprove(sacco)}
-                              className="px-3.5 py-1 bg-[#DCFCE7] hover:bg-emerald-200 text-[#15803D] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                              className="px-3.5 py-1 bg-[#DCFCE7] dark:bg-emerald-950/80 hover:bg-emerald-200 dark:hover:bg-emerald-900 text-[#15803D] dark:text-emerald-300 border border-transparent dark:border-emerald-700/60 text-xs font-semibold rounded-md transition-colors disabled:opacity-50 cursor-pointer"
                             >
                               Approve
                             </button>
                             <button
                               disabled={actionLoadingId === sacco.id}
                               onClick={() => handleReject(sacco)}
-                              className="px-3.5 py-1 bg-[#FEE2E2] hover:bg-rose-200 text-[#B91C1C] text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                              className="px-3.5 py-1 bg-[#FEE2E2] dark:bg-rose-950/80 hover:bg-rose-200 dark:hover:bg-rose-900 text-[#B91C1C] dark:text-rose-300 border border-transparent dark:border-rose-700/60 text-xs font-semibold rounded-md transition-colors disabled:opacity-50 cursor-pointer"
                             >
                               Reject
                             </button>
@@ -412,7 +412,7 @@ export const ManageSaccosPage: React.FC = () => {
                            <button
                             disabled={actionLoadingId === sacco.id}
                             onClick={() => handleSuspend(sacco)}
-                            className="px-3.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            className="px-3.5 py-1 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700/60 text-xs font-semibold rounded-md transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             Suspend
                           </button>
@@ -422,7 +422,7 @@ export const ManageSaccosPage: React.FC = () => {
                            <button
                             disabled={actionLoadingId === sacco.id}
                             onClick={() => handleReactivate(sacco)}
-                            className="px-3.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                            className="px-3.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 text-xs font-semibold rounded-md transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             Reactivate
                           </button>
@@ -430,7 +430,7 @@ export const ManageSaccosPage: React.FC = () => {
 
                         <Link
                           to={`/super-admin/saccos/${sacco.id}`}
-                          className="px-3.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition-colors"
+                          className="px-3.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-md transition-colors"
                         >
                           View
                         </Link>
@@ -444,7 +444,7 @@ export const ManageSaccosPage: React.FC = () => {
         </div>
 
         {/* Table Footer Pagination */}
-        <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             {meta && meta.total > 0 ? (
               <>Showing {meta.from ?? 1} to {meta.to ?? meta.total} of {meta.total} entries</>
@@ -456,7 +456,7 @@ export const ManageSaccosPage: React.FC = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={!meta || meta.current_page <= 1 || loading}
-              className="p-1 rounded text-slate-600 hover:text-slate-900 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white disabled:text-slate-300 dark:disabled:text-slate-600 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -466,7 +466,7 @@ export const ManageSaccosPage: React.FC = () => {
             <button
               onClick={() => setCurrentPage((prev) => (meta ? Math.min(prev + 1, meta.last_page) : prev))}
               disabled={!meta || meta.current_page >= meta.last_page || loading}
-              className="p-1 rounded text-slate-600 hover:text-slate-900 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white disabled:text-slate-300 dark:disabled:text-slate-600 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
