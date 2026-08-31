@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import ScrollReveal from '../components/ScrollReveal';
-import { publicService, ContactFormData } from '../services/publicService';
+import { publicService, type ContactFormData } from '../services/publicService';
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
