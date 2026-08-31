@@ -29,8 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $approved_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Sacco $sacco
- * @property-read User $user
+ * @property-read Sacco|null $sacco
+ * @property-read User|null $user
  * @property-read Collection<int, LoanSchedule> $schedules
  * @property-read Collection<int, Repayment> $repayments
  * @property-read Collection<int, LoanGuarantor> $guarantors

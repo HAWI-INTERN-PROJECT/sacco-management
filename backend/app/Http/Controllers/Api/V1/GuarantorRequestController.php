@@ -65,9 +65,11 @@ class GuarantorRequestController extends Controller
         $guaranteeRequest->update(['status' => 'accepted']);
 
         // Notify loan applicant
-        if ($guaranteeRequest->loan && $guaranteeRequest->loan->user) {
-            Notification::send($guaranteeRequest->loan->user, new GuarantorResponseNotification(
-                $guaranteeRequest->loan,
+        $loan = $guaranteeRequest->loan;
+        $applicant = $loan?->user;
+        if ($loan && $applicant) {
+            Notification::send($applicant, new GuarantorResponseNotification(
+                $loan,
                 $user,
                 'accepted'
             ));
@@ -100,9 +102,11 @@ class GuarantorRequestController extends Controller
         $guaranteeRequest->update(['status' => 'rejected']);
 
         // Notify loan applicant
-        if ($guaranteeRequest->loan && $guaranteeRequest->loan->user) {
-            Notification::send($guaranteeRequest->loan->user, new GuarantorResponseNotification(
-                $guaranteeRequest->loan,
+        $loan = $guaranteeRequest->loan;
+        $applicant = $loan?->user;
+        if ($loan && $applicant) {
+            Notification::send($applicant, new GuarantorResponseNotification(
+                $loan,
                 $user,
                 'rejected'
             ));
