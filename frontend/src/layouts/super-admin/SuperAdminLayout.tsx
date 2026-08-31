@@ -14,12 +14,14 @@ import {
   X,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/auth";
+import { NewSaccoModal } from "../../components/super-admin/NewSaccoModal";
 
 export const SuperAdminLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -106,13 +108,16 @@ export const SuperAdminLayout: React.FC = () => {
 
           {/* New Application CTA Button */}
           <div className="px-4 py-4">
-            <Link
-              to="/super-admin/saccos"
-              className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsNewModalOpen(true);
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Application</span>
-            </Link>
+            </button>
           </div>
 
           {/* Main Navigation */}
@@ -228,6 +233,18 @@ export const SuperAdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Global New SACCO Application Modal */}
+      <NewSaccoModal
+        isOpen={isNewModalOpen}
+        onClose={() => setIsNewModalOpen(false)}
+        onSuccess={() => {
+          window.dispatchEvent(new Event('sacco-created'))
+          if (!location.pathname.startsWith('/super-admin/saccos')) {
+            navigate('/super-admin/saccos?status=pending')
+          }
+        }}
+      />
     </div>
   );
 };

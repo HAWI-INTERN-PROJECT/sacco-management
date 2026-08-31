@@ -80,6 +80,14 @@ export const ManageSaccosPage: React.FC = () => {
     fetchSaccos()
   }, [fetchSaccos])
 
+  useEffect(() => {
+    const handleSaccoCreated = () => {
+      fetchSaccos()
+    }
+    window.addEventListener('sacco-created', handleSaccoCreated)
+    return () => window.removeEventListener('sacco-created', handleSaccoCreated)
+  }, [fetchSaccos])
+
   // Fetch overall tab counts once on mount
   useEffect(() => {
     const fetchCounts = async () => {
