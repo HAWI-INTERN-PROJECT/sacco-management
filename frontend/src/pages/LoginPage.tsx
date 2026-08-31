@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { publicService } from "../services/publicService";
 import { useAuthStore } from "../stores/auth";
 import {
   Shield,
@@ -22,6 +24,11 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+
+  const { data: stats } = useQuery({
+    queryKey: ['publicStats'],
+    queryFn: publicService.getStats,
+  });
 
   const loginSchema = z.object({
     login: z.string().min(1, t("auth.emailRequired")),
@@ -101,13 +108,13 @@ export default function LoginPage() {
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center">
-                <p className="text-2xl font-bold text-white">25K+</p>
+                <p className="text-2xl font-bold text-white">{stats?.saccos_registered || "25K+"}</p>
                 <p className="text-green-200 text-[10px] uppercase tracking-wider mt-1">
                   SACCOs in Ethiopia
                 </p>
               </div>
               <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center">
-                <p className="text-2xl font-bold text-white">5M+</p>
+                <p className="text-2xl font-bold text-white">{stats?.active_members || "5M+"}</p>
                 <p className="text-green-200 text-[10px] uppercase tracking-wider mt-1">
                   Members Nationwide
                 </p>
