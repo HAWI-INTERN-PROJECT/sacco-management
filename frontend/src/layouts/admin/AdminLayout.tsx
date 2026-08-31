@@ -19,6 +19,7 @@ import { useAuthStore } from '../../stores/auth'
 import ThemeToggle from '../../components/ThemeToggle'
 import { GlobalSearch } from '../../components/admin/GlobalSearch'
 import { NotificationDropdown } from '../../components/admin/NotificationDropdown'
+import { PendingSaccoPage } from '../../pages/admin/PendingSaccoPage'
 
 export const AdminLayout: React.FC = () => {
   const location = useLocation()
@@ -56,6 +57,10 @@ export const AdminLayout: React.FC = () => {
 
   // Find current page title based on path
   const currentTitle = navItems.find(item => isActive(item.path))?.label || 'Dashboard'
+
+  if (user?.sacco_status === 'pending') {
+    return <PendingSaccoPage />
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 flex flex-col md:flex-row font-sans text-slate-900 dark:text-slate-100 transition-colors">
