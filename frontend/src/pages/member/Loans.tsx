@@ -36,6 +36,8 @@ function formatDate(value: string | null): string {
       }).format(date);
 }
 
+import GuarantorRequestsSection from "./GuarantorRequests";
+
 export default function Loans() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
@@ -51,6 +53,8 @@ export default function Loans() {
 
   return (
     <div className="space-y-6">
+      <GuarantorRequestsSection />
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">

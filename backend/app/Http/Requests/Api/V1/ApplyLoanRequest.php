@@ -28,6 +28,8 @@ class ApplyLoanRequest extends FormRequest
             'loan_type' => ['required', 'string'],
             'term_months' => ['required', 'integer', 'min:1'],
             'guarantor_id' => ['nullable', 'integer', 'exists:users,id'],
+            'guarantor_ids' => ['nullable', 'array'],
+            'guarantor_ids.*' => ['integer', 'exists:users,id'],
         ];
     }
 }

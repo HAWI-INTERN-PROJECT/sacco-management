@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AdminSaccoController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DividendController;
+use App\Http\Controllers\Api\V1\GuarantorRequestController;
 use App\Http\Controllers\Api\V1\LoanController;
 use App\Http\Controllers\Api\V1\MemberController;
 use App\Http\Controllers\Api\V1\MemberSavingsController;
@@ -77,8 +78,11 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
     // Change password
     Route::put('change-password', [AuthController::class, 'changePassword'])->name('api.v1.change-password');
     
-    // Guarantor Search (accessible to members)
+    // Guarantor Search & Requests (accessible to members)
     Route::get('guarantors/search', [MemberController::class, 'searchGuarantors'])->name('api.v1.guarantors.search');
+    Route::get('guarantor-requests', [GuarantorRequestController::class, 'index'])->name('api.v1.guarantor-requests.index');
+    Route::patch('guarantor-requests/{id}/accept', [GuarantorRequestController::class, 'accept'])->name('api.v1.guarantor-requests.accept');
+    Route::patch('guarantor-requests/{id}/reject', [GuarantorRequestController::class, 'reject'])->name('api.v1.guarantor-requests.reject');
 
     Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])
         ->middleware('throttle:6,1')

@@ -8,6 +8,28 @@ export type MemberLoanStatus =
   | "closed"
   | "completed";
 
+export interface LoanGuarantorItem {
+  id: number;
+  member_id: number;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  amount_guaranteed: number;
+  status: "pending" | "accepted" | "rejected";
+}
+
+export interface FinancialPositionData {
+  current_savings: number;
+  num_shares: number;
+  share_capital: number;
+  max_3x_limit: number;
+  requested_amount: number;
+  is_within_3x_limit: boolean;
+  requires_guarantors: boolean;
+  all_guarantors_accepted: boolean;
+  is_eligible_for_approval: boolean;
+}
+
 export interface MemberLoan {
   id: number;
   loan_number: string;
@@ -24,6 +46,8 @@ export interface MemberLoan {
   created_at: string | null;
   repayment_schedule?: MemberLoanSchedule[];
   repayments?: MemberLoanRepayment[];
+  guarantors?: LoanGuarantorItem[];
+  financial_position?: FinancialPositionData;
 }
 
 export interface MemberLoanSchedule {
@@ -69,6 +93,7 @@ export interface ApplyForLoanRequest {
   loan_type: string;
   term_months: number;
   guarantor_id?: number | null;
+  guarantor_ids?: number[];
 }
 
 export async function getMemberLoans(page = 1): Promise<MemberLoansPage> {
@@ -110,4 +135,31 @@ export async function searchGuarantors(query: string): Promise<GuarantorSearchUs
     params: { search: query }
   });
   return data.data;
+}
+
+export interface GuarantorRequest {
+  id: number;
+  loan_id: number;
+  loan_number: string | null;
+  applicant_name: string;
+  applicant_email: string | null;
+  loan_amount: number;
+  loan_purpose: string | null;
+  amount_guaranteed: number;
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getGuarantorRequests(): Promise<GuarantorRequest[]> {
+  const { data } = await api.get<{ data: GuarantorRequest[] }>("/guarantor-requests");
+  return data.data;
+}
+
+export async function acceptGuarantorRequest(id: number): Promise<void> {
+  await api.patch(`/guarantor-requests/${id}/accept`);
+}
+
+export async function rejectGuarantorRequest(id: number): Promise<void> {
+  await api.patch(`/guarantor-requests/${id}/reject`);
 }
