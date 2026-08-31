@@ -84,24 +84,24 @@ export const PlatformSettingsPage: React.FC = () => {
   }
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500">Loading settings...</div>
+    return <div className="p-8 text-center text-slate-500 dark:text-slate-400 font-semibold">Loading settings...</div>
   }
 
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             Platform Settings
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Configure global platform behavior, defaults, and branding.
           </p>
         </div>
         <button
           onClick={handleSubmit(onSubmit)}
           disabled={!isDirty || isSubmitting}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#F59E0B] hover:bg-[#D97706] disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#F59E0B] hover:bg-[#D97706] disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:text-slate-500 dark:disabled:text-slate-600 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors shadow-sm cursor-pointer"
         >
           <Save className="w-4 h-4" />
           <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
@@ -111,10 +111,10 @@ export const PlatformSettingsPage: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         
         {/* Registration Settings */}
-        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-base font-bold text-slate-900">Registration Settings</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+          <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Registration Settings</h2>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
@@ -123,12 +123,12 @@ export const PlatformSettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     {...register('auto_approve_saccos')}
-                    className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-amber-500 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-slate-900">Auto-approve SACCOs</span>
-                  <p className="text-xs text-slate-500 mt-0.5">Automatically approve new SACCO registrations without manual review.</p>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">Auto-approve SACCOs</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Automatically approve new SACCO registrations without manual review.</p>
                 </div>
               </label>
 
@@ -137,63 +137,63 @@ export const PlatformSettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     {...register('require_registration_verification')}
-                    className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-amber-500 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-slate-900">Require Document Verification</span>
-                  <p className="text-xs text-slate-500 mt-0.5">Mandate upload of registration documents during sign-up.</p>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">Require Document Verification</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Mandate upload of registration documents during sign-up.</p>
                 </div>
               </label>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Max SACCOs Allowed</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max SACCOs Allowed</label>
               <input
                 type="number"
                 {...register('max_saccos_allowed', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 placeholder="Leave blank for unlimited"
               />
-              <p className="text-xs text-slate-500 mt-1">Limit the total number of SACCOs on the platform.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Limit the total number of SACCOs on the platform.</p>
             </div>
           </div>
         </div>
 
         {/* Default SACCO Settings */}
-        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center gap-3">
-            <Building2 className="w-5 h-5 text-emerald-600" />
-            <h2 className="text-base font-bold text-slate-900">Default SACCO Configuration</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+          <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
+            <Building2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Default SACCO Configuration</h2>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Default Interest Rate (%)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Default Interest Rate (%)</label>
               <input
                 type="number"
                 step="0.01"
                 {...register('default_interest_rate', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
               />
               {errors.default_interest_rate && <p className="text-xs text-rose-500 mt-1">{errors.default_interest_rate.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Default Share Value</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Default Share Value</label>
               <input
                 type="number"
                 step="0.01"
                 {...register('default_share_value', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
               />
               {errors.default_share_value && <p className="text-xs text-rose-500 mt-1">{errors.default_share_value.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Loan-to-Savings Ratio</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Loan-to-Savings Ratio</label>
               <input
                 type="number"
                 step="0.01"
                 {...register('default_loan_to_savings_ratio', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
               />
               {errors.default_loan_to_savings_ratio && <p className="text-xs text-rose-500 mt-1">{errors.default_loan_to_savings_ratio.message}</p>}
             </div>
@@ -202,10 +202,10 @@ export const PlatformSettingsPage: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notifications */}
-          <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center gap-3">
-              <Bell className="w-5 h-5 text-amber-600" />
-              <h2 className="text-base font-bold text-slate-900">Email Notifications</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
+              <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Email Notifications</h2>
             </div>
             <div className="p-6 space-y-4">
               <label className="flex items-start gap-3 cursor-pointer">
@@ -213,12 +213,12 @@ export const PlatformSettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     {...register('notify_new_sacco_registration')}
-                    className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-amber-500 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-slate-900">New SACCO Registration</span>
-                  <p className="text-xs text-slate-500 mt-0.5">Receive an email when a new SACCO registers.</p>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">New SACCO Registration</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Receive an email when a new SACCO registers.</p>
                 </div>
               </label>
 
@@ -227,12 +227,12 @@ export const PlatformSettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     {...register('notify_sacco_milestone')}
-                    className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-amber-500 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-slate-900">SACCO Milestones</span>
-                  <p className="text-xs text-slate-500 mt-0.5">Notify when a SACCO hits major growth milestones.</p>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">SACCO Milestones</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Notify when a SACCO hits major growth milestones.</p>
                 </div>
               </label>
 
@@ -241,60 +241,60 @@ export const PlatformSettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     {...register('weekly_platform_summary')}
-                    className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-amber-500 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-slate-900">Weekly Summary</span>
-                  <p className="text-xs text-slate-500 mt-0.5">Receive a weekly digest of platform activity.</p>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">Weekly Summary</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Receive a weekly digest of platform activity.</p>
                 </div>
               </label>
             </div>
           </div>
 
           {/* Branding */}
-          <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center gap-3">
-              <Palette className="w-5 h-5 text-rose-600" />
-              <h2 className="text-base font-bold text-slate-900">Platform Branding</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
+              <Palette className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Platform Branding</h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Platform Name</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Platform Name</label>
                 <input
                   type="text"
                   {...register('platform_name')}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 />
                 {errors.platform_name && <p className="text-xs text-rose-500 mt-1">{errors.platform_name.message}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Support Email</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Support Email</label>
                 <input
                   type="email"
                   {...register('support_email')}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 />
                 {errors.support_email && <p className="text-xs text-rose-500 mt-1">{errors.support_email.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Terms URL</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Terms URL</label>
                   <input
                     type="text"
                     {...register('terms_of_service_url')}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                   />
                   {errors.terms_of_service_url && <p className="text-xs text-rose-500 mt-1">{errors.terms_of_service_url.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Privacy URL</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Privacy URL</label>
                   <input
                     type="text"
                     {...register('privacy_policy_url')}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                   />
                   {errors.privacy_policy_url && <p className="text-xs text-rose-500 mt-1">{errors.privacy_policy_url.message}</p>}
                 </div>
