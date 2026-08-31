@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, Area, AreaChart
+  BarChart, Bar, Cell, Area, AreaChart, Legend
 } from 'recharts'
 import {
   TrendingUp,
@@ -11,8 +11,12 @@ import {
   Users,
   Download,
   Filter,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react'
 import { superAdminReportsService } from '../../services/superAdminReportsService'
+import { adminSaccoService } from '../../services/adminSaccoService'
+import { toast } from 'sonner'
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -26,26 +30,40 @@ const formatCurrency = (value: number) => {
 export const PlatformReportsPage: React.FC = () => {
   const [period, setPeriod] = useState('1Y')
   const [sort, setSort] = useState('savings_desc')
+  const [exporting, setExporting] = useState(false)
 
-  const { data: overview, isLoading: _loadingOverview } = useQuery({
+  const { data: overview, isLoading: loadingOverview, isError: overviewError } = useQuery({
     queryKey: ['reports-overview'],
     queryFn: superAdminReportsService.getOverview,
   })
 
-  const { data: trends, isLoading: loadingTrends } = useQuery({
+  const { data: trends, isLoading: loadingTrends, isError: trendsError } = useQuery({
     queryKey: ['reports-trends', period],
     queryFn: () => superAdminReportsService.getGrowthTrends(period),
   })
 
-  const { data: comparison, isLoading: loadingComparison } = useQuery({
+  const { data: comparison, isLoading: loadingComparison, isError: comparisonError } = useQuery({
     queryKey: ['reports-comparison', sort],
     queryFn: () => superAdminReportsService.getSaccoComparison(sort),
   })
 
-  const { data: geography, isLoading: loadingGeography } = useQuery({
+  const { data: geography, isLoading: loadingGeography, isError: geographyError } = useQuery({
     queryKey: ['reports-geography'],
     queryFn: superAdminReportsService.getGeographicDistribution,
   })
+
+  const handleExportReport = async () => {
+    try {
+      setExporting(true)
+      await adminSaccoService.exportSaccos()
+      toast.success('Platform report exported successfully.')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to export report.'
+      toast.error(msg)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -60,8 +78,12 @@ export const PlatformReportsPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors shadow-sm">
-            <Download className="w-4 h-4" />
+          <button
+            onClick={handleExportReport}
+            disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             <span>Export Report</span>
           </button>
         </div>
@@ -78,7 +100,13 @@ export const PlatformReportsPage: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-slate-500">Total Savings</p>
               <h3 className="text-2xl font-bold text-slate-900">
-                {overview?.data?.total_savings ? formatCurrency(overview.data.total_savings) : '$0'}
+                {loadingOverview ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
+                ) : overviewError ? (
+                  <span className="text-sm font-medium text-rose-500">Error loading</span>
+                ) : (
+                  formatCurrency(overview?.data?.total_savings || 0)
+                )}
               </h3>
             </div>
           </div>
@@ -93,7 +121,13 @@ export const PlatformReportsPage: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-slate-500">Loans Disbursed</p>
               <h3 className="text-2xl font-bold text-slate-900">
-                {overview?.data?.total_loans_disbursed ? formatCurrency(overview.data.total_loans_disbursed) : '$0'}
+                {loadingOverview ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
+                ) : overviewError ? (
+                  <span className="text-sm font-medium text-rose-500">Error loading</span>
+                ) : (
+                  formatCurrency(overview?.data?.total_loans_disbursed || 0)
+                )}
               </h3>
             </div>
           </div>
@@ -108,7 +142,13 @@ export const PlatformReportsPage: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-slate-500">Repayments</p>
               <h3 className="text-2xl font-bold text-slate-900">
-                {overview?.data?.total_repayments_collected ? formatCurrency(overview.data.total_repayments_collected) : '$0'}
+                {loadingOverview ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
+                ) : overviewError ? (
+                  <span className="text-sm font-medium text-rose-500">Error loading</span>
+                ) : (
+                  formatCurrency(overview?.data?.total_repayments_collected || 0)
+                )}
               </h3>
             </div>
           </div>
@@ -123,8 +163,16 @@ export const PlatformReportsPage: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-slate-500">Member Growth</p>
               <h3 className="text-2xl font-bold text-slate-900 flex items-baseline gap-2">
-                {overview?.data?.platform_growth || 0}%
-                <span className="text-xs font-medium text-emerald-600">This Month</span>
+                {loadingOverview ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
+                ) : overviewError ? (
+                  <span className="text-sm font-medium text-rose-500">Error</span>
+                ) : (
+                  <>
+                    {overview?.data?.platform_growth || 0}%
+                    <span className="text-xs font-medium text-emerald-600">This Month</span>
+                  </>
+                )}
               </h3>
             </div>
           </div>
@@ -133,7 +181,7 @@ export const PlatformReportsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Growth Trends Chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/60 shadow-sm p-5">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/60 shadow-sm p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-base font-bold text-slate-900">Platform Growth Trends</h3>
@@ -144,7 +192,7 @@ export const PlatformReportsPage: React.FC = () => {
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
                     period === p ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
@@ -155,10 +203,22 @@ export const PlatformReportsPage: React.FC = () => {
           </div>
           <div className="h-[300px] w-full">
             {loadingTrends ? (
-              <div className="w-full h-full flex items-center justify-center text-slate-400">Loading chart...</div>
+              <div className="w-full h-full flex items-center justify-center text-slate-400 gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Loading chart data...</span>
+              </div>
+            ) : trendsError ? (
+              <div className="w-full h-full flex flex-col items-center justify-center text-rose-500 gap-2">
+                <AlertCircle className="w-6 h-6" />
+                <span className="text-sm font-medium">Failed to load platform growth trends.</span>
+              </div>
+            ) : !trends?.data || trends.data.length === 0 ? (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">
+                <span>No growth trend data available.</span>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trends?.data || []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart data={trends.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorSavings" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
@@ -171,7 +231,7 @@ export const PlatformReportsPage: React.FC = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                   <XAxis 
-                    dataKey="month_short" 
+                    dataKey={period === 'All' ? 'month' : 'month_short'} 
                     axisLine={false} 
                     tickLine={false} 
                     tick={{ fill: '#64748B', fontSize: 12 }} 
@@ -187,6 +247,7 @@ export const PlatformReportsPage: React.FC = () => {
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     formatter={(value: any) => formatCurrency(value)}
                   />
+                  <Legend verticalAlign="top" align="right" height={36} iconType="circle" />
                   <Area type="monotone" dataKey="savings" name="Savings" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorSavings)" />
                   <Area type="monotone" dataKey="loans" name="Loans" stroke="#3B82F6" strokeWidth={2} fillOpacity={1} fill="url(#colorLoans)" />
                 </AreaChart>
@@ -196,25 +257,39 @@ export const PlatformReportsPage: React.FC = () => {
         </div>
 
         {/* Geographic Distribution */}
-        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm p-5">
-          <h3 className="text-base font-bold text-slate-900 mb-1">Geographic Distribution</h3>
-          <p className="text-sm text-slate-500 mb-6">SACCOs by region</p>
+        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm p-5 flex flex-col justify-between">
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-1">Geographic Distribution</h3>
+            <p className="text-sm text-slate-500 mb-6">SACCOs by region</p>
+          </div>
           
           <div className="h-[260px] w-full">
             {loadingGeography ? (
-              <div className="w-full h-full flex items-center justify-center text-slate-400">Loading...</div>
+              <div className="w-full h-full flex items-center justify-center text-slate-400 gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Loading distribution...</span>
+              </div>
+            ) : geographyError ? (
+              <div className="w-full h-full flex flex-col items-center justify-center text-rose-500 gap-2">
+                <AlertCircle className="w-6 h-6" />
+                <span className="text-sm font-medium">Failed to load geographic data.</span>
+              </div>
+            ) : !geography?.data || geography.data.length === 0 ? (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">
+                <span>No geographic data available.</span>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={geography?.data || []} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+                <BarChart data={geography.data} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E2E8F0" />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 12 }} width={80} />
+                  <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 12 }} width={110} />
                   <RechartsTooltip 
                     cursor={{fill: 'transparent'}}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
                   <Bar dataKey="count" name="SACCOs" radius={[0, 4, 4, 0]} barSize={20}>
-                    {geography?.data?.map((_entry: any, index: number) => (
+                    {geography.data.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={index === 0 ? '#F59E0B' : '#94A3B8'} />
                     ))}
                   </Bar>
@@ -257,15 +332,28 @@ export const PlatformReportsPage: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loadingComparison ? (
-                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">Loading data...</td>
-                </tr>
-              ) : comparison?.data?.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">No data available</td>
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                      <span>Loading comparison data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : comparisonError ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-rose-500 font-medium">
+                    Failed to load SACCO comparison data.
+                  </td>
+                </tr>
+              ) : !comparison?.data || comparison.data.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-slate-500">
+                    No SACCO comparison data available.
+                  </td>
                 </tr>
               ) : (
-                comparison?.data?.map((sacco: any) => (
+                comparison.data.map((sacco: any) => (
                   <tr key={sacco.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-5 py-4 font-medium text-slate-900">{sacco.name}</td>
                     <td className="px-5 py-4 text-right">{sacco.members_count}</td>
@@ -276,7 +364,7 @@ export const PlatformReportsPage: React.FC = () => {
                         <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full ${sacco.repayment_rate >= 90 ? 'bg-emerald-500' : sacco.repayment_rate >= 75 ? 'bg-amber-500' : 'bg-rose-500'}`} 
-                            style={{ width: `${sacco.repayment_rate}%` }}
+                            style={{ width: `${Math.min(100, Math.max(0, sacco.repayment_rate))}%` }}
                           />
                         </div>
                         <span className="font-medium text-slate-700 w-9">{sacco.repayment_rate}%</span>
@@ -289,7 +377,6 @@ export const PlatformReportsPage: React.FC = () => {
           </table>
         </div>
       </div>
-
     </div>
   )
 }
