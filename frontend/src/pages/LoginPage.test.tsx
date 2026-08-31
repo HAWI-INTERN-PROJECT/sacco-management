@@ -2,7 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LoginPage from './LoginPage'
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
+  )
+}
 
 vi.mock('../stores/auth', () => ({
   useAuthStore: vi.fn(() => ({
@@ -18,11 +30,7 @@ describe('LoginPage', () => {
   })
 
   it('renders login form', () => {
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    )
+    render(<LoginPage />, { wrapper: createWrapper() })
 
     expect(screen.getByText('Welcome Back')).toBeInTheDocument()
     expect(screen.getByText(/sign in to your sacco account/i)).toBeInTheDocument()
@@ -32,11 +40,7 @@ describe('LoginPage', () => {
   })
 
   it('renders sign up link', () => {
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    )
+    render(<LoginPage />, { wrapper: createWrapper() })
 
     expect(screen.getByText(/don't have a sacco/i)).toBeInTheDocument()
     expect(screen.getByText('Register here')).toHaveAttribute('href', '/register')
@@ -45,11 +49,7 @@ describe('LoginPage', () => {
   it('validates required fields', async () => {
     const user = userEvent.setup()
 
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    )
+    render(<LoginPage />, { wrapper: createWrapper() })
 
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
@@ -74,11 +74,7 @@ describe('LoginPage', () => {
       setToken: vi.fn(),
     })
 
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    )
+    render(<LoginPage />, { wrapper: createWrapper() })
 
     await user.type(screen.getByPlaceholderText('name@sacco.org'), 'john@example.com')
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
@@ -104,11 +100,7 @@ describe('LoginPage', () => {
       setToken: vi.fn(),
     })
 
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    )
+    render(<LoginPage />, { wrapper: createWrapper() })
 
     expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled()
   })
