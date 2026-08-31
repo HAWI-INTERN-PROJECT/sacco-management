@@ -18,28 +18,22 @@ export default function DashboardPage() {
       getProfile()
         .then(() => {
           const currentUser = useAuthStore.getState().user
-          if (
-            currentUser?.role === 'superadmin' ||
-            currentUser?.username === 'superadmin' ||
-            currentUser?.email === 'superadmin@example.com'
-          ) {
+          if (currentUser?.role === 'superadmin') {
             navigate('/super-admin', { replace: true })
+          } else if (currentUser?.role === 'admin') {
+            navigate('/admin', { replace: true })
+          } else if (currentUser?.role === 'member') {
+            navigate('/member', { replace: true })
           }
         })
         .catch(() => {
           navigate('/login')
         })
-    } else if (
-      user.role === 'superadmin' ||
-      user.username === 'superadmin' ||
-      user.email === 'superadmin@example.com'
-    ) {
+    } else if (user.role === 'superadmin') {
       navigate('/super-admin', { replace: true })
-    } else if (
-      user.role === 'member' ||
-      user.username === 'member' ||
-      user.email === 'member@example.com'
-    ) {
+    } else if (user.role === 'admin') {
+      navigate('/admin', { replace: true })
+    } else if (user.role === 'member') {
       navigate('/member', { replace: true })
     }
   }, [user, getProfile, navigate])
