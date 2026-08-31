@@ -75,6 +75,15 @@ class AuthController extends Controller
 
         $user = $request->user();
 
+        // Block login if the user's SACCO is rejected
+        if ($user->sacco && $user->sacco->status === 'rejected') {
+            // Revoke the token that was just created by authenticate() or prevent it
+            // Actually $request->authenticate() might not create a token, it just authenticates the session/user
+            throw ValidationException::withMessages([
+                'login' => 'Your SACCO registration has been rejected. Please contact support.',
+            ]);
+        }
+
         // Append savings_balance from latest savings transaction
         $latestBalance = \App\Models\SavingsTransaction::where('member_id', $user->id)
             ->latest('transaction_date')
