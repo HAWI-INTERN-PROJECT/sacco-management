@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\LoanApplicationSubmitted;
+use App\Notifications\GuarantorRequestNotification;
 use App\Models\User;
+use App\Models\LoanGuarantor;
+use App\Models\SavingsTransaction;
 
 class LoanController extends Controller
 {
@@ -31,7 +34,7 @@ class LoanController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Loan::where('sacco_id', $request->user()->sacco_id)->with('user');
+        $query = Loan::where('sacco_id', $request->user()->sacco_id)->with(['user', 'guarantors.member']);
 
         if ($request->has('status')) {
             $status = (string) $request->query('status');
@@ -55,7 +58,7 @@ class LoanController extends Controller
     {
         $user = $request->user();
 
-        $latestTransaction = \App\Models\SavingsTransaction::where('member_id', $user->id)
+        $latestTransaction = SavingsTransaction::where('member_id', $user->id)
             ->latest('transaction_date')
             ->latest('id')
             ->first();
@@ -66,23 +69,39 @@ class LoanController extends Controller
         $multiplier = $sacco ? (float) $sacco->loan_savings_multiplier : 3.0;
         $maxAllowedWithoutGuarantor = $savingsBalance * $multiplier;
         
+        // Build array of guarantor IDs from request
+        $guarantorIds = [];
+        if ($request->has('guarantor_ids') && is_array($request->guarantor_ids)) {
+            $guarantorIds = array_map('intval', $request->guarantor_ids);
+        } elseif ($request->guarantor_id) {
+            $guarantorIds = [(int) $request->guarantor_id];
+        }
+
         if ($request->amount > $maxAllowedWithoutGuarantor) {
-            if (!$request->guarantor_id) {
-                return $this->error('The requested loan amount exceeds your eligible limit (' . number_format($maxAllowedWithoutGuarantor, 2) . '). You must provide a guarantor to proceed.', 422);
+            // Rule: Loans exceeding 3x savings REQUIRE EXACTLY 3 GUARANTORS
+            if (count($guarantorIds) !== 3) {
+                return $this->error('The requested loan amount exceeds 3x your savings balance (' . number_format($maxAllowedWithoutGuarantor, 2) . '). You must select EXACTLY 3 valid guarantors to proceed.', 422);
+            }
+
+            // Check for duplicates
+            if (count(array_unique($guarantorIds)) !== 3) {
+                return $this->error('Duplicate guarantors are not allowed. Please select 3 distinct members.', 422);
             }
             
-            if ((int) $request->guarantor_id === $user->id) {
-                return $this->error('You cannot be your own guarantor.', 422);
+            // Check self-guarantee
+            if (in_array($user->id, $guarantorIds, true)) {
+                return $this->error('You cannot select yourself as a guarantor.', 422);
             }
             
-            $guarantor = \App\Models\User::where('id', $request->guarantor_id)
+            // Validate all 3 guarantors exist, active, member role, same sacco
+            $validGuarantors = User::whereIn('id', $guarantorIds)
                 ->where('sacco_id', $user->sacco_id)
                 ->where('role', 'member')
                 ->where('is_active', true)
-                ->first();
-                
-            if (!$guarantor) {
-                return $this->error('Invalid guarantor selected.', 422);
+                ->get();
+
+            if ($validGuarantors->count() !== 3) {
+                return $this->error('One or more selected guarantors are invalid, inactive, or not from your SACCO.', 422);
             }
         }
 
@@ -99,14 +118,26 @@ class LoanController extends Controller
                 'status' => 'pending',
             ]);
 
-            if ($request->amount > $maxAllowedWithoutGuarantor && $request->guarantor_id) {
-                $amountGuaranteed = $request->amount - $maxAllowedWithoutGuarantor;
-                \App\Models\LoanGuarantor::create([
-                    'loan_id' => $loan->id,
-                    'member_id' => $request->guarantor_id,
-                    'amount_guaranteed' => $amountGuaranteed,
-                    'status' => 'pending'
-                ]);
+            if ($request->amount > $maxAllowedWithoutGuarantor && count($guarantorIds) === 3) {
+                $amountGuaranteedPerPerson = round(($request->amount - $maxAllowedWithoutGuarantor) / 3, 2);
+                if ($amountGuaranteedPerPerson <= 0) {
+                    $amountGuaranteedPerPerson = round($request->amount / 3, 2);
+                }
+
+                foreach ($guarantorIds as $gid) {
+                    LoanGuarantor::create([
+                        'loan_id' => $loan->id,
+                        'member_id' => $gid,
+                        'amount_guaranteed' => $amountGuaranteedPerPerson,
+                        'status' => 'pending'
+                    ]);
+                }
+
+                // Send guarantee request notifications to all 3 guarantors
+                $guarantorsToNotify = User::whereIn('id', $guarantorIds)->get();
+                foreach ($guarantorsToNotify as $gUser) {
+                    Notification::send($gUser, new GuarantorRequestNotification($loan, $amountGuaranteedPerPerson));
+                }
             }
             
             DB::commit();
@@ -120,7 +151,7 @@ class LoanController extends Controller
             }
 
             return $this->created(
-                LoanResource::make($loan),
+                LoanResource::make($loan->load(['guarantors.member', 'user'])),
                 'Loan application submitted successfully.'
             );
         } catch (\Exception $e) {
@@ -152,7 +183,7 @@ class LoanController extends Controller
             return $this->forbidden('You do not have permission to view this loan.');
         }
 
-        $loan->load(['schedules', 'repayments', 'user']);
+        $loan->load(['schedules', 'repayments', 'user', 'guarantors.member']);
 
         return $this->success(
             LoanResource::make($loan),
@@ -177,6 +208,33 @@ class LoanController extends Controller
             return $this->error('Only pending loans can be approved.', 400);
         }
 
+        // Re-check applicant's CURRENT savings balance and 3X limit
+        $latestTransaction = SavingsTransaction::where('member_id', $loan->member_id)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->first();
+
+        $currentSavings = $latestTransaction ? (float) $latestTransaction->balance_after : 0;
+        $sacco = $loan->sacco;
+        $multiplier = (float) ($sacco->loan_savings_multiplier ?? 3.0);
+        $currentMaxWithoutGuarantor = $currentSavings * $multiplier;
+
+        // If current requested amount exceeds current 3x limit, enforce EXACTLY 3 ACCEPTED GUARANTORS
+        if ($loan->principal_amount > $currentMaxWithoutGuarantor) {
+            $guarantors = LoanGuarantor::where('loan_id', $loan->id)->get();
+            $totalCount = $guarantors->count();
+            $acceptedCount = $guarantors->where('status', 'accepted')->count();
+            $pendingCount = $guarantors->where('status', 'pending')->count();
+            $rejectedCount = $guarantors->where('status', 'rejected')->count();
+
+            if ($totalCount !== 3 || $acceptedCount !== 3) {
+                return $this->error(
+                    "Loan cannot be approved because the requested amount (ETB " . number_format((float)$loan->principal_amount, 2) . ") exceeds the applicant's current 3x savings limit (ETB " . number_format($currentMaxWithoutGuarantor, 2) . "). Exactly 3 accepted guarantors are required. Current guarantor status: {$acceptedCount} accepted, {$pendingCount} pending, {$rejectedCount} rejected out of {$totalCount} guarantors.",
+                    422
+                );
+            }
+        }
+
         $interestRate = (float) $request->interest_rate;
         $termMonths = (int) $request->term_months;
         $totalInterest = round(((float) $loan->principal_amount) * ($interestRate / 100) * ($termMonths / 12), 2);
@@ -194,7 +252,7 @@ class LoanController extends Controller
         ]);
 
         return $this->success(
-            LoanResource::make($loan->fresh()),
+            LoanResource::make($loan->fresh(['guarantors.member', 'user'])),
             'Loan approved successfully.'
         );
     }

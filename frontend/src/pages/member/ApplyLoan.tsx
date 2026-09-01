@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, CircleAlert, Send, Calculator, Search, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CircleAlert, Send, Calculator, Search, X } from "lucide-react";
 import {
   applyForLoan,
   searchGuarantors,
@@ -29,15 +29,15 @@ export default function ApplyLoan() {
   const { user } = useAuthStore();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
-  // Guarantor State
+  // Guarantors State (Exactly 3 required when exceeding 3x limit)
   const [guarantorSearch, setGuarantorSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedGuarantor, setSelectedGuarantor] = useState<GuarantorSearchUser | null>(null);
+  const [selectedGuarantors, setSelectedGuarantors] = useState<GuarantorSearchUser[]>([]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(guarantorSearch);
-    }, 500);
+    }, 400);
     return () => clearTimeout(handler);
   }, [guarantorSearch]);
 
@@ -62,12 +62,12 @@ export default function ApplyLoan() {
 
   // Calculations
   const savingsBalance = user?.savings_balance ?? 0;
-  const loanSavingsMultiplier = 3.0; // Standard rule, could be fetched from sacco settings
+  const loanSavingsMultiplier = 3.0; // Standard 3x rule
   const maxAllowedWithoutGuarantor = savingsBalance * loanSavingsMultiplier;
   
   const principal = Number(amountValue) || 0;
   const months = Number(termMonthsValue) || 12;
-  const requiresGuarantor = principal > maxAllowedWithoutGuarantor;
+  const requiresGuarantors = principal > maxAllowedWithoutGuarantor;
 
   const annualInterestRate = 0.12; // 12% standard
   const monthlyInterestRate = annualInterestRate / 12;
@@ -75,6 +75,27 @@ export default function ApplyLoan() {
     ? (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, months)) / (Math.pow(1 + monthlyInterestRate, months) - 1) 
     : 0;
   const totalRepayable = estimatedMonthly * months;
+
+  const addGuarantor = (g: GuarantorSearchUser) => {
+    if (selectedGuarantors.length >= 3) {
+      toast.error("You can select a maximum of 3 guarantors.");
+      return;
+    }
+    if (selectedGuarantors.some(existing => existing.id === g.id)) {
+      toast.error("Guarantor already selected.");
+      return;
+    }
+    if (g.id === user?.id) {
+      toast.error("You cannot select yourself as a guarantor.");
+      return;
+    }
+    setSelectedGuarantors([...selectedGuarantors, g]);
+    setGuarantorSearch("");
+  };
+
+  const removeGuarantor = (id: number) => {
+    setSelectedGuarantors(selectedGuarantors.filter(g => g.id !== id));
+  };
 
   const mutation = useMutation({
     mutationFn: (request: ApplyForLoanRequest) => applyForLoan(request),
@@ -110,9 +131,11 @@ export default function ApplyLoan() {
       return;
     }
     
-    if (requiresGuarantor && !selectedGuarantor) {
-      setSubmissionError("You must select a guarantor because the requested amount exceeds your eligible limit.");
-      return;
+    if (requiresGuarantors) {
+      if (selectedGuarantors.length !== 3) {
+        setSubmissionError(`The requested loan amount exceeds 3x your savings (ETB ${maxAllowedWithoutGuarantor.toLocaleString(undefined, {minimumFractionDigits: 2})}). You MUST select EXACTLY 3 guarantors to submit this application.`);
+        return;
+      }
     }
 
     if (!formData.agree_terms) {
@@ -131,7 +154,7 @@ export default function ApplyLoan() {
       purpose, 
       loan_type: formData.loan_type,
       term_months,
-      guarantor_id: selectedGuarantor ? selectedGuarantor.id : null
+      guarantor_ids: requiresGuarantors ? selectedGuarantors.map(g => g.id) : undefined
     });
   };
 
@@ -213,37 +236,57 @@ export default function ApplyLoan() {
               
               <div className="mt-2 text-xs text-slate-500 flex justify-between">
                 <span>Your Savings: ETB {savingsBalance.toLocaleString()}</span>
-                <span>Max without Guarantor: ETB {maxAllowedWithoutGuarantor.toLocaleString()}</span>
+                <span>Max 3x Limit (No Guarantor): ETB {maxAllowedWithoutGuarantor.toLocaleString()}</span>
               </div>
             </div>
 
-            {requiresGuarantor && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
-                <h3 className="font-semibold text-amber-800 dark:text-amber-300 text-sm mb-1">Guarantor Required</h3>
-                <p className="text-xs text-amber-700 dark:text-amber-400 mb-4">
-                  The requested amount exceeds your eligible limit. Please select a guarantor to cover the remaining ETB {(principal - maxAllowedWithoutGuarantor).toLocaleString(undefined, {minimumFractionDigits: 2})}.
+            {requiresGuarantors && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
+                    3 Guarantors Required
+                  </h3>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${selectedGuarantors.length === 3 ? "bg-emerald-100 text-emerald-800" : "bg-amber-200 text-amber-900"}`}>
+                    {selectedGuarantors.length} / 3 Selected
+                  </span>
+                </div>
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Your requested loan amount exceeds your 3x savings limit (ETB {maxAllowedWithoutGuarantor.toLocaleString()}). You must select <strong>EXACTLY 3 guarantors</strong> from your SACCO.
                 </p>
-                
-                {selectedGuarantor ? (
-                  <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-md border border-amber-200 dark:border-amber-800">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-emerald-100 text-emerald-600 rounded-full p-1.5">
-                        <CheckCircle2 className="w-4 h-4" />
+
+                {/* Selected Guarantors List */}
+                <div className="space-y-2">
+                  {selectedGuarantors.map((g, index) => (
+                    <div key={g.id} className="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-md border border-amber-200 dark:border-amber-800">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-emerald-100 text-emerald-600 rounded-full p-1 text-xs font-bold w-6 h-6 flex items-center justify-center">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">{g.name}</p>
+                          <p className="text-xs text-slate-500">{g.email} • ID: {g.national_id || 'N/A'}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">{selectedGuarantor.name}</p>
-                        <p className="text-xs text-slate-500">{selectedGuarantor.email}</p>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeGuarantor(g.id)}
+                        className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                        title="Remove guarantor"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button type="button" onClick={() => setSelectedGuarantor(null)} className="text-xs text-rose-500 hover:underline">Remove</button>
-                  </div>
-                ) : (
-                  <div className="relative">
+                  ))}
+                </div>
+
+                {/* Search Bar for adding guarantors */}
+                {selectedGuarantors.length < 3 && (
+                  <div className="relative pt-1">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input
                         type="text"
-                        placeholder="Search by name, email, or National ID..."
+                        placeholder={`Search and add Guarantor #${selectedGuarantors.length + 1}...`}
                         value={guarantorSearch}
                         onChange={(e) => setGuarantorSearch(e.target.value)}
                         className="w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-emerald-600 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
@@ -256,24 +299,23 @@ export default function ApplyLoan() {
                           <div className="p-3 text-xs text-slate-500 text-center">Searching...</div>
                         ) : guarantors && guarantors.length > 0 ? (
                           <ul className="py-1">
-                            {guarantors.map((g) => (
-                              <li key={g.id}>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedGuarantor(g);
-                                    setGuarantorSearch("");
-                                  }}
-                                  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex flex-col"
-                                >
-                                  <span className="font-medium text-slate-900 dark:text-white">{g.name}</span>
-                                  <span className="text-xs text-slate-500">{g.email} • ID: {g.national_id || 'N/A'}</span>
-                                </button>
-                              </li>
-                            ))}
+                            {guarantors
+                              .filter(g => !selectedGuarantors.some(sel => sel.id === g.id) && g.id !== user?.id)
+                              .map((g) => (
+                                <li key={g.id}>
+                                  <button
+                                    type="button"
+                                    onClick={() => addGuarantor(g)}
+                                    className="w-full text-left px-4 py-2 text-sm hover:bg-emerald-50 dark:hover:bg-slate-700 flex flex-col"
+                                  >
+                                    <span className="font-medium text-slate-900 dark:text-white">{g.name}</span>
+                                    <span className="text-xs text-slate-500">{g.email} • ID: {g.national_id || 'N/A'}</span>
+                                  </button>
+                                </li>
+                              ))}
                           </ul>
                         ) : (
-                          <div className="p-3 text-xs text-slate-500 text-center">No members found.</div>
+                          <div className="p-3 text-xs text-slate-500 text-center">No eligible members found.</div>
                         )}
                       </div>
                     )}

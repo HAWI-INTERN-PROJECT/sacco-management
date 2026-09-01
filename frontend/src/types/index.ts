@@ -129,6 +129,29 @@ export interface SavingsTransaction {
   created_at: string
 }
 
+export interface LoanGuarantor {
+  id: number
+  member_id: number
+  name: string
+  email?: string | null
+  phone?: string | null
+  national_id?: string | null
+  amount_guaranteed: number
+  status: 'pending' | 'accepted' | 'rejected'
+}
+
+export interface FinancialPosition {
+  current_savings: number
+  num_shares: number
+  share_capital: number
+  max_3x_limit: number
+  requested_amount: number
+  is_within_3x_limit: boolean
+  requires_guarantors: boolean
+  all_guarantors_accepted: boolean
+  is_eligible_for_approval: boolean
+}
+
 export interface Loan {
   id: number
   sacco_id: number
@@ -136,15 +159,33 @@ export interface Loan {
   loan_number: string
   amount: number
   purpose: string
-  interest_rate: number
-  term_months: number
+  interest_rate: number | null
+  term_months: number | null
   status: 'pending' | 'approved' | 'active' | 'rejected' | 'closed'
   created_at: string
   member?: User
   user?: User
   repayment_schedule?: LoanSchedule[]
   schedules?: LoanSchedule[]
-  total_repayable?: number
+  repayments?: Repayment[]
+  total_repayable?: number | null
+  monthly_installment?: number | null
+  guarantors?: LoanGuarantor[]
+  financial_position?: FinancialPosition
+}
+
+export interface GuarantorRequest {
+  id: number
+  loan_id: number
+  loan_number: string | null
+  applicant_name: string
+  applicant_email: string | null
+  loan_amount: number
+  loan_purpose: string | null
+  amount_guaranteed: number
+  status: 'pending' | 'accepted' | 'rejected'
+  created_at: string
+  updated_at: string
 }
 
 export interface LoanSchedule {
