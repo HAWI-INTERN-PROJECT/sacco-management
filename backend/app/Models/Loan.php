@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property int $sacco_id
  * @property int $member_id
+ * @property string $loan_number
+ * @property string $loan_type
  * @property float $principal_amount
  * @property string $purpose
  * @property string $status
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read User $user
  * @property-read Collection<int, LoanSchedule> $schedules
  * @property-read Collection<int, Repayment> $repayments
+ * @property-read Collection<int, LoanGuarantor> $guarantors
  */
 class Loan extends Model
 {
@@ -44,6 +47,7 @@ class Loan extends Model
         'sacco_id',
         'member_id',
         'loan_number',
+        'loan_type',
         'principal_amount',
         'purpose',
         'status',
@@ -113,5 +117,13 @@ class Loan extends Model
     public function repayments(): HasMany
     {
         return $this->hasMany(Repayment::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\LoanGuarantor, $this>
+     */
+    public function guarantors(): HasMany
+    {
+        return $this->hasMany(LoanGuarantor::class);
     }
 }

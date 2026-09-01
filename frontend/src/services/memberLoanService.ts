@@ -66,6 +66,9 @@ export interface MemberLoansPage {
 export interface ApplyForLoanRequest {
   amount: number;
   purpose: string;
+  loan_type: string;
+  term_months: number;
+  guarantor_id?: number | null;
 }
 
 export async function getMemberLoans(page = 1): Promise<MemberLoansPage> {
@@ -92,5 +95,19 @@ export async function applyForLoan(
   request: ApplyForLoanRequest,
 ): Promise<MemberLoan> {
   const { data } = await api.post<{ data: MemberLoan }>("/loans", request);
+  return data.data;
+}
+
+export interface GuarantorSearchUser {
+  id: number;
+  name: string;
+  email: string;
+  national_id: string;
+}
+
+export async function searchGuarantors(query: string): Promise<GuarantorSearchUser[]> {
+  const { data } = await api.get<{ data: GuarantorSearchUser[] }>("/guarantors/search", {
+    params: { search: query }
+  });
   return data.data;
 }

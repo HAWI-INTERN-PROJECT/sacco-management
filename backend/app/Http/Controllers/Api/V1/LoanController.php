@@ -50,19 +50,72 @@ class LoanController extends Controller
      */
     public function store(ApplyLoanRequest $request): JsonResponse
     {
-        $loan = Loan::create([
-            'sacco_id' => $request->user()->sacco_id,
-            'member_id' => $request->user()->id,
-            'loan_number' => 'LN-' . strtoupper(Str::random(8)),
-            'principal_amount' => $request->amount,
-            'purpose' => $request->purpose,
-            'status' => 'pending',
-        ]);
+        $user = $request->user();
 
-        return $this->created(
-            LoanResource::make($loan),
-            'Loan application submitted successfully.'
-        );
+        $latestTransaction = \App\Models\SavingsTransaction::where('member_id', $user->id)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->first();
+
+        $savingsBalance = $latestTransaction ? (float) $latestTransaction->balance_after : 0;
+        
+        $sacco = $user->sacco;
+        $multiplier = $sacco ? (float) $sacco->loan_savings_multiplier : 3.0;
+        $maxAllowedWithoutGuarantor = $savingsBalance * $multiplier;
+        
+        if ($request->amount > $maxAllowedWithoutGuarantor) {
+            if (!$request->guarantor_id) {
+                return $this->error('The requested loan amount exceeds your eligible limit (' . number_format($maxAllowedWithoutGuarantor, 2) . '). You must provide a guarantor to proceed.', 422);
+            }
+            
+            if ((int) $request->guarantor_id === $user->id) {
+                return $this->error('You cannot be your own guarantor.', 422);
+            }
+            
+            $guarantor = \App\Models\User::where('id', $request->guarantor_id)
+                ->where('sacco_id', $user->sacco_id)
+                ->where('role', 'member')
+                ->where('is_active', true)
+                ->first();
+                
+            if (!$guarantor) {
+                return $this->error('Invalid guarantor selected.', 422);
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            $loan = Loan::create([
+                'sacco_id' => $user->sacco_id,
+                'member_id' => $user->id,
+                'loan_number' => 'LN-' . strtoupper(Str::random(8)),
+                'loan_type' => $request->loan_type,
+                'term_months' => $request->term_months,
+                'principal_amount' => $request->amount,
+                'purpose' => $request->purpose,
+                'status' => 'pending',
+            ]);
+
+            if ($request->amount > $maxAllowedWithoutGuarantor && $request->guarantor_id) {
+                $amountGuaranteed = $request->amount - $maxAllowedWithoutGuarantor;
+                \App\Models\LoanGuarantor::create([
+                    'loan_id' => $loan->id,
+                    'member_id' => $request->guarantor_id,
+                    'amount_guaranteed' => $amountGuaranteed,
+                    'status' => 'pending'
+                ]);
+            }
+            
+            DB::commit();
+
+            return $this->created(
+                LoanResource::make($loan),
+                'Loan application submitted successfully.'
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**

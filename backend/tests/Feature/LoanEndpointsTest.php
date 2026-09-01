@@ -40,6 +40,16 @@ class LoanEndpointsTest extends TestCase
         $this->memberA1 = User::factory()->create(['role' => 'member', 'sacco_id' => $this->saccoA->id]);
         $this->memberA2 = User::factory()->create(['role' => 'member', 'sacco_id' => $this->saccoA->id]);
 
+        // Give memberA1 enough savings for the 3x multiplier (5000 / 3 = ~1667)
+        \App\Models\SavingsTransaction::create([
+            'member_id' => $this->memberA1->id,
+            'type' => 'deposit',
+            'amount' => 5000,
+            'balance_after' => 5000,
+            'description' => 'Initial deposit',
+            'transaction_date' => now(),
+        ]);
+
         // SACCO B
         $this->saccoB = Sacco::create([
             'name' => 'SACCO Beta',
@@ -95,6 +105,8 @@ class LoanEndpointsTest extends TestCase
         $payload = [
             'amount' => 5000.00,
             'purpose' => 'Business inventory purchase',
+            'loan_type' => 'Personal',
+            'term_months' => 12,
         ];
 
         $response = $this->actingAs($this->memberA1)->postJson('/api/v1/loans', $payload);
@@ -110,6 +122,7 @@ class LoanEndpointsTest extends TestCase
             'sacco_id' => $this->saccoA->id,
             'member_id' => $this->memberA1->id,
             'principal_amount' => 5000.00,
+            'loan_type' => 'Personal',
             'status' => 'pending',
         ]);
     }
@@ -119,7 +132,7 @@ class LoanEndpointsTest extends TestCase
         $response = $this->actingAs($this->memberA1)->postJson('/api/v1/loans', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['amount', 'purpose']);
+            ->assertJsonValidationErrors(['amount', 'purpose', 'loan_type', 'term_months']);
     }
 
     public function test_apply_loan_validates_positive_amount(): void
@@ -127,6 +140,8 @@ class LoanEndpointsTest extends TestCase
         $response = $this->actingAs($this->memberA1)->postJson('/api/v1/loans', [
             'amount' => -100,
             'purpose' => 'Invalid amount loan',
+            'loan_type' => 'Personal',
+            'term_months' => 12,
         ]);
 
         $response->assertStatus(422)
@@ -138,6 +153,8 @@ class LoanEndpointsTest extends TestCase
         $response = $this->actingAs($this->adminA)->postJson('/api/v1/loans', [
             'amount' => 1000.00,
             'purpose' => 'Admin trying to get loan',
+            'loan_type' => 'Personal',
+            'term_months' => 12,
         ]);
 
         $response->assertStatus(403);
