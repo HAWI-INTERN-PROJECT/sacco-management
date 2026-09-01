@@ -140,6 +140,32 @@ class AuthController extends Controller
     }
 
     /**
+     * Update User Profile
+     *
+     * @param  Request  $request
+     * @return UserResource
+     */
+    public function updateProfile(Request $request): UserResource
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'national_id' => ['nullable', 'string', 'max:50'],
+            'region' => ['nullable', 'string', 'max:100'],
+            'zone' => ['nullable', 'string', 'max:100'],
+            'town' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $user->update($validated);
+
+        ActivityLogger::log('profile_updated', 'User updated their profile', $request, ['user_id' => $user->id]);
+
+        return UserResource::make($user->fresh());
+    }
+
+    /**
      * Verify Email
      *
      * @return JsonResponse

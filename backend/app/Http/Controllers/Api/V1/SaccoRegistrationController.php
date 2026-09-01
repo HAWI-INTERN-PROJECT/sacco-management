@@ -44,6 +44,10 @@ class SaccoRegistrationController extends Controller
                     'password' => Hash::make($request->password),
                     'role' => 'admin',
                     'sacco_id' => $sacco->id,
+                    'national_id' => $request->national_id,
+                    'region' => $request->region,
+                    'zone' => $request->zone,
+                    'town' => $request->town,
                 ]);
 
                 $user->sendEmailVerificationNotification();

@@ -27,6 +27,10 @@ class UserTest extends TestCase
             'password',
             'num_shares',
             'is_active',
+            'national_id',
+            'region',
+            'zone',
+            'town',
         ];
 
         $this->assertEquals($expected, $user->getFillable());

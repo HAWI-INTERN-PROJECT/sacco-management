@@ -28,10 +28,11 @@ import Dividends from "./pages/member/Dividends";
 import Loans from "./pages/member/Loans";
 import LoanDetails from "./pages/member/LoanDetails";
 import ApplyLoan from "./pages/member/ApplyLoan";
-import NotificationsPage from "./pages/member/NotificationsPage";
+import Notifications from "./pages/member/Notifications";
 import Payments from "./pages/member/Payments";
-import StatementsPage from "./pages/member/StatementsPage";
-import ProfilePage from "./pages/member/ProfilePage";
+import Statements from "./pages/member/Statements";
+import AcceptInvitePage from "./pages/member/AcceptInvitePage";
+import ProfileSettingsPage from "./pages/member/ProfileSettingsPage";
 import HelpSupportPage from "./pages/member/HelpSupportPage";
 //import ApplayLoan from "./pages/member/ApplayLoan";
 
@@ -145,6 +146,7 @@ export default function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/member/accept-invite" element={<AcceptInvitePage />} />
             </Route>
             <Route
               path="/login"
@@ -223,10 +225,10 @@ export default function App() {
               <Route path="loans/apply" element={<ApplyLoan />} />
               <Route path="loans/:id" element={<LoanDetails />} />
               <Route path="dividends" element={<Dividends />} />
-              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="notifications" element={<Notifications />} />
               <Route path="payments" element={<Payments />} />
-              <Route path="statements" element={<StatementsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
+              <Route path="statements" element={<Statements />} />
+              <Route path="profile" element={<ProfileSettingsPage />} />
               <Route path="help-support" element={<HelpSupportPage />} />
             </Route>
 
