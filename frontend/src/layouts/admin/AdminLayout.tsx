@@ -9,8 +9,6 @@ import {
   PieChart,
   Gift,
   Settings,
-  Search,
-  Bell,
   Menu,
   X,
   ChevronDown,
@@ -19,6 +17,8 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth'
 import ThemeToggle from '../../components/ThemeToggle'
+import { GlobalSearch } from '../../components/admin/GlobalSearch'
+import { NotificationDropdown } from '../../components/admin/NotificationDropdown'
 
 export const AdminLayout: React.FC = () => {
   const location = useLocation()
@@ -143,14 +143,9 @@ export const AdminLayout: React.FC = () => {
           <div className="flex items-center gap-5">
             <ThemeToggle />
             
-            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
+            <GlobalSearch />
             
-            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full border border-white dark:border-slate-900"></span>
-            </button>
+            <NotificationDropdown />
 
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 

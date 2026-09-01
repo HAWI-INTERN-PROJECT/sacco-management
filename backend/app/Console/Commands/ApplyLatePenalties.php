@@ -3,8 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\LoanSchedule;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\LoanOverdueAlert;
 
 class ApplyLatePenalties extends Command
 {
@@ -57,7 +60,7 @@ class ApplyLatePenalties extends Command
                 continue;
             }
 
-            DB::transaction(function () use ($schedule, $penalty): void {
+            DB::transaction(function () use ($schedule, $penalty, $sacco): void {
                 $locked = LoanSchedule::where('id', $schedule->id)
                     ->lockForUpdate()
                     ->first();
@@ -67,6 +70,14 @@ class ApplyLatePenalties extends Command
                     $locked->penalty_amount = $penalty;
                     $locked->status = 'overdue';
                     $locked->save();
+
+                    // Notify SACCO Admins
+                    $admins = User::where('sacco_id', $sacco->id)
+                                  ->where('role', 'admin')
+                                  ->get();
+                    if ($admins->isNotEmpty()) {
+                        Notification::send($admins, new LoanOverdueAlert($locked));
+                    }
                 }
             });
 
