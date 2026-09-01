@@ -34,6 +34,7 @@ class UpdateSaccoSettingsRequest extends FormRequest
             'max_loan_term' => ['sometimes', 'integer', 'min:1'],
             'loan_to_savings_ratio' => ['sometimes', 'numeric', 'min:0'],
             'min_shares_per_member' => ['sometimes', 'integer', 'min:0'],
+            'late_fee_percentage' => ['sometimes', 'numeric', 'min:0', 'max:100'],
         ];
     }
 }

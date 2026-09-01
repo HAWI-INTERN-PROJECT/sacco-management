@@ -54,17 +54,16 @@ export const RepaymentsPage: React.FC = () => {
   // Normalize schedule array across backend LoanResource (repayment_schedule) and fallback (schedules)
   const scheduleData: LoanSchedule[] = selectedLoan?.repayment_schedule || selectedLoan?.schedules || []
   
-  // Unpaid schedules: status is not paid OR amount_paid is less than total_due
   const unpaidSchedules = scheduleData.filter(s => {
-    const due = Number(s.total_due ?? s.amount_due ?? 0)
+    const due = Number(s.total_due ?? s.amount_due ?? 0) + Number((s as any).penalty_amount || 0)
     const paid = Number(s.amount_paid ?? 0)
     return s.status !== 'paid' && paid < due
   })
   
   // Calculate total repaid amount and progress
-  const totalRepayable = Number(selectedLoan?.total_repayable || scheduleData.reduce((sum, s) => sum + Number(s.total_due ?? s.amount_due ?? 0), 0))
+  const totalRepayable = Number(selectedLoan?.total_repayable || scheduleData.reduce((sum, s) => sum + Number(s.total_due ?? s.amount_due ?? 0) + Number((s as any).penalty_amount || 0), 0))
   const repaidAmount = scheduleData.reduce((sum, s) => {
-    const due = Number(s.total_due ?? s.amount_due ?? 0)
+    const due = Number(s.total_due ?? s.amount_due ?? 0) + Number((s as any).penalty_amount || 0)
     const paid = Number(s.amount_paid ?? (s.status === 'paid' ? due : 0))
     return sum + paid
   }, 0)
@@ -390,7 +389,8 @@ export const RepaymentsPage: React.FC = () => {
                   {selectedLoanId ? (
                     scheduleData.length > 0 ? (
                       scheduleData.map((row: any, idx: number) => {
-                        const dueAmount = Number(row.total_due ?? row.amount_due ?? 0)
+                        const penalty = Number(row.penalty_amount || 0)
+                        const dueAmount = Number(row.total_due ?? row.amount_due ?? 0) + penalty
                         const paidAmount = Number(row.amount_paid ?? (row.status === 'paid' ? dueAmount : 0))
                         const remaining = Math.max(0, dueAmount - paidAmount)
 
@@ -407,7 +407,10 @@ export const RepaymentsPage: React.FC = () => {
                               {row.due_date}
                             </td>
                             <td className="px-6 py-4 text-right font-bold text-slate-900 dark:text-white">
-                              {dueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              <div>{dueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                              {penalty > 0 && (
+                                <div className="text-[10px] text-rose-500 font-semibold">+ {penalty.toLocaleString()} penalty</div>
+                              )}
                             </td>
                             <td className="px-6 py-4 text-right font-medium text-slate-600 dark:text-slate-400">
                               {paidAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -508,8 +511,9 @@ export const RepaymentsPage: React.FC = () => {
                     const memberObj = item.member || {}
                     const loanObj = item.loan || {}
                     const total = Number(sched.total_due ?? 0)
+                    const penalty = Number(sched.penalty_amount || 0)
                     const paid = Number(sched.amount_paid ?? 0)
-                    const overdueAmount = Math.max(0, total - paid)
+                    const overdueAmount = Math.max(0, (total + penalty) - paid)
 
                     return (
                       <tr key={sched.id || idx} className="hover:bg-rose-50/20 dark:hover:bg-rose-500/5 transition-colors">
@@ -527,7 +531,10 @@ export const RepaymentsPage: React.FC = () => {
                           {sched.due_date || 'N/A'}
                         </td>
                         <td className="px-6 py-4 text-right font-extrabold text-slate-900 dark:text-white">
-                          {overdueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <div>{overdueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          {penalty > 0 && (
+                            <div className="text-[10px] text-rose-500 font-semibold">+ {penalty.toLocaleString()} penalty</div>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
@@ -577,7 +584,7 @@ export const RepaymentsPage: React.FC = () => {
                     setSelectedScheduleId(id)
                     const item = scheduleData.find(s => s.id === id)
                     if (item) {
-                      const due = Number(item.total_due ?? item.amount_due ?? 0)
+                      const due = Number(item.total_due ?? item.amount_due ?? 0) + Number((item as any).penalty_amount || 0)
                       const paid = Number(item.amount_paid ?? 0)
                       const rem = Math.max(0, due - paid)
                       setAmountPaid(rem > 0 ? rem.toString() : due.toString())
@@ -588,12 +595,13 @@ export const RepaymentsPage: React.FC = () => {
                 >
                   <option value="">Select Installment...</option>
                   {unpaidSchedules.map((s: any) => {
-                    const due = Number(s.total_due ?? s.amount_due ?? 0)
+                    const due = Number(s.total_due ?? s.amount_due ?? 0) + Number(s.penalty_amount || 0)
+                    const penalty = Number(s.penalty_amount || 0)
                     const paid = Number(s.amount_paid ?? 0)
                     const rem = Math.max(0, due - paid)
                     return (
                       <option key={s.id} value={s.id}>
-                        Inst #{s.installment_number} - Due {s.due_date} (Remaining: ETB {rem.toLocaleString()})
+                        Inst #{s.installment_number} - Due {s.due_date} (Remaining: ETB {rem.toLocaleString()} {penalty > 0 ? `incl. penalty` : ''})
                       </option>
                     )
                   })}

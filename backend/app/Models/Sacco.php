@@ -33,6 +33,7 @@ class Sacco extends Model
         'loan_to_savings_ratio',
         'min_shares_per_member',
         'loan_savings_multiplier',
+        'late_fee_percentage',
     ];
 
     /**
@@ -49,6 +50,7 @@ class Sacco extends Model
             'max_loan_term' => 'integer',
             'loan_to_savings_ratio' => 'decimal:2',
             'min_shares_per_member' => 'integer',
+            'late_fee_percentage' => 'decimal:2',
         ];
     }
 
