@@ -38,6 +38,37 @@ class MemberController extends Controller
     }
 
     /**
+     * Search for eligible guarantors within the same SACCO.
+     * Excludes the authenticated user.
+     *
+     * @param  Request  $request
+     * @return AnonymousResourceCollection
+     */
+    public function searchGuarantors(Request $request): AnonymousResourceCollection
+    {
+        $user = $request->user();
+        
+        $query = User::where('sacco_id', $user->sacco_id)
+            ->where('role', 'member')
+            ->where('is_active', true)
+            ->where('id', '!=', $user->id);
+
+        if ($request->filled('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                    ->orWhere('email', 'like', $searchTerm)
+                    ->orWhere('national_id', 'like', $searchTerm)
+                    ->orWhere('phone', 'like', $searchTerm);
+            });
+        }
+
+        $members = $query->limit(10)->get();
+
+        return UserResource::collection($members);
+    }
+
+    /**
      * List all members in the SACCO.
      *
      * @param  Request  $request

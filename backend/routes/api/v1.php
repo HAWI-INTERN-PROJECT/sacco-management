@@ -68,6 +68,9 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
 
     // Change password
     Route::put('change-password', [AuthController::class, 'changePassword'])->name('api.v1.change-password');
+    
+    // Guarantor Search (accessible to members)
+    Route::get('guarantors/search', [MemberController::class, 'searchGuarantors'])->name('api.v1.guarantors.search');
 
     Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])
         ->middleware('throttle:6,1')
