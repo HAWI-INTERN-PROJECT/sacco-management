@@ -24,10 +24,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import ThemeToggle from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-
-// TODO: wire this up to your real notifications source (query/store) —
-// hard-coded here just to match the "3" badge in the reference design.
-const UNREAD_NOTIFICATIONS = 3;
+import { useMemberNotifications } from "../../hooks/useMemberNotifications";
 
 export const MemberLayout: React.FC = () => {
   const location = useLocation();
@@ -35,6 +32,7 @@ export const MemberLayout: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { unreadCount } = useMemberNotifications();
 
   // Only members should ever see this layout. Anyone else (or a
   // not-yet-loaded user) gets bounced — adjust the fallback route to
@@ -87,7 +85,7 @@ export const MemberLayout: React.FC = () => {
       label: t("member.nav.notifications"),
       path: "/member/notifications",
       icon: Bell,
-      badge: UNREAD_NOTIFICATIONS,
+      badge: unreadCount,
     },
   ];
 
@@ -99,19 +97,36 @@ export const MemberLayout: React.FC = () => {
     },
     {
       label: t("member.nav.support"),
-      path: "/member/support",
+      path: "/member/help-support",
       icon: HelpCircle,
     },
   ];
 
-  const isActive = (path: string) => {
+  // Match a nav path against the current URL. "/member" only matches the
+  // dashboard itself; every other path matches its own page as well as any
+  // nested routes under it (e.g. "/member/loans" also matches
+  // "/member/loans/5").
+  const pathMatches = (pathname: string, path: string) => {
     if (path === "/member") {
-      return (
-        location.pathname === "/member" || location.pathname === "/member/"
-      );
+      return pathname === "/member" || pathname === "/member/";
     }
-    return location.pathname.startsWith(path);
+    return pathname === path || pathname.startsWith(`${path}/`);
   };
+
+  // Some nav paths are prefixes of others (e.g. "/member/loans" is a
+  // prefix of "/member/loans/apply"), which would otherwise highlight both
+  // at once. Only the longest (most specific) matching path should be
+  // treated as active.
+  const activeNavPath = [...navItems, ...bottomNavItems]
+    .map((item) => item.path)
+    .filter((path) => pathMatches(location.pathname, path))
+    .reduce<string | null>(
+      (longest, path) =>
+        longest === null || path.length > longest.length ? path : longest,
+      null
+    );
+
+  const isActive = (path: string) => path === activeNavPath;
 
   const initials =
     user?.name
@@ -263,9 +278,9 @@ export const MemberLayout: React.FC = () => {
             onClick={() => navigate("/member/notifications")}
           >
             <Bell className="w-5 h-5" />
-            {UNREAD_NOTIFICATIONS > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
-                {UNREAD_NOTIFICATIONS}
+                {unreadCount}
               </span>
             )}
           </button>
