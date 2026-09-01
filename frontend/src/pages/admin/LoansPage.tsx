@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Download, Eye, Landmark, Loader2, X, CheckCircle, XCircle } from 'lucide-react'
+import { Download, Eye, Landmark, Loader2, X, CheckCircle, XCircle, ShieldCheck, ShieldAlert } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { adminService } from '../../services/adminService'
 import { exportToCSV } from '../../utils/exportToCSV'
@@ -191,16 +191,16 @@ export const LoansPage: React.FC = () => {
                 displayLoans.map((loan: any, index: number) => (
                   <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4">
-                      <a href="#" className="font-semibold text-[#0B6B3A] dark:text-emerald-400 hover:underline">
+                      <span className="font-semibold text-[#0B6B3A] dark:text-emerald-400">
                         {loan.loan_number}
-                      </a>
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0">
-                          {(loan.user?.name || 'Unknown').substring(0, 2).toUpperCase()}
+                          {(loan.user?.name || loan.member?.name || 'Unknown').substring(0, 2).toUpperCase()}
                         </div>
-                        <span className="font-medium text-slate-900 dark:text-white">{loan.user?.name || 'Unknown'}</span>
+                        <span className="font-medium text-slate-900 dark:text-white">{loan.user?.name || loan.member?.name || 'Unknown'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -278,43 +278,151 @@ export const LoansPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Review Modal */}
+      {/* Review Modal (Consolidated Financial Standing & 3x Limit Review) */}
       <Dialog.Root open={!!reviewLoan} onOpenChange={(open) => !open && handleCloseModals()}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800">
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
               <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                Review Loan Application
+                Admin Loan Review & Financial Audit
               </Dialog.Title>
               <button onClick={handleCloseModals} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
               {reviewLoan && (
                 <>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Member</div>
-                        <div className="text-sm font-bold text-slate-900 dark:text-white">{reviewLoan.user?.name || reviewLoan.member?.name}</div>
+                  {/* Applicant & Loan Overview */}
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Applicant Member</div>
+                      <div className="text-base font-bold text-slate-900 dark:text-white">{reviewLoan.user?.name || reviewLoan.member?.name}</div>
+                      <div className="text-xs text-slate-500">{reviewLoan.user?.email || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Requested Loan Amount</div>
+                      <div className="text-base font-bold text-[#0B6B3A] dark:text-emerald-400">
+                        ETB {Number(reviewLoan.amount || reviewLoan.principal_amount).toLocaleString()}
                       </div>
-                      <div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Requested Amount</div>
-                        <div className="text-sm font-bold text-[#0B6B3A] dark:text-emerald-400">ETB {Number(reviewLoan.amount || reviewLoan.principal_amount).toLocaleString()}</div>
-                      </div>
-                      <div className="col-span-2">
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Purpose</div>
-                        <div className="text-sm text-slate-700 dark:text-slate-300 capitalize">{reviewLoan.purpose}</div>
-                      </div>
+                      <div className="text-xs text-slate-500 capitalize">{reviewLoan.purpose} ({reviewLoan.loan_number})</div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  {/* Financial Position Breakdown */}
+                  {reviewLoan.financial_position && (
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Applicant Financial Standing & 3x Limit
+                      </h4>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 rounded-lg">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 block">Current Savings</span>
+                          <strong className="text-sm font-bold text-emerald-800 dark:text-emerald-300">
+                            ETB {Number(reviewLoan.financial_position.current_savings).toLocaleString()}
+                          </strong>
+                        </div>
+
+                        <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 rounded-lg">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 block">Share Capital</span>
+                          <strong className="text-sm font-bold text-blue-800 dark:text-blue-300">
+                            ETB {Number(reviewLoan.financial_position.share_capital).toLocaleString()}
+                            <span className="text-xs font-normal text-slate-500 ml-1">({reviewLoan.financial_position.num_shares} shares)</span>
+                          </strong>
+                        </div>
+
+                        <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 rounded-lg">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 block">3x Savings Limit</span>
+                          <strong className="text-sm font-bold text-amber-800 dark:text-amber-300">
+                            ETB {Number(reviewLoan.financial_position.max_3x_limit).toLocaleString()}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {/* LOAN ELIGIBILITY BANNER */}
+                      <div className={`p-4 rounded-lg border text-sm flex items-start gap-3 ${
+                        reviewLoan.financial_position.is_eligible_for_approval
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950/30 dark:border-emerald-900/60 dark:text-emerald-300'
+                          : 'bg-rose-50 border-rose-200 text-rose-900 dark:bg-rose-950/30 dark:border-rose-900/60 dark:text-rose-300'
+                      }`}>
+                        {reviewLoan.financial_position.is_eligible_for_approval ? (
+                          <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        ) : (
+                          <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                        )}
+                        <div>
+                          <p className="font-bold">
+                            {reviewLoan.financial_position.is_within_3x_limit
+                              ? '✓ LOAN ELIGIBLE: Amount is within 3x Savings Limit'
+                              : reviewLoan.financial_position.all_guarantors_accepted
+                                ? '✓ LOAN ELIGIBLE: 3 Guarantors Required & All 3 Have Accepted'
+                                : '⚠ LOAN INELIGIBLE: Requires 3 Accepted Guarantors'}
+                          </p>
+                          <p className="text-xs mt-1 opacity-90">
+                            {reviewLoan.financial_position.is_within_3x_limit
+                              ? 'No guarantors required because requested loan does not exceed 3x savings balance.'
+                              : reviewLoan.financial_position.all_guarantors_accepted
+                                ? 'Requested amount exceeds 3x savings limit. Exactly 3 guarantors were selected and all 3 have explicitly accepted.'
+                                : 'Requested amount exceeds 3x savings limit. All 3 guarantors must accept their guarantee requests before this loan can be approved.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Guarantors Table Section */}
+                  {reviewLoan.financial_position?.requires_guarantors && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Required Guarantors Status (3 Required)
+                      </h4>
+                      {reviewLoan.guarantors && reviewLoan.guarantors.length > 0 ? (
+                        <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                          <table className="w-full text-xs text-left">
+                            <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+                              <tr>
+                                <th className="px-3 py-2">Guarantor</th>
+                                <th className="px-3 py-2">Amount Guaranteed</th>
+                                <th className="px-3 py-2 text-right">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {reviewLoan.guarantors.map((g: any, i: number) => (
+                                <tr key={i}>
+                                  <td className="px-3 py-2.5 font-medium text-slate-900 dark:text-white">
+                                    {g.name} <span className="text-slate-400 text-[11px]">({g.email || 'Member'})</span>
+                                  </td>
+                                  <td className="px-3 py-2.5 text-slate-700 dark:text-slate-300">
+                                    ETB {Number(g.amount_guaranteed).toLocaleString()}
+                                  </td>
+                                  <td className="px-3 py-2.5 text-right">
+                                    <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                                      g.status === 'accepted' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' :
+                                      g.status === 'rejected' ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300' :
+                                      'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                                    }`}>
+                                      {g.status.toUpperCase()}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg border border-rose-200">
+                          No guarantors attached to this loan application.
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Loan Parameters Setup */}
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-slate-800">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Interest Rate (%)</label>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Approved Interest Rate (%)</label>
                       <input 
                         type="number" 
                         value={interestRate} 
@@ -323,7 +431,7 @@ export const LoansPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Term (Months)</label>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Approved Term (Months)</label>
                       <input 
                         type="number" 
                         value={termMonths} 
@@ -356,10 +464,22 @@ export const LoansPage: React.FC = () => {
                 {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                 Reject
               </button>
+
               <button 
                 onClick={() => approveMutation.mutate()} 
-                disabled={approveMutation.isPending || rejectMutation.isPending || !interestRate || !termMonths} 
-                className="inline-flex items-center gap-2 px-6 py-2 bg-[#0B6B3A] text-white rounded-lg text-sm font-bold hover:bg-[#095730] transition-colors shadow-md disabled:opacity-50"
+                disabled={
+                  approveMutation.isPending || 
+                  rejectMutation.isPending || 
+                  !interestRate || 
+                  !termMonths || 
+                  (reviewLoan?.financial_position?.requires_guarantors && !reviewLoan?.financial_position?.all_guarantors_accepted)
+                } 
+                title={
+                  reviewLoan?.financial_position?.requires_guarantors && !reviewLoan?.financial_position?.all_guarantors_accepted
+                    ? "Cannot approve until all 3 guarantors have accepted"
+                    : "Approve this loan"
+                }
+                className="inline-flex items-center gap-2 px-6 py-2 bg-[#0B6B3A] text-white rounded-lg text-sm font-bold hover:bg-[#095730] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {approveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 Approve Loan

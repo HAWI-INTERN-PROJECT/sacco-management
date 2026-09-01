@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Models\Loan;
+use App\Models\SavingsTransaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
+ * @property Loan $resource
  * @property-read int $id
  * @property-read int $sacco_id
  * @property-read int $member_id
@@ -26,6 +29,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read mixed $user
  * @property-read mixed $schedules
  * @property-read mixed $repayments
+ * @property-read mixed $guarantors
+ * @property-read mixed $sacco
  * @property-read string $loan_number
  */
 class LoanResource extends JsonResource
@@ -37,11 +42,57 @@ class LoanResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $applicant = $this->user;
+
+        // Current savings calculation
+        $latestTx = SavingsTransaction::where('member_id', $this->member_id)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->first();
+        $currentSavings = $latestTx ? (float) $latestTx->balance_after : 0.0;
+
+        // SACCO settings
+        $sacco = $this->sacco ?? ($applicant ? $applicant->sacco : null);
+        $multiplier = $sacco ? (float) ($sacco->loan_savings_multiplier ?? 3.0) : 3.0;
+        $shareValue = $sacco ? (float) ($sacco->share_value ?? 100.0) : 100.0;
+
+        $max3xLimit = $currentSavings * $multiplier;
+        $numShares = $applicant ? (int) ($applicant->num_shares ?? 0) : 0;
+        $shareCapital = $numShares * $shareValue;
+
+        $principal = (float) $this->principal_amount;
+        $isWithin3xLimit = $principal <= $max3xLimit;
+        $requiresGuarantors = !$isWithin3xLimit;
+
+        // Guarantors collection
+        $guarantorsData = [];
+        $allAccepted = true;
+        if ($this->resource->relationLoaded('guarantors')) {
+            foreach ($this->guarantors as $g) {
+                if ($g->status !== 'accepted') {
+                    $allAccepted = false;
+                }
+                $guarantorsData[] = [
+                    'id' => $g->id,
+                    'member_id' => $g->member_id,
+                    'name' => $g->member->name ?? 'Member #' . $g->member_id,
+                    'email' => $g->member->email ?? null,
+                    'phone' => $g->member->phone ?? null,
+                    'national_id' => $g->member->national_id ?? null,
+                    'amount_guaranteed' => (float) $g->amount_guaranteed,
+                    'status' => $g->status,
+                ];
+            }
+        } else {
+            $allAccepted = false;
+        }
+
         return [
             'id' => $this->id,
             'loan_number' => $this->loan_number,
             'sacco_id' => $this->sacco_id,
             'user_id' => $this->member_id,
+            'member_id' => $this->member_id,
             'amount' => (float) $this->principal_amount,
             'purpose' => $this->purpose,
             'status' => $this->status,
@@ -56,8 +107,21 @@ class LoanResource extends JsonResource
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'user' => UserResource::make($this->whenLoaded('user')),
+            'member' => UserResource::make($this->whenLoaded('user')),
             'repayment_schedule' => LoanScheduleResource::collection($this->whenLoaded('schedules')),
             'repayments' => RepaymentResource::collection($this->whenLoaded('repayments')),
+            'guarantors' => $guarantorsData,
+            'financial_position' => [
+                'current_savings' => $currentSavings,
+                'num_shares' => $numShares,
+                'share_capital' => $shareCapital,
+                'max_3x_limit' => $max3xLimit,
+                'requested_amount' => $principal,
+                'is_within_3x_limit' => $isWithin3xLimit,
+                'requires_guarantors' => $requiresGuarantors,
+                'all_guarantors_accepted' => $requiresGuarantors ? (count($guarantorsData) === 3 && $allAccepted) : true,
+                'is_eligible_for_approval' => $isWithin3xLimit || (count($guarantorsData) === 3 && $allAccepted),
+            ],
         ];
     }
 }
