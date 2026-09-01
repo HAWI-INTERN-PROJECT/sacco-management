@@ -68,17 +68,17 @@ export const AllUsersPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             All Users
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Manage all platform members, SACCO admins, and superadmins.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium transition-colors shadow-sm cursor-pointer"
           >
             <Download className="w-4 h-4" />
             <span>Export CSV</span>
@@ -87,23 +87,23 @@ export const AllUsersPage: React.FC = () => {
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Search users by name, email, or username..."
             value={params.search || ''}
             onChange={handleSearch}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
           />
         </div>
         
         <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
-            <Filter className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+            <Filter className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             <select
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
               value={params.role || ''}
               onChange={(e) => handleFilterChange('role', e.target.value)}
             >
@@ -114,10 +114,10 @@ export const AllUsersPage: React.FC = () => {
             </select>
           </div>
           
-          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
-            <Filter className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+            <Filter className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             <select
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
               value={params.status || ''}
               onChange={(e) => handleFilterChange('status', e.target.value)}
             >
@@ -130,10 +130,10 @@ export const AllUsersPage: React.FC = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50/80 border-b border-slate-200 text-xs uppercase font-semibold text-slate-500">
+          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+            <thead className="bg-slate-50/80 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-xs uppercase font-semibold text-slate-500 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-4">User</th>
                 <th className="px-6 py-4">Role</th>
@@ -143,10 +143,10 @@ export const AllUsersPage: React.FC = () => {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                       <span>Loading users...</span>
@@ -156,46 +156,46 @@ export const AllUsersPage: React.FC = () => {
               ) : data?.data?.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
-                    <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <h3 className="text-lg font-medium text-slate-900">No users found</h3>
-                    <p className="text-slate-500">Try adjusting your filters or search query.</p>
+                    <Users className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">No users found</h3>
+                    <p className="text-slate-500 dark:text-slate-400">Try adjusting your filters or search query.</p>
                   </td>
                 </tr>
               ) : (
                 data?.data.map((user: any) => (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800 flex items-center justify-center font-bold text-sm shrink-0">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-900">
+                          <div className="font-semibold text-slate-900 dark:text-white">
                             {user.name}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
                             {user.email}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                        ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 
-                          user.role === 'admin' ? 'bg-blue-100 text-blue-700' : 
-                          'bg-slate-100 text-slate-700'}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize border
+                        ${user.role === 'superadmin' ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' : 
+                          user.role === 'admin' ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' : 
+                          'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}
                       `}>
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-600 font-medium">
-                      {user.sacco ? user.sacco.name : <span className="text-slate-400 italic">None</span>}
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 font-medium">
+                      {user.sacco ? user.sacco.name : <span className="text-slate-400 dark:text-slate-500 italic">None</span>}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
                         ${user.is_active !== false 
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' 
-                          : 'bg-rose-50 text-rose-700 border border-rose-200/50'}
+                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-700/60' 
+                          : 'bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200/50 dark:border-rose-700/60'}
                       `}>
                         {user.is_active !== false ? (
                           <><CheckCircle2 className="w-3.5 h-3.5" /> Active</>
@@ -204,7 +204,7 @@ export const AllUsersPage: React.FC = () => {
                         )}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-500">
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -217,7 +217,7 @@ export const AllUsersPage: React.FC = () => {
                                   suspendMutation.mutate(user.id)
                                 }
                               }}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 rounded-lg transition-colors cursor-pointer"
                               title="Suspend User"
                             >
                               <ShieldAlert className="w-4 h-4" />
@@ -229,7 +229,7 @@ export const AllUsersPage: React.FC = () => {
                                   activateMutation.mutate(user.id)
                                 }
                               }}
-                              className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 rounded-lg transition-colors cursor-pointer"
                               title="Activate User"
                             >
                               <CheckCircle2 className="w-4 h-4" />
@@ -247,22 +247,22 @@ export const AllUsersPage: React.FC = () => {
         
         {/* Pagination */}
         {data?.meta && data.meta.last_page > 1 && (
-          <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-            <div className="text-sm text-slate-500">
-              Showing <span className="font-medium text-slate-900">{data.meta.from}</span> to <span className="font-medium text-slate-900">{data.meta.to}</span> of <span className="font-medium text-slate-900">{data.meta.total}</span> results
+          <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <div className="text-sm">
+              Showing <span className="font-medium text-slate-900 dark:text-white">{data.meta.from}</span> to <span className="font-medium text-slate-900 dark:text-white">{data.meta.to}</span> of <span className="font-medium text-slate-900 dark:text-white">{data.meta.total}</span> results
             </div>
             <div className="flex items-center gap-2">
               <button
                 disabled={params.page === 1}
                 onClick={() => setParams({ ...params, page: (params.page || 1) - 1 })}
-                className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
               >
                 Previous
               </button>
               <button
                 disabled={params.page === data.meta.last_page}
                 onClick={() => setParams({ ...params, page: (params.page || 1) + 1 })}
-                className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
               >
                 Next
               </button>

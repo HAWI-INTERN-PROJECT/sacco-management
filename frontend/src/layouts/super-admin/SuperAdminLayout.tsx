@@ -14,12 +14,15 @@ import {
   X,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/auth";
+import { NewSaccoModal } from "../../components/super-admin/NewSaccoModal";
+import ThemeToggle from "../../components/ThemeToggle";
 
 export const SuperAdminLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -53,7 +56,7 @@ export const SuperAdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] flex flex-col md:flex-row font-sans text-slate-900">
+    <div className="min-h-screen bg-[#F4F6F9] dark:bg-slate-950 flex flex-col md:flex-row font-sans text-slate-900 dark:text-slate-100 transition-colors">
       {/* Mobile Top Header */}
       <div className="md:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
         <div className="flex items-center gap-3">
@@ -86,7 +89,7 @@ export const SuperAdminLayout: React.FC = () => {
       <aside
         className={`${
           mobileMenuOpen ? "block" : "hidden"
-        } md:block w-full md:w-[260px] bg-[#0F172A] text-slate-300 shrink-0 flex flex-col justify-between z-40 select-none`}
+        } md:block w-full md:w-[260px] bg-[#0F172A] text-slate-300 shrink-0 flex flex-col justify-between z-40 select-none border-r border-slate-800/80`}
       >
         <div>
           {/* Brand Logo Header */}
@@ -106,13 +109,16 @@ export const SuperAdminLayout: React.FC = () => {
 
           {/* New Application CTA Button */}
           <div className="px-4 py-4">
-            <Link
-              to="/super-admin/saccos"
-              className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsNewModalOpen(true);
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold text-sm py-2.5 px-4 rounded-lg shadow-xs transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Application</span>
-            </Link>
+            </button>
           </div>
 
           {/* Main Navigation */}
@@ -169,45 +175,48 @@ export const SuperAdminLayout: React.FC = () => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F4F6F9]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F4F6F9] dark:bg-slate-950 transition-colors">
         {/* Top Bar Header */}
-        <header className="bg-white border-b border-slate-200/90 px-6 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs">
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-6 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs transition-colors">
           {/* Left Title & Badge */}
           <div className="flex items-center gap-3 min-w-0">
-            <h1 className="text-lg font-bold text-slate-900 truncate">
+            <h1 className="text-lg font-bold text-slate-900 dark:text-white truncate">
               Platform Admin
             </h1>
           </div>
 
           {/* Right Header Search & Actions */}
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Search Input */}
             <div className="relative hidden lg:block w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full pl-9 pr-4 py-1.5 bg-[#F1F5F9] border border-slate-200/80 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:bg-white transition-all"
+                className="w-full pl-9 pr-4 py-1.5 bg-[#F1F5F9] dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-full text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all"
               />
             </div>
 
             {/* Icons */}
             <button
-              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full relative transition-colors"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative transition-colors"
               title="Notifications"
             >
               <Bell className="w-5 h-5" />
-              <span className="w-2 h-2 bg-rose-500 rounded-full absolute top-1.5 right-1.5 ring-2 ring-white"></span>
+              <span className="w-2 h-2 bg-rose-500 rounded-full absolute top-1.5 right-1.5 ring-2 ring-white dark:ring-slate-900"></span>
             </button>
 
             <button
-              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors hidden sm:block"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden sm:block"
               title="Help & Support"
             >
               <HelpCircle className="w-5 h-5" />
             </button>
 
-            <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
             {/* Profile User Info */}
             <div className="flex items-center gap-3">
@@ -217,7 +226,7 @@ export const SuperAdminLayout: React.FC = () => {
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80"
                 alt="Admin Avatar"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-200 shrink-0"
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 shrink-0"
               />
             </div>
           </div>
@@ -228,6 +237,18 @@ export const SuperAdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Global New SACCO Application Modal */}
+      <NewSaccoModal
+        isOpen={isNewModalOpen}
+        onClose={() => setIsNewModalOpen(false)}
+        onSuccess={() => {
+          window.dispatchEvent(new Event('sacco-created'))
+          if (!location.pathname.startsWith('/super-admin/saccos')) {
+            navigate('/super-admin/saccos?status=pending')
+          }
+        }}
+      />
     </div>
   );
 };

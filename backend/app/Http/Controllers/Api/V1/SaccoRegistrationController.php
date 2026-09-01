@@ -50,7 +50,11 @@ class SaccoRegistrationController extends Controller
                     'town' => $request->town,
                 ]);
 
-                $user->sendEmailVerificationNotification();
+                try {
+                    $user->sendEmailVerificationNotification();
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('Verification email sending failed: ' . $e->getMessage());
+                }
 
                 // 3. Return auth token for the new admin
                 return AuthResource::make($user);

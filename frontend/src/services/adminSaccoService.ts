@@ -9,6 +9,20 @@ export interface GetSaccosParams {
   page?: number
 }
 
+export interface CreateSaccoPayload {
+  sacco_name: string
+  registration_number: string
+  admin_name: string
+  admin_email: string
+  admin_username: string
+  password: string
+  password_confirmation: string
+  national_id: string
+  region: string
+  zone: string
+  town: string
+}
+
 export const adminSaccoService = {
   getDashboardStats: async (): Promise<{ success?: boolean; data: DashboardStats }> => {
     const response = await api.get<{ success?: boolean; data: DashboardStats }>('/admin/dashboard/stats')
@@ -75,6 +89,11 @@ export const adminSaccoService = {
 
   getSaccoGrowth: async (): Promise<{ success?: boolean; data: any[] }> => {
     const response = await api.get<{ success?: boolean; data: any[] }>('/admin/dashboard/sacco-growth')
+    return response.data
+  },
+
+  createSacco: async (payload: CreateSaccoPayload): Promise<any> => {
+    const response = await api.post('/saccos/register', payload)
     return response.data
   },
 }

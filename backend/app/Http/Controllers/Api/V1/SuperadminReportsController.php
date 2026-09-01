@@ -33,23 +33,27 @@ class SuperadminReportsController extends Controller
         $totalSavings = round(max(0, $deposits - $withdrawals), 2);
 
         $totalLoansDisbursed = round((float) Loan::whereIn('status', ['active', 'completed'])
-            ->sum('approved_amount'), 2);
+            ->sum('principal_amount'), 2);
 
         $totalRepaymentsCollected = round((float) Repayment::sum('amount'), 2);
 
         // Platform growth: % increase in members over the last month
+        $startOfCurrentMonth = Carbon::now()->startOfMonth();
+        $startOfLastMonth = $startOfCurrentMonth->copy()->subMonth();
+        $endOfLastMonth = $startOfLastMonth->copy()->endOfMonth();
+
         $currentMonthMembers = User::where('role', 'member')
-            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('created_at', '>=', $startOfCurrentMonth)
             ->count();
         $lastMonthMembers = User::where('role', 'member')
             ->whereBetween('created_at', [
-                Carbon::now()->subMonth()->startOfMonth(),
-                Carbon::now()->subMonth()->endOfMonth(),
+                $startOfLastMonth,
+                $endOfLastMonth,
             ])
             ->count();
         $platformGrowth = $lastMonthMembers > 0
             ? round((($currentMonthMembers - $lastMonthMembers) / $lastMonthMembers) * 100, 1)
-            : 0;
+            : ($currentMonthMembers > 0 ? 100.0 : 0.0);
 
         $totalMembers = User::where('role', 'member')->count();
 
@@ -91,7 +95,7 @@ class SuperadminReportsController extends Controller
             // Calculate repayment rate
             $totalExpected = (float) $sacco->loans()
                 ->whereIn('status', ['active', 'completed'])
-                ->sum('approved_amount');
+                ->sum('principal_amount');
             $totalRepaid = (float) Repayment::whereIn('loan_id', $sacco->loans()->pluck('id'))
                 ->sum('amount');
             $repaymentRate = $totalExpected > 0
@@ -142,9 +146,10 @@ class SuperadminReportsController extends Controller
         };
 
         $trends = collect();
+        $startOfCurrentMonth = Carbon::now()->startOfMonth();
 
         for ($i = $months - 1; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i);
+            $date = $startOfCurrentMonth->copy()->subMonths($i);
             $endOfMonth = $date->copy()->endOfMonth();
 
             // Cumulative members up to end of month
@@ -164,7 +169,7 @@ class SuperadminReportsController extends Controller
             // Cumulative loans disbursed up to end of month
             $loans = (float) Loan::whereIn('status', ['active', 'completed'])
                 ->where('created_at', '<=', $endOfMonth)
-                ->sum('approved_amount');
+                ->sum('principal_amount');
 
             $trends->push([
                 'month' => $date->format('M Y'),
