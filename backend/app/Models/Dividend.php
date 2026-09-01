@@ -15,6 +15,12 @@ class Dividend extends Model
         'share_pct',
         'amount',
         'total_pool',
+        'savings_balance',
+        'savings_pct',
+        'share_dividend_amount',
+        'savings_interest_amount',
+        'reserve_percentage',
+        'reserve_amount',
     ];
 
     /**

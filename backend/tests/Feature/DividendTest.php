@@ -44,10 +44,23 @@ class DividendTest extends TestCase
             'sacco_id' => $this->mySacco->id,
             'num_shares' => 10,
         ]);
+        \App\Models\SavingsTransaction::factory()->create([
+            'member_id' => $this->member1->id,
+            'type' => 'deposit',
+            'amount' => 1000,
+            'balance_after' => 1000,
+        ]);
+
         $this->member2 = User::factory()->create([
             'role' => 'member',
             'sacco_id' => $this->mySacco->id,
             'num_shares' => 40,
+        ]);
+        \App\Models\SavingsTransaction::factory()->create([
+            'member_id' => $this->member2->id,
+            'type' => 'deposit',
+            'amount' => 9000,
+            'balance_after' => 9000,
         ]);
 
         $this->otherSacco = Sacco::create([
@@ -63,6 +76,12 @@ class DividendTest extends TestCase
             'role' => 'member',
             'sacco_id' => $this->otherSacco->id,
             'num_shares' => 50,
+        ]);
+        \App\Models\SavingsTransaction::factory()->create([
+            'member_id' => $this->otherMember->id,
+            'type' => 'deposit',
+            'amount' => 5000,
+            'balance_after' => 5000,
         ]);
     }
 
@@ -108,22 +127,51 @@ class DividendTest extends TestCase
         $this->assertEquals(80.0, $member2Preview['share_pct']);
     }
 
-    // 4. Preview calculates correct dividend amounts
+    // 4. Preview calculates correct dividend amounts (shares + savings - reserve)
     public function test_preview_calculates_correct_dividend_amounts(): void
     {
+        // Pool: 100,000
+        // Reserve 20% = 20,000
+        // Distributable = 80,000
+        // Share Pool (70%) = 56,000
+        // Savings Pool (30%) = 24,000
+        //
+        // Member 1:
+        // Shares: 10/50 = 20% of 56,000 = 11,200
+        // Savings: 1,000/10,000 = 10% of 24,000 = 2,400
+        // Total = 13,600
+        //
+        // Member 2:
+        // Shares: 40/50 = 80% of 56,000 = 44,800
+        // Savings: 9,000/10,000 = 90% of 24,000 = 21,600
+        // Total = 66,400
+
         $response = $this->actingAs($this->myAdmin)->postJson('/api/v1/dividends/calculate', [
             'period' => '2026',
             'total_pool' => 100000,
+            'reserve_percentage' => 20,
         ]);
 
         $response->assertStatus(200);
+        
+        // Check pools
+        $response->assertJsonPath('data.reserve_amount', 20000)
+                 ->assertJsonPath('data.distributable_pool', 80000)
+                 ->assertJsonPath('data.share_pool', 56000)
+                 ->assertJsonPath('data.savings_pool', 24000);
+
         $preview = collect($response->json('data.preview'));
 
         $member1Preview = $preview->firstWhere('member_id', $this->member1->id);
         $member2Preview = $preview->firstWhere('member_id', $this->member2->id);
 
-        $this->assertEquals(20000.0, $member1Preview['amount']);
-        $this->assertEquals(80000.0, $member2Preview['amount']);
+        $this->assertEquals(11200.0, $member1Preview['share_dividend_amount']);
+        $this->assertEquals(2400.0, $member1Preview['savings_interest_amount']);
+        $this->assertEquals(13600.0, $member1Preview['amount']);
+
+        $this->assertEquals(44800.0, $member2Preview['share_dividend_amount']);
+        $this->assertEquals(21600.0, $member2Preview['savings_interest_amount']);
+        $this->assertEquals(66400.0, $member2Preview['amount']);
     }
 
     // 5. Preview does NOT save dividend records
@@ -132,6 +180,7 @@ class DividendTest extends TestCase
         $this->actingAs($this->myAdmin)->postJson('/api/v1/dividends/calculate', [
             'period' => '2026',
             'total_pool' => 100000,
+            'reserve_percentage' => 20,
         ]);
 
         $this->assertDatabaseCount('dividends', 0);
@@ -149,27 +198,53 @@ class DividendTest extends TestCase
             ->assertJsonPath('success', true);
     }
 
-    // 7. Distribution saves the correct records
-    public function test_distribution_saves_the_correct_records(): void
+    // 7. Distribution saves the correct records and creates SavingsTransactions
+    public function test_distribution_saves_the_correct_records_and_transactions(): void
     {
         $this->actingAs($this->myAdmin)->postJson('/api/v1/dividends/distribute', [
             'period' => '2026',
             'total_pool' => 100000,
+            'reserve_percentage' => 20,
         ]);
 
         $this->assertDatabaseHas('dividends', [
             'sacco_id' => $this->mySacco->id,
             'user_id' => $this->member1->id,
             'period' => '2026',
-            'amount' => 20000.00,
+            'reserve_percentage' => 20,
+            'amount' => 13600.00,
         ]);
 
         $this->assertDatabaseHas('dividends', [
             'sacco_id' => $this->mySacco->id,
             'user_id' => $this->member2->id,
             'period' => '2026',
-            'amount' => 80000.00,
+            'amount' => 66400.00,
         ]);
+
+        // Check SavingsTransactions
+        $this->assertDatabaseHas('savings_transactions', [
+            'member_id' => $this->member1->id,
+            'type' => 'deposit',
+            'amount' => 13600.00,
+            'balance_after' => 14600.00,
+        ]);
+        
+        $this->assertDatabaseHas('savings_transactions', [
+            'member_id' => $this->member2->id,
+            'type' => 'deposit',
+            'amount' => 66400.00,
+            'balance_after' => 75400.00,
+        ]);
+
+        // Check user table updated (Wait, user doesn't have savings_balance column. 
+        // The balance is fetched dynamically via subqueries in controllers.
+        // We can verify that the latest transaction for member 1 has balance_after 14600)
+        $latestTx1 = \App\Models\SavingsTransaction::where('member_id', $this->member1->id)->latest('id')->first();
+        $this->assertEquals(14600.00, $latestTx1->balance_after);
+        
+        $latestTx2 = \App\Models\SavingsTransaction::where('member_id', $this->member2->id)->latest('id')->first();
+        $this->assertEquals(75400.00, $latestTx2->balance_after);
     }
 
     // 8. Distribution returns the correct count
