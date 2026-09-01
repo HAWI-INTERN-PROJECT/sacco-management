@@ -25,8 +25,10 @@ class StoreMemberRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => ['nullable', 'string', 'max:255', 'unique:users'],
+            'phone' => ['nullable', 'string', 'max:255'],
+            'num_shares' => ['nullable', 'integer', 'min:0'],
+            'password' => ['nullable', 'string', 'min:8'],
         ];
     }
 }

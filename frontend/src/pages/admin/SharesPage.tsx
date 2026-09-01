@@ -6,6 +6,7 @@ import {
   ArrowUpRight, Users, CheckCircle2, Download 
 } from 'lucide-react'
 import { adminService } from '../../services/adminService'
+import { exportToCSV } from '../../utils/exportToCSV'
 
 export const SharesPage: React.FC = () => {
   const [page, setPage] = useState(1)
@@ -28,6 +29,24 @@ export const SharesPage: React.FC = () => {
   const lastPage = data?.members?.last_page || 1
   const from = data?.members?.from || 0
   const to = data?.members?.to || 0
+
+  const handleExportShares = () => {
+    if (!memberShares || memberShares.length === 0) {
+      alert('No member share distribution data available to export.')
+      return
+    }
+
+    const columns = [
+      { header: 'Member Name', accessor: (row: any) => row.name || 'Member' },
+      { header: 'Member Number', accessor: (row: any) => row.member_id || row.id || '' },
+      { header: 'Current Shares', accessor: (row: any) => row.shares || 0 },
+      { header: 'Share Value (ETB)', accessor: (row: any) => Number(row.share_value || 0) },
+      { header: 'Total Capital (ETB)', accessor: (row: any) => Number(row.total_capital || 0) },
+      { header: 'Ownership Percentage (%)', accessor: (row: any) => row.ownership_pct ?? 0 },
+    ]
+
+    exportToCSV('sacco-share-capital-report.csv', columns, memberShares)
+  }
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -131,7 +150,11 @@ export const SharesPage: React.FC = () => {
               <option value="lowest">Lowest Ownership</option>
               <option value="name">Name A-Z</option>
             </select>
-            <button className="p-2 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <button 
+              onClick={handleExportShares}
+              className="p-2 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Export Share Distribution"
+            >
               <Download className="w-5 h-5" />
             </button>
           </div>

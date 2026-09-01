@@ -28,7 +28,10 @@ class UpdateMemberRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $memberId],
             'username' => ['sometimes', 'string', 'max:255', 'unique:users,username,' . $memberId],
-            'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:255'],
+            'num_shares' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['sometimes', 'boolean'],
+            'password' => ['sometimes', 'string', 'min:8'],
         ];
     }
 }
