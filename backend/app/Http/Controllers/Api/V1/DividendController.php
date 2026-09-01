@@ -28,31 +28,61 @@ class DividendController extends Controller
         $admin = $request->user();
         $period = $request->validated('period');
         $totalPool = (float) $request->validated('total_pool');
+        $reservePercentage = (float) ($request->validated('reserve_percentage') ?? 0);
+
+        $reserveAmount = round($totalPool * ($reservePercentage / 100), 2);
+        $distributablePool = $totalPool - $reserveAmount;
+        
+        $sharePool = round($distributablePool * 0.70, 2);
+        $savingsPool = $distributablePool - $sharePool;
 
         $members = User::where('sacco_id', $admin->sacco_id)
             ->where('role', 'member')
+            ->addSelect([
+                'savings_balance' => \App\Models\SavingsTransaction::select('balance_after')
+                    ->whereColumn('member_id', 'users.id')
+                    ->latest('id')
+                    ->limit(1)
+            ])
             ->get();
 
         $totalShares = (int) $members->sum('num_shares');
+        $totalSavings = (float) $members->sum('savings_balance');
 
-        $preview = $members->map(function ($member) use ($totalShares, $totalPool) {
+        $preview = $members->map(function ($member) use ($totalShares, $totalSavings, $sharePool, $savingsPool) {
             $shares = (int) ($member->num_shares ?? 0);
+            $savings = (float) ($member->savings_balance ?? 0);
+            
             $sharePct = $totalShares > 0 ? round(($shares / $totalShares) * 100, 2) : 0.0;
-            $amount = $totalShares > 0 ? round(($totalPool * $shares) / $totalShares, 2) : 0.0;
+            $savingsPct = $totalSavings > 0 ? round(($savings / $totalSavings) * 100, 2) : 0.0;
+            
+            $shareDividend = $totalShares > 0 ? round(($sharePool * $shares) / $totalShares, 2) : 0.0;
+            $savingsInterest = $totalSavings > 0 ? round(($savingsPool * $savings) / $totalSavings, 2) : 0.0;
+            $totalAmount = $shareDividend + $savingsInterest;
 
             return [
                 'member_id' => $member->id,
                 'name' => $member->name,
                 'shares' => $shares,
                 'share_pct' => $sharePct,
-                'amount' => $amount,
+                'savings_balance' => $savings,
+                'savings_pct' => $savingsPct,
+                'share_dividend_amount' => $shareDividend,
+                'savings_interest_amount' => $savingsInterest,
+                'amount' => $totalAmount,
             ];
         })->values();
 
         return $this->success([
             'preview' => $preview,
             'total_pool' => $totalPool,
+            'reserve_percentage' => $reservePercentage,
+            'reserve_amount' => $reserveAmount,
+            'distributable_pool' => $distributablePool,
+            'share_pool' => $sharePool,
+            'savings_pool' => $savingsPool,
             'total_shares' => $totalShares,
+            'total_savings' => $totalSavings,
         ], 'Dividend preview calculated successfully.');
     }
 
@@ -68,25 +98,45 @@ class DividendController extends Controller
         $saccoId = $admin->sacco_id;
         $period = $request->validated('period');
         $totalPool = (float) $request->validated('total_pool');
+        $reservePercentage = (float) ($request->validated('reserve_percentage') ?? 0);
 
         // Prevent duplicate distributions for the same SACCO + period
         if (Dividend::where('sacco_id', $saccoId)->where('period', $period)->exists()) {
             return $this->error("Dividends for period '{$period}' have already been distributed.", 422);
         }
 
+        $reserveAmount = round($totalPool * ($reservePercentage / 100), 2);
+        $distributablePool = $totalPool - $reserveAmount;
+        
+        $sharePool = round($distributablePool * 0.70, 2);
+        $savingsPool = $distributablePool - $sharePool;
+
         $members = User::where('sacco_id', $saccoId)
             ->where('role', 'member')
+            ->addSelect([
+                'savings_balance' => \App\Models\SavingsTransaction::select('balance_after')
+                    ->whereColumn('member_id', 'users.id')
+                    ->latest('id')
+                    ->limit(1)
+            ])
             ->get();
 
         $totalShares = (int) $members->sum('num_shares');
+        $totalSavings = (float) $members->sum('savings_balance');
 
         $dividendList = [];
 
-        DB::transaction(function () use ($members, $totalShares, $totalPool, $period, $saccoId, &$dividendList) {
+        DB::transaction(function () use ($members, $totalShares, $totalSavings, $totalPool, $sharePool, $savingsPool, $reservePercentage, $reserveAmount, $period, $saccoId, &$dividendList) {
             foreach ($members as $member) {
                 $shares = (int) ($member->num_shares ?? 0);
+                $savings = (float) ($member->savings_balance ?? 0);
+                
                 $sharePct = $totalShares > 0 ? round(($shares / $totalShares) * 100, 4) : 0.0;
-                $amount = $totalShares > 0 ? round(($totalPool * $shares) / $totalShares, 2) : 0.0;
+                $savingsPct = $totalSavings > 0 ? round(($savings / $totalSavings) * 100, 4) : 0.0;
+                
+                $shareDividend = $totalShares > 0 ? round(($sharePool * $shares) / $totalShares, 2) : 0.0;
+                $savingsInterest = $totalSavings > 0 ? round(($savingsPool * $savings) / $totalSavings, 2) : 0.0;
+                $totalAmount = $shareDividend + $savingsInterest;
 
                 Dividend::create([
                     'sacco_id' => $saccoId,
@@ -94,13 +144,32 @@ class DividendController extends Controller
                     'period' => $period,
                     'num_shares' => $shares,
                     'share_pct' => $sharePct,
-                    'amount' => $amount,
+                    'savings_balance' => $savings,
+                    'savings_pct' => $savingsPct,
+                    'share_dividend_amount' => $shareDividend,
+                    'savings_interest_amount' => $savingsInterest,
+                    'reserve_percentage' => $reservePercentage,
+                    'reserve_amount' => $reserveAmount,
+                    'amount' => $totalAmount,
                     'total_pool' => $totalPool,
                 ]);
 
+                if ($totalAmount > 0) {
+                    $newBalance = $savings + $totalAmount;
+                    
+                    \App\Models\SavingsTransaction::create([
+                        'member_id' => $member->id,
+                        'type' => 'deposit',
+                        'amount' => $totalAmount,
+                        'balance_after' => $newBalance,
+                        'description' => "Dividend and Interest Distribution for {$period}",
+                        'transaction_date' => now()->toDateString(),
+                    ]);
+                }
+
                 $dividendList[] = [
                     'member_id' => $member->id,
-                    'amount' => $amount,
+                    'amount' => $totalAmount,
                 ];
             }
         });

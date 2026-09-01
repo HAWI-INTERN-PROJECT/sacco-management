@@ -25,6 +25,7 @@ class CalculateDividendRequest extends FormRequest
         return [
             'period' => ['required', 'string'],
             'total_pool' => ['required', 'numeric', 'gt:0'],
+            'reserve_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 }

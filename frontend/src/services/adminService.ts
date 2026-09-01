@@ -119,11 +119,11 @@ export const adminService = {
     const response = await api.get('/dividends')
     return response.data.data
   },
-  calculateDividends: async (data: { period: string, total_pool: number }) => {
+  calculateDividends: async (data: { period: string, total_pool: number, reserve_percentage?: number }) => {
     const response = await api.post('/dividends/calculate', data)
     return response.data.data
   },
-  distributeDividends: async (data: { period: string, total_pool: number }) => {
+  distributeDividends: async (data: { period: string, total_pool: number, reserve_percentage?: number }) => {
     const response = await api.post('/dividends/distribute', data)
     return response.data
   },
