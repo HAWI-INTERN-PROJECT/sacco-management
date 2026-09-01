@@ -87,7 +87,8 @@ class RepaymentController extends Controller
             }
 
             $remaining = round(
-                (float) $schedule->total_due -
+                (float) $schedule->total_due +
+                (float) $schedule->penalty_amount -
                 (float) $schedule->amount_paid,
                 2
             );
@@ -125,8 +126,8 @@ class RepaymentController extends Controller
             /*
              * Determine the schedule status.
              */
-            if ((float) $schedule->amount_paid >= (float) $schedule->total_due) {
-                $schedule->amount_paid = $schedule->total_due;
+            if ((float) $schedule->amount_paid >= ((float) $schedule->total_due + (float) $schedule->penalty_amount)) {
+                $schedule->amount_paid = round((float) $schedule->total_due + (float) $schedule->penalty_amount, 2);
                 $schedule->status = 'paid';
             } elseif ((float) $schedule->amount_paid > 0) {
                 if ($schedule->due_date->lt(now()->toDateString())) {

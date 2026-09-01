@@ -255,6 +255,20 @@ export const SettingsPage: React.FC = () => {
                               <input type="number" step="0.1" name="loan_savings_multiplier" defaultValue={settings?.loan_savings_multiplier || 3} className="w-full pl-7 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A]" />
                             </div>
                           </div>
+
+                          <div className="h-px w-full bg-slate-100 dark:bg-slate-800"></div>
+
+                          {/* Item 5 – Late Fee Penalty */}
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="font-semibold text-slate-900 dark:text-white text-sm">Late Fee Penalty</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 pr-4">One-time penalty on overdue installments.</div>
+                            </div>
+                            <div className="relative w-24 shrink-0">
+                              <input type="number" step="0.01" name="late_fee_percentage" defaultValue={settings?.late_fee_percentage || 0} className="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#0B6B3A]/30 focus:border-[#0B6B3A]" />
+                              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium text-sm">%</span>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
