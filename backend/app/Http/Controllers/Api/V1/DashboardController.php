@@ -148,6 +148,8 @@ class DashboardController extends Controller
                 'change' => round((float) $newSavings, 2),
             ],
             'active_loans' => [
+                'value' => $activeLoans,
+                'outstanding_amount' => round((float) $outstandingAmount, 2),
                 'count' => $activeLoans,
                 'outstanding' => round((float) $outstandingAmount, 2),
             ],
@@ -156,9 +158,10 @@ class DashboardController extends Controller
                 'amount' => round((float) $overdueAmount, 2),
             ],
             'share_capital' => [
-                'shares' => $totalShares,
                 'value' => round((float) $shareCapital, 2),
-            ]
+                'total_shares' => (int) $totalShares,
+                'shares' => (int) $totalShares,
+            ],
         ], 'Metrics retrieved successfully.');
     }
 
@@ -199,7 +202,7 @@ class DashboardController extends Controller
         // 2. Loan Status Distribution
         $loanStatuses = DB::table('loans')
             ->where('sacco_id', $saccoId)
-            ->select('status', DB::raw('count(*) as count'))
+            ->select('status as name', DB::raw('count(*) as value'))
             ->groupBy('status')
             ->get();
 

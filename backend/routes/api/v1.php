@@ -127,7 +127,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
 
 // ─── SACCO Admin Routes ──────────────────────────────────────────────
 // Protected by auth + role:admin middleware
-Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin'])
+Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_admin'])
     ->group(function (): void {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('api.v1.dashboard');
         Route::get('dashboard/metrics', [DashboardController::class, 'metrics'])->name('api.v1.dashboard.metrics');

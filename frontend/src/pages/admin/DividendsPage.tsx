@@ -4,6 +4,7 @@ import { Settings2, Download, CheckCircle, Calculator } from 'lucide-react'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminService } from '../../services/adminService'
+import { exportToCSV } from '../../utils/exportToCSV'
 
 export const DividendsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('new')
@@ -43,6 +44,22 @@ export const DividendsPage: React.FC = () => {
     if (!calculateMutation.data) return
     const amount = Number(poolAmount.replace(/,/g, ''))
     distributeMutation.mutate({ period, total_pool: amount })
+  }
+
+  const handleExportDividends = () => {
+    if (!previewData || previewData.length === 0) {
+      alert('No dividend distribution calculation data available to export. Please calculate dividends first.')
+      return
+    }
+
+    const columns = [
+      { header: 'Member Name', accessor: (row: any) => row.member_name || row.name || 'Member' },
+      { header: 'Shares Held', accessor: (row: any) => row.num_shares || row.shares || 0 },
+      { header: 'Ownership Percentage (%)', accessor: (row: any) => row.ownership_percentage ?? row.ownership_pct ?? 0 },
+      { header: 'Dividend Amount (ETB)', accessor: (row: any) => Number(row.dividend_amount ?? row.amount ?? 0) },
+    ]
+
+    exportToCSV('sacco-dividends-report.csv', columns, previewData)
   }
 
   const formatCurrency = (amount: number) => {
@@ -189,7 +206,10 @@ export const DividendsPage: React.FC = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Based on shareholding as of end of period.</p>
               </div>
               <div className="flex items-center gap-3">
-                <button className="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <button 
+                  onClick={handleExportDividends}
+                  className="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
                   <Download className="w-4 h-4" /> Export
                 </button>
                 <button 

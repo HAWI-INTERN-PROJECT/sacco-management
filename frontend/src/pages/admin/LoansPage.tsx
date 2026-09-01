@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Download, Eye, Landmark } from 'lucide-react'
 import { adminService } from '../../services/adminService'
+import { exportToCSV } from '../../utils/exportToCSV'
 
 export const LoansPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
@@ -29,6 +30,26 @@ export const LoansPage: React.FC = () => {
   const from = loanData?.meta?.from || 0
   const to = loanData?.meta?.to || 0
 
+  const handleExportLoans = () => {
+    if (!displayLoans || displayLoans.length === 0) {
+      alert('No loan records currently loaded to export.')
+      return
+    }
+
+    const columns = [
+      { header: 'Loan Number', accessor: (row: any) => row.loan_number || '' },
+      { header: 'Member Name', accessor: (row: any) => row.user?.name || row.member?.name || 'Member' },
+      { header: 'Principal Amount (ETB)', accessor: (row: any) => Number(row.amount || row.principal_amount || 0) },
+      { header: 'Purpose', accessor: (row: any) => row.purpose || '' },
+      { header: 'Terms (Months)', accessor: (row: any) => row.term_months || '-' },
+      { header: 'Interest Rate (%)', accessor: (row: any) => row.interest_rate || '-' },
+      { header: 'Status', accessor: (row: any) => row.status || '' },
+      { header: 'Created Date', accessor: (row: any) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '' },
+    ]
+
+    exportToCSV('sacco-loans-report.csv', columns, displayLoans)
+  }
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
@@ -49,7 +70,10 @@ export const LoansPage: React.FC = () => {
             Review, disburse, and track member loans.
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-slate-600 dark:bg-slate-700 text-white rounded-full text-sm font-medium hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors shadow-sm">
+        <button 
+          onClick={handleExportLoans}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-600 dark:bg-slate-700 text-white rounded-full text-sm font-medium hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors shadow-sm cursor-pointer"
+        >
           <Download className="w-4 h-4" />
           Export Report
         </button>
