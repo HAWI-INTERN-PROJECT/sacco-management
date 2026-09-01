@@ -71,8 +71,8 @@ export default function RegisterPage() {
         zone: data.zone,
         town: data.town,
       })
-      toast.success('Account created successfully')
-      navigate('/dashboard')
+      toast.success('Account created successfully! Your SACCO is pending approval.')
+      navigate('/admin')
     } catch (error: any) {
       const message = error.response?.data?.message || (error instanceof Error ? error.message : 'Registration failed')
       toast.error(message)
@@ -348,7 +348,7 @@ export default function RegisterPage() {
                 <div className="flex items-start gap-3">
                   <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#0B6B3A] focus:ring-[#0B6B3A] dark:bg-slate-800" />
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    I agree to the <Link to="#" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Terms of Service</Link> and <Link to="#" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Privacy Policy</Link>.
+                    I agree to the <Link to="/terms" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-[#0B6B3A] dark:text-emerald-400 font-medium hover:underline">Privacy Policy</Link>.
                   </p>
                 </div>
 

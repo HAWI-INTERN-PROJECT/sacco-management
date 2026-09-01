@@ -72,11 +72,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 function SuperAdminRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (
-    user?.role !== "superadmin" &&
-    user?.username !== "superadmin" &&
-    user?.email !== "superadmin@example.com"
-  ) {
+  if (user?.role !== "superadmin") {
     return <Navigate to="/dashboard" replace />;
   }
   return <>{children}</>;
@@ -84,11 +80,7 @@ function SuperAdminRoute({ children }: { children: React.ReactNode }) {
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore();
   if (isAuthenticated) {
-    if (
-      user?.role === "superadmin" ||
-      user?.username === "superadmin" ||
-      user?.email === "superadmin@example.com"
-    ) {
+    if (user?.role === "superadmin") {
       return <Navigate to="/super-admin" replace />;
     }
     if (user?.role === "admin") {

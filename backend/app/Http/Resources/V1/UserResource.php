@@ -13,6 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string $username
  * @property-read string|null $role
  * @property-read int|null $sacco_id
+ * @property-read \App\Models\Sacco|null $sacco
  * @property-read Carbon|null $email_verified_at
  * @property-read string|null $phone
  * @property-read string $role
@@ -45,6 +46,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'role' => $this->role,
             'sacco_id' => $this->sacco_id,
+            'sacco_status' => $this->sacco ? $this->sacco->status : null,
             'national_id' => $this->national_id,
             'region' => $this->region,
             'zone' => $this->zone,
