@@ -183,12 +183,12 @@ export default function PublicLayout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/about" className="hover:text-white transition-colors">
                     Team
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/about" className="hover:text-white transition-colors">
                     Careers
                   </Link>
                 </li>
@@ -217,12 +217,12 @@ export default function PublicLayout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/services" className="hover:text-white transition-colors">
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/services" className="hover:text-white transition-colors">
                     Security
                   </Link>
                 </li>
@@ -235,17 +235,17 @@ export default function PublicLayout() {
               </h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/about" className="hover:text-white transition-colors">
                     Documentation
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/services" className="hover:text-white transition-colors">
                     API
                   </Link>
                 </li>
                 <li>
-                  <Link to="#" className="hover:text-white transition-colors">
+                  <Link to="/contact" className="hover:text-white transition-colors">
                     Support
                   </Link>
                 </li>
@@ -281,10 +281,10 @@ export default function PublicLayout() {
             </div>
 
             <div className="order-3 flex space-x-6">
-              <Link to="#" className="hover:text-white transition-colors">
+              <Link to="/about" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="#" className="hover:text-white transition-colors">
+              <Link to="/about" className="hover:text-white transition-colors">
                 Terms of Service
               </Link>
             </div>

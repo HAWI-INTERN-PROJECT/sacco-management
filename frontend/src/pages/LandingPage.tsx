@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import AnimatedCounter from '../components/AnimatedCounter';
+import { useQuery } from '@tanstack/react-query';
+import { publicService } from '../services/publicService';
 
 const staggerContainer: any = {
   hidden: {},
@@ -20,6 +22,14 @@ const fadeInUp: any = {
 };
 
 export default function LandingPage() {
+  const { data: stats } = useQuery({
+    queryKey: ['publicStats'],
+    queryFn: publicService.getStats,
+  });
+
+  const defaultGrowth = [40, 60, 45, 80, 65, 100];
+  const growthData = stats?.monthly_growth || defaultGrowth;
+
   return (
     <div className="flex flex-col w-full bg-white dark:bg-slate-900 transition-colors duration-300">
 
@@ -97,7 +107,7 @@ export default function LandingPage() {
                     <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-between">
                        <div>
                          <p className="text-emerald-800 dark:text-emerald-400 text-xs font-semibold mb-1 uppercase tracking-wider">Total Members</p>
-                         <p className="text-2xl font-bold text-[#0B6B3A]">128</p>
+                         <p className="text-2xl font-bold text-[#0B6B3A]">{stats?.active_members || 128}</p>
                        </div>
                        <div className="w-10 h-10 rounded-full bg-emerald-200/50 flex items-center justify-center">
                          <Users className="w-5 h-5 text-[#0B6B3A]" />
@@ -108,7 +118,9 @@ export default function LandingPage() {
                     <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-100 dark:border-amber-800/50 flex items-center justify-between">
                        <div>
                          <p className="text-amber-800 dark:text-amber-400 text-xs font-semibold mb-1 uppercase tracking-wider">Total Savings</p>
-                         <p className="text-2xl font-bold text-amber-600">1.8M <span className="text-sm font-medium">ETB</span></p>
+                         <p className="text-2xl font-bold text-amber-600">
+                           {stats?.birr_managed ? (stats.birr_managed / 1000000).toFixed(1) + 'M' : '1.8M'} <span className="text-sm font-medium">ETB</span>
+                         </p>
                        </div>
                        <div className="w-10 h-10 rounded-full bg-amber-200/50 flex items-center justify-center">
                          <Wallet className="w-5 h-5 text-amber-600" />
@@ -119,7 +131,7 @@ export default function LandingPage() {
                     <div className="pt-2">
                        <p className="text-slate-500 text-xs font-semibold mb-3">MONTHLY GROWTH</p>
                        <div className="flex items-end gap-2 h-16">
-                         {[40, 60, 45, 80, 65, 100].map((height, i) => (
+                         {growthData.map((height: number, i: number) => (
                            <motion.div 
                              key={i} 
                              className="flex-1 bg-gradient-to-t from-[#0B6B3A] to-emerald-400 rounded-t-sm"
@@ -175,9 +187,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: 12, suffix: '+', label: 'SACCOs Registered' },
-              { value: 850, suffix: '+', label: 'Active Members' },
-              { value: 4, suffix: 'M+', label: 'Birr Managed' },
+              { value: stats?.saccos_registered || 12, suffix: '+', label: 'SACCOs Registered' },
+              { value: stats?.active_members || 850, suffix: '+', label: 'Active Members' },
+              { value: stats?.birr_managed ? stats.birr_managed / 1000000 : 4, suffix: 'M+', label: 'Birr Managed' },
               { value: 99, suffix: '.9%', label: 'Uptime SLA' },
             ].map((stat, i) => (
               <div key={i}>
