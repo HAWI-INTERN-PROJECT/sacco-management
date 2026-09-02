@@ -332,7 +332,7 @@ export const MemberDashboardPage: React.FC = () => {
                   </p>
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                      ETB {upcomingInstallmentDetails.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      ETB {upcomingInstallmentDetails.amount.toLocaleString()}
                     </span>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-slate-500 dark:text-slate-400">
@@ -355,7 +355,7 @@ export const MemberDashboardPage: React.FC = () => {
               ) : (
                 <div className="mt-1">
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    No Installment Due
+                    {t("member.dashboard.no_installment_due")}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     You have no active loans or upcoming payment installments at this time.
