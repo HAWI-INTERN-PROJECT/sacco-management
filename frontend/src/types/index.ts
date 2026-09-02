@@ -16,6 +16,7 @@ export interface User {
   zone?: string
   town?: string
   savings_balance?: number
+  must_change_password?: boolean
   email_verified_at: string | null
   created_at: string
   updated_at: string

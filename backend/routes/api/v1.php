@@ -140,6 +140,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
         Route::get('users/{user}', [SuperadminUserController::class, 'show'])->name('api.v1.admin.users.show');
         Route::patch('users/{user}/suspend', [SuperadminUserController::class, 'suspend'])->name('api.v1.admin.users.suspend');
         Route::patch('users/{user}/activate', [SuperadminUserController::class, 'activate'])->name('api.v1.admin.users.activate');
+        Route::post('users/{user}/reset-password', [SuperadminUserController::class, 'resetPassword'])->name('api.v1.admin.users.reset-password');
 
         // Platform Reports
         Route::get('reports/overview', [SuperadminReportsController::class, 'overview'])->name('api.v1.admin.reports.overview');
@@ -163,6 +164,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_a
 
         Route::apiResource('members', MemberController::class)->names('api.v1.members');
         Route::post('members/invite', [\App\Http\Controllers\Api\V1\InvitationController::class, 'invite'])->name('api.v1.members.invite');
+        Route::post('members/{member}/reset-password', [MemberController::class, 'resetPassword'])->name('api.v1.members.reset-password');
 
         Route::post('dividends/calculate', [DividendController::class, 'calculate'])->name('api.v1.dividends.calculate');
         Route::post('dividends/distribute', [DividendController::class, 'distribute'])->name('api.v1.dividends.distribute');
