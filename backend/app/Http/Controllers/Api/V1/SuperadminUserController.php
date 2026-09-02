@@ -216,4 +216,33 @@ class SuperadminUserController extends Controller
             'Password reset successfully. Please share the temporary password with the user.'
         );
     }
+
+    /**
+     * Superadmin disables 2FA for any user (emergency recovery).
+     *
+     * @param  User  $user
+     * @return JsonResponse
+     */
+    public function disableTwoFactor(User $user): JsonResponse
+    {
+        if ($user->role === 'superadmin' && $user->id !== auth()->id()) {
+            return $this->error('Cannot disable 2FA for another superadmin.', 422);
+        }
+
+        if (! $user->hasTwoFactorEnabled()) {
+            return $this->error('Two-factor authentication is not enabled for this user.', 422);
+        }
+
+        $user->forceFill([
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+            'two_factor_remember_token' => null,
+        ])->save();
+
+        return $this->success(
+            null,
+            'Two-factor authentication has been disabled for the user.'
+        );
+    }
 }
