@@ -31,6 +31,11 @@ export const superAdminUserService = {
     return response.data
   },
 
+  resetPassword: async (id: string | number): Promise<{ success?: boolean; message?: string; data: { temporary_password: string } }> => {
+    const response = await api.post(`/admin/users/${id}/reset-password`)
+    return response.data
+  },
+
   exportUsers: async (params?: Omit<GetUsersParams, 'page' | 'sort' | 'search'>): Promise<void> => {
     const response = await api.get('/admin/users/export', {
       params,
