@@ -10,7 +10,9 @@ export interface User {
   member_id?: string
   role?: string
   sacco_id?: number | null
+  sacco_name?: string | null
   sacco_status?: string | null
+  sacco?: Sacco | null
   national_id?: string
   region?: string
   zone?: string
@@ -157,16 +159,29 @@ export interface FinancialPosition {
   is_eligible_for_approval: boolean
 }
 
+export interface NextInstallmentInfo {
+  id: number
+  installment_number: number
+  due_date: string
+  amount_due: number
+  remaining_days: number
+  status: string
+}
+
 export interface Loan {
   id: number
   sacco_id: number
   member_id: number
   loan_number: string
   amount: number
+  outstanding_balance?: number
+  next_due_date?: string
+  next_due_amount?: number
+  next_installment?: NextInstallmentInfo | null
   purpose: string
   interest_rate: number | null
   term_months: number | null
-  status: 'pending' | 'approved' | 'active' | 'rejected' | 'closed'
+  status: 'pending' | 'approved' | 'active' | 'disbursed' | 'rejected' | 'closed'
   created_at: string
   member?: User
   user?: User
