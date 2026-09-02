@@ -13,6 +13,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property float|null $savings_balance
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property \Carbon\Carbon|null $two_factor_confirmed_at
+ * @property string|null $two_factor_remember_token
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -39,6 +43,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'zone',
         'town',
         'must_change_password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'two_factor_remember_token',
     ];
 
     /**
@@ -49,6 +57,9 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_remember_token',
     ];
 
     /**
@@ -63,6 +74,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'num_shares' => 'integer',
             'must_change_password' => 'boolean',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
@@ -139,5 +153,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isMember(): bool
     {
         return $this->role === 'member';
+    }
+
+    /**
+     * Check if user has 2FA enabled and confirmed.
+     */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return ! is_null($this->two_factor_secret) && ! is_null($this->two_factor_confirmed_at);
+    }
+
+    /**
+     * Check if user has started but not yet confirmed 2FA setup.
+     */
+    public function hasPendingTwoFactorSetup(): bool
+    {
+        return ! is_null($this->two_factor_secret) && is_null($this->two_factor_confirmed_at);
     }
 }

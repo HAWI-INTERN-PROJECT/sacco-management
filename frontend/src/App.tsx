@@ -10,6 +10,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ForceChangePasswordPage } from "./pages/ForceChangePasswordPage";
+import { TwoFactorChallengePage } from "./pages/TwoFactorChallengePage";
+import { TwoFactorSetupPage } from "./pages/TwoFactorSetupPage";
 import { useEffect, useState } from "react";
 
 import { SuperAdminLayout } from "./layouts/super-admin/SuperAdminLayout";
@@ -187,6 +189,14 @@ export default function App() {
               element={<ForceChangePasswordPage />}
             />
             <Route
+              path="/two-factor-challenge"
+              element={
+                <GuestRoute>
+                  <TwoFactorChallengePage />
+                </GuestRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
@@ -212,6 +222,7 @@ export default function App() {
               <Route path="shares" element={<SharesPage />} />
               <Route path="dividends" element={<DividendsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="two-factor-setup" element={<TwoFactorSetupPage />} />
             </Route>
 
             {/* Super Admin Routes */}
@@ -229,6 +240,7 @@ export default function App() {
               <Route path="users" element={<AllUsersPage />} />
               <Route path="reports" element={<PlatformReportsPage />} />
               <Route path="settings" element={<PlatformSettingsPage />} />
+              <Route path="two-factor-setup" element={<TwoFactorSetupPage />} />
             </Route>
             {/* Member Routes */}
             <Route
