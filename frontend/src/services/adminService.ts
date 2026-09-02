@@ -36,6 +36,10 @@ export const adminService = {
     const response = await api.post('/members', data)
     return response.data
   },
+  inviteMember: async (data: { email: string }) => {
+    const response = await api.post('/members/invite', data)
+    return response.data
+  },
   getMember: async (id: number) => {
     const response = await api.get<{ data: User }>(`/members/${id}`)
     return response.data.data
