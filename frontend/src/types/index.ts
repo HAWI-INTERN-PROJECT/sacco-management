@@ -19,6 +19,7 @@ export interface User {
   town?: string
   savings_balance?: number
   must_change_password?: boolean
+  two_factor_confirmed_at?: string | null
   email_verified_at: string | null
   created_at: string
   updated_at: string
@@ -29,6 +30,9 @@ export interface AuthResponse {
   access_token: string
   token_type: string
   expires_at: string
+  two_factor_required?: boolean
+  two_factor_token?: string
+  message?: string
 }
 
 export interface LoginRequest {
