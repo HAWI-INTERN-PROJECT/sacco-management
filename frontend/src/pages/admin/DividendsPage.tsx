@@ -65,21 +65,6 @@ export const DividendsPage: React.FC = () => {
     exportToCSV('sacco-dividends-report.csv', columns, previewData)
   }
 
-  const handleExportDividends = () => {
-    if (!previewData || previewData.length === 0) {
-      alert('No dividend distribution calculation data available to export. Please calculate dividends first.')
-      return
-    }
-
-    const columns = [
-      { header: 'Member Name', accessor: (row: any) => row.member_name || row.name || 'Member' },
-      { header: 'Shares Held', accessor: (row: any) => row.num_shares || row.shares || 0 },
-      { header: 'Ownership Percentage (%)', accessor: (row: any) => row.ownership_percentage ?? row.ownership_pct ?? 0 },
-      { header: 'Dividend Amount (ETB)', accessor: (row: any) => Number(row.dividend_amount ?? row.amount ?? 0) },
-    ]
-
-    exportToCSV('sacco-dividends-report.csv', columns, previewData)
-  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2 }).format(amount)
