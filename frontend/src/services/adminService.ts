@@ -52,6 +52,10 @@ export const adminService = {
     const response = await api.delete(`/members/${id}`)
     return response.data
   },
+  resetMemberPassword: async (id: number) => {
+    const response = await api.post(`/members/${id}/reset-password`)
+    return response.data
+  },
 
   // Savings
   getSavingsTransactions: async (memberId?: number, page = 1) => {

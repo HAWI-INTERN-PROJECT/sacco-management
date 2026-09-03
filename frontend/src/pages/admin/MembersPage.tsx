@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { 
   UserPlus, Search, Filter, 
-  Eye, Edit, Trash2, ChevronLeft, ChevronRight, X, Loader2
+  Eye, Edit, Trash2, ChevronLeft, ChevronRight, X, Loader2, Key
 } from 'lucide-react'
 import { adminService } from '../../services/adminService'
 import type { User } from '../../types'
@@ -22,6 +22,8 @@ export const MembersPage: React.FC = () => {
   const [viewMember, setViewMember] = useState<User | null>(null)
   const [editMember, setEditMember] = useState<User | null>(null)
   const [deleteMemberId, setDeleteMemberId] = useState<number | null>(null)
+  const [resetPasswordMember, setResetPasswordMember] = useState<User | null>(null)
+  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null)
 
   // Form states
   const [activeTab, setActiveTab] = useState<'invite' | 'manual'>('invite')
@@ -121,6 +123,17 @@ export const MembersPage: React.FC = () => {
     },
     onError: (err: any) => {
       alert(err?.response?.data?.message || 'Failed to delete member.')
+    }
+  })
+
+  // Reset Password Mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: (id: number) => adminService.resetMemberPassword(id),
+    onSuccess: (data) => {
+      setTemporaryPassword(data?.data?.temporary_password)
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.message || 'Failed to reset password.')
     }
   })
 
@@ -327,6 +340,13 @@ export const MembersPage: React.FC = () => {
                             title="Delete Member"
                           >
                             <Trash2 className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => setResetPasswordMember(member)}
+                            className="p-1.5 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors" 
+                            title="Reset Password"
+                          >
+                            <Key className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -787,6 +807,95 @@ export const MembersPage: React.FC = () => {
                 {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </button>
             </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Reset Password Modal */}
+      <Dialog.Root open={!!resetPasswordMember} onOpenChange={(open) => {
+        if (!open) {
+          setResetPasswordMember(null)
+          setTemporaryPassword(null)
+        }
+      }}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800 p-6 space-y-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+              <Key className="w-6 h-6" />
+            </div>
+            
+            {!temporaryPassword ? (
+              <>
+                <div>
+                  <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white">Reset Password</Dialog.Title>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                    Are you sure you want to reset the password for <strong>{resetPasswordMember?.name}</strong>?
+                    They will be forced to change this temporary password upon their next login.
+                  </p>
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setResetPasswordMember(null)}
+                    className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button"
+                    disabled={resetPasswordMutation.isPending}
+                    onClick={() => resetPasswordMember && resetPasswordMutation.mutate(resetPasswordMember.id)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700 disabled:opacity-50"
+                  >
+                    {resetPasswordMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {resetPasswordMutation.isPending ? 'Resetting...' : 'Reset Password'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-4"
+              >
+                <div>
+                  <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white">Password Reset Successful</Dialog.Title>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                    Please securely share this temporary password with the user.
+                  </p>
+                </div>
+                
+                <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Temporary Password</span>
+                  <code className="text-xl font-mono font-bold text-slate-900 dark:text-emerald-400">
+                    {temporaryPassword}
+                  </code>
+                </div>
+
+                <div className="flex justify-center gap-3 pt-2">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(temporaryPassword)
+                    }}
+                    className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Copy
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setResetPasswordMember(null)
+                      setTemporaryPassword(null)
+                    }}
+                    className="flex-1 px-4 py-2 bg-[#0B6B3A] hover:bg-[#095730] text-white rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
