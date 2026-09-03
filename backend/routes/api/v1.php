@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\V1\SaccoSettingsController;
 use App\Http\Controllers\Api\V1\SuperadminReportsController;
 use App\Http\Controllers\Api\V1\SuperadminUserController;
 use App\Http\Controllers\Api\V1\PublicController;
+use App\Http\Controllers\Api\V1\SavingsRequestController;
+use App\Http\Controllers\Api\V1\PaymentRequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -178,6 +180,18 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:admin,sacco_a
 
         Route::post('repayments', [RepaymentController::class, 'store'])->name('api.v1.repayments.store');
         Route::get('repayments/overdue', [RepaymentController::class, 'overdue'])->name('api.v1.repayments.overdue');
+
+        // Savings Requests (Admin)
+        Route::get('savings-requests', [SavingsRequestController::class, 'indexAdmin'])->name('api.v1.savings-requests.index');
+        Route::get('savings-requests/{savingsRequest}', [SavingsRequestController::class, 'showAdmin'])->name('api.v1.savings-requests.show');
+        Route::patch('savings-requests/{id}/approve', [SavingsRequestController::class, 'approve'])->name('api.v1.savings-requests.approve');
+        Route::patch('savings-requests/{id}/reject', [SavingsRequestController::class, 'reject'])->name('api.v1.savings-requests.reject');
+
+        // Payment Requests (Admin)
+        Route::get('payment-requests', [PaymentRequestController::class, 'indexAdmin'])->name('api.v1.payment-requests.index');
+        Route::get('payment-requests/{paymentRequest}', [PaymentRequestController::class, 'showAdmin'])->name('api.v1.payment-requests.show');
+        Route::patch('payment-requests/{id}/approve', [PaymentRequestController::class, 'approve'])->name('api.v1.payment-requests.approve');
+        Route::patch('payment-requests/{id}/reject', [PaymentRequestController::class, 'reject'])->name('api.v1.payment-requests.reject');
     });
 
 // ─── Loan Endpoints ──────────────────────────────────────────────────
@@ -198,9 +212,20 @@ Route::post('loans/{loan}/repayments', [RepaymentController::class, 'store'])
 Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:member'])->group(function (): void {
     Route::post('loans', [LoanController::class, 'store'])->name('api.v1.loans.store');
     Route::get('me/loans', [LoanController::class, 'myLoans'])->name('api.v1.me.loans');
+
+    // Savings Requests (Member)
+    Route::post('me/savings-requests', [SavingsRequestController::class, 'store'])->name('api.v1.me.savings-requests.store');
+    Route::get('me/savings-requests', [SavingsRequestController::class, 'indexOwn'])->name('api.v1.me.savings-requests.index');
+    Route::get('me/savings-requests/{savingsRequest}', [SavingsRequestController::class, 'showOwn'])->name('api.v1.me.savings-requests.show');
+
+    // Payment Requests (Member)
+    Route::post('loans/{loan}/payment-requests', [PaymentRequestController::class, 'store'])->name('api.v1.loans.payment-requests.store');
+    Route::get('me/payment-requests', [PaymentRequestController::class, 'indexOwn'])->name('api.v1.me.payment-requests.index');
+    Route::get('me/payment-requests/{paymentRequest}', [PaymentRequestController::class, 'showOwn'])->name('api.v1.me.payment-requests.show');
 });
 
 Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function (): void {
     Route::get('loans/{loan}', [LoanController::class, 'show'])->name('api.v1.loans.show');
     Route::get('loans/{loan}/repayments', [RepaymentController::class, 'index'])->name('api.v1.loans.repayments.index');
 });
+
