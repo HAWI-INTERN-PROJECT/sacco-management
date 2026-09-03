@@ -23,9 +23,8 @@ class PublicController extends Controller
         $totalSaccos = Sacco::count();
         $totalMembers = User::where('role', 'member')->count();
         // Since SavingsTransaction tracks balance per member, we can sum the latest balance of each member
-        // For simplicity in a public stats endpoint, we'll just sum all deposits (transaction_type = deposit)
-        // or just return a dummy value if the DB gets too large. Let's do a simple sum for now.
-        $totalSavings = SavingsTransaction::where('transaction_type', 'deposit')->sum('amount');
+        // For simplicity in a public stats endpoint, we sum all deposits (type = deposit).
+        $totalSavings = SavingsTransaction::where('type', 'deposit')->sum('amount');
 
         // Dummy monthly growth data for the chart
         $monthlyGrowth = [40, 60, 45, 80, 65, 100];
