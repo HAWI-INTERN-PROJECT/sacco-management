@@ -164,5 +164,39 @@ export const adminService = {
   markAllNotificationsRead: async () => {
     const response = await api.post('/notifications/read-all')
     return response.data
+  },
+
+  // Savings Requests
+  getSavingsRequests: async (status?: string, page = 1) => {
+    const params = new URLSearchParams()
+    params.append('page', page.toString())
+    if (status && status !== 'all') params.append('status', status)
+    const response = await api.get(`/savings-requests?${params.toString()}`)
+    return response.data
+  },
+  approveSavingsRequest: async (id: number) => {
+    const response = await api.patch(`/savings-requests/${id}/approve`)
+    return response.data
+  },
+  rejectSavingsRequest: async (id: number, data?: { rejection_reason?: string }) => {
+    const response = await api.patch(`/savings-requests/${id}/reject`, data ?? {})
+    return response.data
+  },
+
+  // Payment Requests
+  getPaymentRequests: async (status?: string, page = 1) => {
+    const params = new URLSearchParams()
+    params.append('page', page.toString())
+    if (status && status !== 'all') params.append('status', status)
+    const response = await api.get(`/payment-requests?${params.toString()}`)
+    return response.data
+  },
+  approvePaymentRequest: async (id: number) => {
+    const response = await api.patch(`/payment-requests/${id}/approve`)
+    return response.data
+  },
+  rejectPaymentRequest: async (id: number, data?: { rejection_reason?: string }) => {
+    const response = await api.patch(`/payment-requests/${id}/reject`, data ?? {})
+    return response.data
   }
 }
