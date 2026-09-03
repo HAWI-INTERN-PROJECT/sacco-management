@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\SaccoRegistrationController;
 use App\Http\Controllers\Api\V1\SaccoSettingsController;
 use App\Http\Controllers\Api\V1\SuperadminReportsController;
 use App\Http\Controllers\Api\V1\SuperadminUserController;
+use App\Http\Controllers\Api\V1\TwoFactorController;
 use App\Http\Controllers\Api\V1\PublicController;
 use App\Http\Controllers\Api\V1\SavingsRequestController;
 use App\Http\Controllers\Api\V1\PaymentRequestController;
@@ -50,6 +51,9 @@ Route::middleware('throttle:auth')->group(function (): void {
     Route::post('login', [AuthController::class, 'login'])->name('api.v1.login');
     Route::post('saccos/register', [SaccoRegistrationController::class, 'register'])->name('api.v1.saccos.register');
     
+    // 2FA Challenge
+    Route::post('two-factor/challenge', [TwoFactorController::class, 'challenge'])->name('api.v1.two-factor.challenge');
+    
     // Member registration via invite token
     Route::post('members/register', [\App\Http\Controllers\Api\V1\InvitationController::class, 'register'])->name('api.v1.members.register');
 });
@@ -79,6 +83,12 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function ()
 
     // Change password
     Route::put('change-password', [AuthController::class, 'changePassword'])->name('api.v1.change-password');
+    
+    // Two-Factor Authentication (Personal)
+    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])->name('api.v1.two-factor.enable');
+    Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('api.v1.two-factor.confirm');
+    Route::delete('two-factor/disable', [TwoFactorController::class, 'disable'])->name('api.v1.two-factor.disable');
+    Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('api.v1.two-factor.recovery-codes');
     
     // Guarantor Search & Requests (accessible to members)
     Route::get('guarantors/search', [MemberController::class, 'searchGuarantors'])->name('api.v1.guarantors.search');
@@ -143,6 +153,7 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
         Route::patch('users/{user}/suspend', [SuperadminUserController::class, 'suspend'])->name('api.v1.admin.users.suspend');
         Route::patch('users/{user}/activate', [SuperadminUserController::class, 'activate'])->name('api.v1.admin.users.activate');
         Route::post('users/{user}/reset-password', [SuperadminUserController::class, 'resetPassword'])->name('api.v1.admin.users.reset-password');
+        Route::delete('users/{user}/two-factor', [SuperadminUserController::class, 'disableTwoFactor'])->name('api.v1.admin.users.disable-two-factor');
 
         // Platform Reports
         Route::get('reports/overview', [SuperadminReportsController::class, 'overview'])->name('api.v1.admin.reports.overview');

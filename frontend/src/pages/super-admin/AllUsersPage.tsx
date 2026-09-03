@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   XCircle,
   ShieldAlert,
+  ShieldOff,
   Key,
   Loader2,
 } from 'lucide-react'
@@ -59,6 +60,17 @@ export const AllUsersPage: React.FC = () => {
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Failed to reset password')
+    },
+  })
+
+  const disable2FaMutation = useMutation({
+    mutationFn: (id: number) => superAdminUserService.disableTwoFactor(id),
+    onSuccess: () => {
+      toast.success('Two-factor authentication disabled for user')
+      queryClient.invalidateQueries({ queryKey: ['superadmin-users'] })
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to disable 2FA')
     },
   })
 
@@ -233,6 +245,21 @@ export const AllUsersPage: React.FC = () => {
                           >
                             <Key className="w-4 h-4" />
                           </button>
+                          
+                          {user.two_factor_confirmed_at && (
+                            <button
+                              onClick={() => {
+                                if(window.confirm('Are you sure you want to disable 2FA for this user? This is an emergency recovery action.')) {
+                                  disable2FaMutation.mutate(user.id)
+                                }
+                              }}
+                              className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/60 rounded-lg transition-colors cursor-pointer"
+                              title="Disable 2FA"
+                            >
+                              <ShieldOff className="w-4 h-4" />
+                            </button>
+                          )}
+
                           {user.is_active !== false ? (
                             <button
                               onClick={() => {
