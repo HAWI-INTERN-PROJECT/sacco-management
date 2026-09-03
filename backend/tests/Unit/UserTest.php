@@ -31,6 +31,7 @@ class UserTest extends TestCase
             'region',
             'zone',
             'town',
+            'must_change_password',
         ];
 
         $this->assertEquals($expected, $user->getFillable());

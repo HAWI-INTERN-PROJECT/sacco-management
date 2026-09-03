@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string|null $region
  * @property-read string|null $zone
  * @property-read string|null $town
+ * @property-read bool $must_change_password
  * @property-read Carbon|null $email_verified_at
  * @property-read Carbon|null $created_at
  * @property-read Carbon|null $updated_at
@@ -54,6 +55,7 @@ class UserResource extends JsonResource
             'num_shares' => (int) ($this->num_shares ?? 0),
             'savings_balance' => (float) ($this->savings_balance ?? 0),
             'is_active' => (bool) ($this->is_active ?? true),
+            'must_change_password' => (bool) $this->must_change_password,
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),

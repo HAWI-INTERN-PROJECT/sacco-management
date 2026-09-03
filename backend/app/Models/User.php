@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'region',
         'zone',
         'town',
+        'must_change_password',
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'num_shares' => 'integer',
+            'must_change_password' => 'boolean',
         ];
     }
 
