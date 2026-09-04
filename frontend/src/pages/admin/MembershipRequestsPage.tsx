@@ -10,7 +10,6 @@ import {
   Loader2,
   Eye,
   AlertCircle,
-  FileText,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { membershipRequestService } from '../../services/membershipRequestService'

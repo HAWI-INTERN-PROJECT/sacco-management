@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
@@ -165,28 +166,32 @@ class MembershipRequestController extends Controller
                 return $this->error("Cannot approve request. Current status is '{$membershipRequest->status}'.", 422);
             }
 
+            $rawToken = Str::random(64);
+            $tokenHash = hash('sha256', $rawToken);
+
             $membershipRequest->update([
                 'status' => 'approved',
+                'activation_token_hash' => $tokenHash,
+                'activation_expires_at' => now()->addDays(7),
                 'reviewed_by' => $admin->id,
                 'reviewed_at' => now(),
             ]);
 
             // Create/Update invitation token
-            $token = Str::random(60);
             Invitation::updateOrCreate(
                 [
                     'sacco_id' => $saccoId,
                     'email' => $membershipRequest->email,
                 ],
                 [
-                    'token' => $token,
+                    'token' => $rawToken,
                     'expires_at' => now()->addDays(7),
                     'accepted_at' => null,
                 ]
             );
 
             $frontendUrl = config('app.frontend_url', 'http://localhost:5173');
-            $activationUrl = "{$frontendUrl}/member/accept-invite?token={$token}";
+            $activationUrl = "{$frontendUrl}/activate-membership/{$rawToken}";
 
             // Send notification
             Notification::route('mail', $membershipRequest->email)
@@ -243,6 +248,161 @@ class MembershipRequestController extends Controller
             return $this->success(
                 MembershipRequestResource::make($membershipRequest->fresh(['sacco', 'reviewer'])),
                 'Membership request rejected successfully.'
+            );
+        });
+    }
+
+    /**
+     * Inspect activation token status and return applicant & SACCO details.
+     */
+    public function showActivation(string $token): JsonResponse
+    {
+        $tokenHash = hash('sha256', $token);
+        $membershipRequest = MembershipRequest::where('activation_token_hash', $tokenHash)->with('sacco')->first();
+
+        if (! $membershipRequest) {
+            return response()->json([
+                'status' => 'invalid',
+                'message' => 'This activation link is invalid.',
+            ], 404);
+        }
+
+        if ($membershipRequest->status !== 'approved') {
+            return response()->json([
+                'status' => 'not_approved',
+                'message' => 'This membership request has not been approved.',
+            ], 400);
+        }
+
+        if ($membershipRequest->activated_at !== null) {
+            return response()->json([
+                'status' => 'already_activated',
+                'message' => 'This activation link has already been used.',
+            ], 400);
+        }
+
+        if ($membershipRequest->activation_expires_at && $membershipRequest->activation_expires_at->isPast()) {
+            return response()->json([
+                'status' => 'expired',
+                'message' => 'This activation link has expired.',
+            ], 400);
+        }
+
+        if (User::where('email', $membershipRequest->email)->where('sacco_id', $membershipRequest->sacco_id)->exists()) {
+            return response()->json([
+                'status' => 'user_exists',
+                'message' => 'An account with this email already exists in this SACCO.',
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => 'valid',
+            'data' => [
+                'full_name' => $membershipRequest->full_name,
+                'email' => $membershipRequest->email,
+                'sacco_name' => $membershipRequest->sacco->name ?? 'SACCO',
+                'expires_at' => $membershipRequest->activation_expires_at?->toIso8601String(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Complete membership account activation by validating password and creating the User account.
+     */
+    public function completeActivation(Request $request, string $token): JsonResponse
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $tokenHash = hash('sha256', $token);
+
+        return DB::transaction(function () use ($tokenHash, $validated): JsonResponse {
+            $membershipRequest = MembershipRequest::where('activation_token_hash', $tokenHash)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $membershipRequest) {
+                return response()->json([
+                    'status' => 'invalid',
+                    'message' => 'This activation link is invalid.',
+                ], 404);
+            }
+
+            if ($membershipRequest->status !== 'approved') {
+                return response()->json([
+                    'status' => 'not_approved',
+                    'message' => 'This membership request has not been approved.',
+                ], 400);
+            }
+
+            if ($membershipRequest->activated_at !== null) {
+                return response()->json([
+                    'status' => 'already_activated',
+                    'message' => 'This activation link has already been used.',
+                ], 400);
+            }
+
+            if ($membershipRequest->activation_expires_at && $membershipRequest->activation_expires_at->isPast()) {
+                return response()->json([
+                    'status' => 'expired',
+                    'message' => 'This activation link has expired.',
+                ], 400);
+            }
+
+            if (User::where('email', $membershipRequest->email)->where('sacco_id', $membershipRequest->sacco_id)->exists()) {
+                return response()->json([
+                    'status' => 'user_exists',
+                    'message' => 'An account with this email already exists in this SACCO.',
+                ], 400);
+            }
+
+            // Derive unique username
+            $baseUsername = strtolower(explode('@', $membershipRequest->email)[0]);
+            $baseUsername = preg_replace('/[^a-z0-9_]/', '', $baseUsername) ?: 'member';
+            $uniqueUsername = $baseUsername;
+            $counter = 1;
+            while (User::where('username', $uniqueUsername)->exists()) {
+                $uniqueUsername = $baseUsername . $counter++;
+            }
+
+            // Create member user account
+            $user = User::create([
+                'name' => $membershipRequest->full_name,
+                'email' => $membershipRequest->email,
+                'phone' => $membershipRequest->phone_number,
+                'national_id' => $membershipRequest->national_id,
+                'username' => $uniqueUsername,
+                'password' => Hash::make($validated['password']),
+                'role' => 'member',
+                'sacco_id' => $membershipRequest->sacco_id,
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]);
+
+            // Mark membership request activated and invalidate token
+            $membershipRequest->update([
+                'activated_at' => now(),
+                'activation_token_hash' => null,
+            ]);
+
+            // Also mark Invitation as accepted if present
+            Invitation::where('email', $membershipRequest->email)
+                ->where('sacco_id', $membershipRequest->sacco_id)
+                ->whereNull('accepted_at')
+                ->update(['accepted_at' => now()]);
+
+            return $this->success(
+                [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'sacco_id' => $user->sacco_id,
+                    ],
+                ],
+                'Your account has been activated successfully. You can now log in.'
             );
         });
     }

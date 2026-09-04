@@ -54,6 +54,7 @@ import { SettingsPage } from "./pages/admin/SettingsPage";
 import { MembershipRequestsPage } from "./pages/admin/MembershipRequestsPage";
 import { PublicSaccoDirectoryPage } from "./pages/public/PublicSaccoDirectoryPage";
 import { PublicSaccoProfilePage } from "./pages/public/PublicSaccoProfilePage";
+import { MembershipActivationPage } from "./pages/public/MembershipActivationPage";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +155,8 @@ export default function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/saccos" element={<PublicSaccoDirectoryPage />} />
               <Route path="/saccos/:id" element={<PublicSaccoProfilePage />} />
+              <Route path="/activate-membership/:token" element={<MembershipActivationPage />} />
+              <Route path="/activate-membership" element={<MembershipActivationPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/contact" element={<ContactPage />} />
