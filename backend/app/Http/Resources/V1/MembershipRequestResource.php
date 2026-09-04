@@ -31,8 +31,8 @@ class MembershipRequestResource extends JsonResource
             'reviewed_by' => $this->reviewed_by,
             'reviewer_name' => $this->reviewer ? $this->reviewer->name : null,
             'reviewed_at' => $this->reviewed_at?->toDateTimeString(),
-            'created_at' => $this->created_at?->toDateTimeString(),
-            'updated_at' => $this->updated_at?->toDateTimeString(),
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }

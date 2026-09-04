@@ -7,13 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read int $id
- * @property-read string $name
- * @property-read string $registration_number
- * @property-read string $status
- * @property-read string|null $rejection_reason
- * @property-read Carbon|null $created_at
- * @property-read Carbon|null $updated_at
+ * @mixin \App\Models\Sacco
  */
 class SaccoResource extends JsonResource
 {
