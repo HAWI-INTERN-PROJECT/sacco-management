@@ -11,9 +11,9 @@ export default function PublicLayout() {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Find SACCOs", path: "/saccos" },
     { name: "About", path: "/about" },
     { name: "Services", path: "/services" },
+    { name: "Find SACCOs", path: "/saccos" },
     { name: "Contact", path: "/contact" },
   ];
 

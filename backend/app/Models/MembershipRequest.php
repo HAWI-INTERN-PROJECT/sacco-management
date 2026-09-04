@@ -33,10 +33,15 @@ class MembershipRequest extends Model
         'rejection_reason',
         'reviewed_by',
         'reviewed_at',
+        'activation_token_hash',
+        'activation_expires_at',
+        'activated_at',
     ];
 
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'activation_expires_at' => 'datetime',
+        'activated_at' => 'datetime',
     ];
 
     /**

@@ -47,6 +47,10 @@ Route::prefix('public')->group(function () {
 Route::middleware('throttle:5,1')->group(function (): void {
     Route::post('public/saccos/{sacco}/membership-requests', [MembershipRequestController::class, 'publicStore'])
         ->name('api.v1.public.membership-requests.store');
+    Route::get('public/membership-activation/{token}', [MembershipRequestController::class, 'showActivation'])
+        ->name('api.v1.public.membership-activation.show');
+    Route::post('public/membership-activation/{token}', [MembershipRequestController::class, 'completeActivation'])
+        ->name('api.v1.public.membership-activation.complete');
 });
 
 // Health check
