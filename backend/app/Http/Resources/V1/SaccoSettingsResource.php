@@ -42,6 +42,18 @@ class SaccoSettingsResource extends JsonResource
             'loan_to_savings_ratio' => (float) $this->loan_to_savings_ratio,
             'min_shares_per_member' => (int) $this->min_shares_per_member,
             'late_fee_percentage' => (float) ($this->late_fee_percentage ?? 0),
+            'is_public' => (bool) $this->is_public,
+            'is_accepting_members' => (bool) $this->is_accepting_members,
+            'show_share_info' => (bool) $this->show_share_info,
+            'is_directory_allowed' => (bool) $this->is_directory_allowed,
+            'logo_path' => $this->logo_path,
+            'description' => $this->description,
+            'location' => $this->location,
+            'category' => $this->category,
+            'eligibility_criteria' => $this->eligibility_criteria,
+            'contact_email' => $this->contact_email,
+            'contact_phone' => $this->contact_phone,
+            'min_shares' => (int) ($this->min_shares ?? 1),
         ];
     }
 }
