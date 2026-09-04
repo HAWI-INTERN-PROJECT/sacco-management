@@ -7,10 +7,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
- * @property string $status
  * @property int $id
  * @property string $name
+ * @property string|null $registration_number
+ * @property string $status
+ * @property string|null $rejection_reason
+ * @property float|string $share_value
+ * @property string|null $currency
+ * @property string|null $email
+ * @property string|null $phone
+ * @property string|null $address
  * @property string|null $region
+ * @property float|string $default_interest_rate
+ * @property float|string $max_loan_amount
+ * @property int $max_loan_term
+ * @property float|string $loan_to_savings_ratio
+ * @property int $min_shares_per_member
+ * @property float|string $late_fee_percentage
  * @property bool $is_public
  * @property bool $is_accepting_members
  * @property bool $show_share_info
@@ -23,8 +36,11 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property string|null $contact_email
  * @property string|null $contact_phone
  * @property int $min_shares
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
  * @property-read int|null $members_count
  * @property-read int|null $active_loans_count
+ * @property-read int|null $users_count
  */
 class Sacco extends Model
 {
