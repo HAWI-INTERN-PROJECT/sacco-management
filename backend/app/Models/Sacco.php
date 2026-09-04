@@ -11,6 +11,18 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int $id
  * @property string $name
  * @property string|null $region
+ * @property bool $is_public
+ * @property bool $is_accepting_members
+ * @property bool $show_share_info
+ * @property bool $is_directory_allowed
+ * @property string|null $logo_path
+ * @property string|null $description
+ * @property string|null $location
+ * @property string|null $category
+ * @property string|null $eligibility_criteria
+ * @property string|null $contact_email
+ * @property string|null $contact_phone
+ * @property int $min_shares
  * @property-read int|null $members_count
  * @property-read int|null $active_loans_count
  */
@@ -34,6 +46,19 @@ class Sacco extends Model
         'min_shares_per_member',
         'loan_savings_multiplier',
         'late_fee_percentage',
+        // Public profile fields
+        'is_public',
+        'is_accepting_members',
+        'show_share_info',
+        'is_directory_allowed',
+        'logo_path',
+        'description',
+        'location',
+        'category',
+        'eligibility_criteria',
+        'contact_email',
+        'contact_phone',
+        'min_shares',
     ];
 
     /**
@@ -51,6 +76,11 @@ class Sacco extends Model
             'loan_to_savings_ratio' => 'decimal:2',
             'min_shares_per_member' => 'integer',
             'late_fee_percentage' => 'decimal:2',
+            'is_public' => 'boolean',
+            'is_accepting_members' => 'boolean',
+            'show_share_info' => 'boolean',
+            'is_directory_allowed' => 'boolean',
+            'min_shares' => 'integer',
         ];
     }
 
@@ -92,5 +122,13 @@ class Sacco extends Model
     public function dividends(): HasMany
     {
         return $this->hasMany(Dividend::class);
+    }
+
+    /**
+     * @return HasMany<MembershipRequest, $this>
+     */
+    public function membershipRequests(): HasMany
+    {
+        return $this->hasMany(MembershipRequest::class);
     }
 }

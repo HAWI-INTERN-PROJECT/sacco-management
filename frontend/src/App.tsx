@@ -51,6 +51,9 @@ import { RepaymentsPage } from "./pages/admin/RepaymentsPage";
 import { SharesPage } from "./pages/admin/SharesPage";
 import { DividendsPage } from "./pages/admin/DividendsPage";
 import { SettingsPage } from "./pages/admin/SettingsPage";
+import { MembershipRequestsPage } from "./pages/admin/MembershipRequestsPage";
+import { PublicSaccoDirectoryPage } from "./pages/public/PublicSaccoDirectoryPage";
+import { PublicSaccoProfilePage } from "./pages/public/PublicSaccoProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -149,6 +152,8 @@ export default function App() {
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/saccos" element={<PublicSaccoDirectoryPage />} />
+              <Route path="/saccos/:id" element={<PublicSaccoProfilePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/contact" element={<ContactPage />} />
@@ -218,6 +223,7 @@ export default function App() {
             >
               <Route index element={<AdminDashboardPage />} />
               <Route path="members" element={<MembersPage />} />
+              <Route path="membership-requests" element={<MembershipRequestsPage />} />
               <Route path="savings" element={<SavingsPage />} />
               <Route path="loans" element={<LoansPage />} />
               <Route path="repayments" element={<RepaymentsPage />} />

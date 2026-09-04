@@ -13,7 +13,8 @@ import {
   X,
   ChevronDown,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  UserPlus
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth'
 import ThemeToggle from '../../components/ThemeToggle'
@@ -41,6 +42,7 @@ export const AdminLayout: React.FC = () => {
   const navItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { label: 'Members', path: '/admin/members', icon: Users },
+    { label: 'Membership Requests', path: '/admin/membership-requests', icon: UserPlus },
     { label: 'Savings', path: '/admin/savings', icon: Wallet },
     { label: 'Loans', path: '/admin/loans', icon: CreditCard },
     { label: 'Repayments', path: '/admin/repayments', icon: CalendarDays },
