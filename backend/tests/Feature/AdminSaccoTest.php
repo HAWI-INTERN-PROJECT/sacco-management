@@ -222,7 +222,7 @@ class AdminSaccoTest extends TestCase
             'town' => 'Nairobi',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
 
         Notification::assertSentTo(
             $superadmin,
