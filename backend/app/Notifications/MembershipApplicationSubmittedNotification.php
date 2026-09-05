@@ -31,7 +31,7 @@ class MembershipApplicationSubmittedNotification extends Notification
      */
     public function toDatabase(object $notifiable): array
     {
-        $saccoName = $this->membershipRequest->sacco?->name ?? 'a SACCO';
+        $saccoName = $this->membershipRequest->sacco->name;
 
         return [
             'title' => 'New Membership Application',
