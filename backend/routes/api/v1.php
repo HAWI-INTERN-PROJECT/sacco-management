@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\RepaymentController;
 use App\Http\Controllers\Api\V1\SaccoRegistrationController;
 use App\Http\Controllers\Api\V1\SaccoSettingsController;
 use App\Http\Controllers\Api\V1\SuperadminReportsController;
+use App\Http\Controllers\Api\V1\SuperadminSearchController;
 use App\Http\Controllers\Api\V1\SuperadminUserController;
 use App\Http\Controllers\Api\V1\TwoFactorController;
 use App\Http\Controllers\Api\V1\PublicController;
@@ -175,6 +176,9 @@ Route::middleware(['auth:sanctum', 'throttle:authenticated', 'role:superadmin'])
         Route::get('reports/sacco-comparison', [SuperadminReportsController::class, 'saccoComparison'])->name('api.v1.admin.reports.sacco-comparison');
         Route::get('reports/growth-trends', [SuperadminReportsController::class, 'growthTrends'])->name('api.v1.admin.reports.growth-trends');
         Route::get('reports/geographic-distribution', [SuperadminReportsController::class, 'geographicDistribution'])->name('api.v1.admin.reports.geographic-distribution');
+
+        // Platform Search
+        Route::get('search', [SuperadminSearchController::class, 'index'])->name('api.v1.admin.search');
 
         // Platform Settings
         Route::get('platform-settings', [PlatformSettingsController::class, 'show'])->name('api.v1.admin.platform-settings.show');
