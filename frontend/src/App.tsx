@@ -22,6 +22,7 @@ import { SaccoDetailsPage } from "./pages/super-admin/SaccoDetailsPage";
 import { AllUsersPage } from "./pages/super-admin/AllUsersPage";
 import { PlatformReportsPage } from "./pages/super-admin/PlatformReportsPage";
 import { PlatformSettingsPage } from "./pages/super-admin/PlatformSettingsPage";
+import SuperAdminHelpSupportPage from "./pages/super-admin/HelpSupportPage";
 import PublicLayout from "./components/PublicLayout";
 import LandingPage from "./pages/LandingPage";
 import AboutPage from "./pages/AboutPage";
@@ -251,6 +252,7 @@ export default function App() {
               <Route path="users" element={<AllUsersPage />} />
               <Route path="reports" element={<PlatformReportsPage />} />
               <Route path="settings" element={<PlatformSettingsPage />} />
+              <Route path="help-support" element={<SuperAdminHelpSupportPage />} />
               <Route path="two-factor-setup" element={<TwoFactorSetupPage />} />
             </Route>
             {/* Member Routes */}
