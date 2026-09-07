@@ -338,4 +338,23 @@ class AdminSaccoController extends Controller
             'SACCO has been reactivated.'
         );
     }
+
+    /**
+     * Toggle directory allowance for a SACCO (Super Admin).
+     */
+    public function toggleDirectoryAllowance(Request $request, Sacco $sacco): JsonResponse
+    {
+        $validated = $request->validate([
+            'is_directory_allowed' => ['required', 'boolean'],
+        ]);
+
+        $sacco->update([
+            'is_directory_allowed' => $validated['is_directory_allowed'],
+        ]);
+
+        return $this->success(
+            SaccoResource::make($sacco->loadCount('users')),
+            'SACCO directory allowance updated successfully.'
+        );
+    }
 }
