@@ -11,6 +11,7 @@ use App\Models\Sacco;
 use App\Models\User;
 use App\Notifications\MembershipRequestApprovedNotification;
 use App\Notifications\MembershipRequestRejectedNotification;
+use App\Notifications\MembershipApplicationSubmittedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -75,6 +76,11 @@ class MembershipRequestController extends Controller
             'message' => $validated['message'] ?? null,
             'status' => 'pending',
         ]);
+
+        $superAdmins = User::where('role', 'superadmin')->get();
+        if ($superAdmins->isNotEmpty()) {
+            Notification::send($superAdmins, new MembershipApplicationSubmittedNotification($membershipRequest->load('sacco')));
+        }
 
         return $this->created(
             MembershipRequestResource::make($membershipRequest),
