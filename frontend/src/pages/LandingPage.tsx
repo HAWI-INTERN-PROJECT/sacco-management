@@ -40,10 +40,10 @@ export default function LandingPage() {
       {/* HERO SECTION */}
       <section className="relative min-h-[620px] overflow-hidden pt-20 pb-24 sm:min-h-[620px]">
         <img
-          src="/sacco%20try.png"
+          src="/sacco%20try.webp"
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,28,18,0.94)_0%,rgba(6,95,70,0.78)_52%,rgba(5,27,21,0.55)_100%)]"></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
@@ -75,7 +75,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-[#de7356] hover:bg-amber-500 text-[#1E293B] font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-[#de7356] hover:bg-amber-500 text-[#1E293B] font-bold text-lg shadow-lg shadow-[#de7356]/20 hover:shadow-lg hover:shadow-[#de7356]/60 transition-all hover:-translate-y-0.5"
                 >
                   Register Your SACCO <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>

@@ -22,19 +22,17 @@ export default function PublicLayout() {
       {/* NAVIGATION BAR */}
       <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <div className="bg-[#0B6B3A] text-white p-2 rounded-lg">
-                <Shield className="w-6 h-6" />
+              <div className="bg-[#0B6B3A] text-white p-1.5 rounded-lg">
+                <Shield className="w-5 h-5" />
               </div>
-              <span className="text-2xl font-bold text-[#0B6B3A]">
-                SACCO Manager
-              </span>
+              <span className="text-xl font-bold text-[#0B6B3A]">SACCO</span>
             </Link>
 
             {/* Desktop Nav Links */}
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex space-x-6">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -51,12 +49,12 @@ export default function PublicLayout() {
                   </Link>
                 );
               })}
+              <LanguageSwitcher />
             </div>
 
             {/* CTAs */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               <ThemeToggle />
-              <LanguageSwitcher />
               <Link
                 to="/login"
                 className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B6B3A] dark:hover:text-emerald-400 transition-colors"
@@ -65,7 +63,7 @@ export default function PublicLayout() {
               </Link>
               <Link
                 to="/register"
-                className="bg-[#0B6B3A] hover:bg-[#065F46] text-white text-sm font-medium px-5 py-2.5 rounded-full transition-all shadow-sm hover:shadow-md"
+                className="group relative isolate overflow-hidden bg-linear-to-r from-[#0B6B3A] via-[#159447] to-[#0B6B3A] hover:from-[#159447] hover:via-[#27b85d] hover:to-[#159447] text-white text-sm font-medium px-4 py-2 rounded-full transition-all shadow-md shadow-[#0B6B3A]/25 hover:shadow-lg hover:shadow-[#0B6B3A]/35 ring-1 ring-white/20 after:absolute after:inset-y-0 after:-left-1/2 after:w-1/3 after:skew-x-[-20deg] after:bg-white/25 after:transition-transform after:duration-700 hover:after:translate-x-[500%]"
               >
                 Register SACCO
               </Link>
@@ -189,12 +187,18 @@ export default function PublicLayout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="hover:text-white transition-colors">
+                  <Link
+                    to="/about"
+                    className="hover:text-white transition-colors"
+                  >
                     Team
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="hover:text-white transition-colors">
+                  <Link
+                    to="/about"
+                    className="hover:text-white transition-colors"
+                  >
                     Careers
                   </Link>
                 </li>
@@ -223,12 +227,18 @@ export default function PublicLayout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services" className="hover:text-white transition-colors">
+                  <Link
+                    to="/services"
+                    className="hover:text-white transition-colors"
+                  >
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services" className="hover:text-white transition-colors">
+                  <Link
+                    to="/services"
+                    className="hover:text-white transition-colors"
+                  >
                     Security
                   </Link>
                 </li>
@@ -241,17 +251,26 @@ export default function PublicLayout() {
               </h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link to="/about" className="hover:text-white transition-colors">
+                  <Link
+                    to="/about"
+                    className="hover:text-white transition-colors"
+                  >
                     Documentation
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services" className="hover:text-white transition-colors">
+                  <Link
+                    to="/services"
+                    className="hover:text-white transition-colors"
+                  >
                     API
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="hover:text-white transition-colors">
+                  <Link
+                    to="/contact"
+                    className="hover:text-white transition-colors"
+                  >
                     Support
                   </Link>
                 </li>
