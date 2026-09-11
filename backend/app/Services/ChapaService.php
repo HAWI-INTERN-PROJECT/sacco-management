@@ -12,7 +12,11 @@ class ChapaService
     /**
      * Initialize a Chapa transaction for a specific SACCO.
      */
-    public function initialize(Sacco $sacco, array $data)
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    public function initialize(Sacco $sacco, array $data): array
     {
         if (empty($sacco->chapa_secret_key)) {
             throw new Exception("Payment gateway is not configured for this SACCO.");
@@ -35,7 +39,10 @@ class ChapaService
     /**
      * Verify a Chapa transaction.
      */
-    public function verify(Sacco $sacco, string $txRef)
+    /**
+     * @return array<string, mixed>
+     */
+    public function verify(Sacco $sacco, string $txRef): array
     {
         if (empty($sacco->chapa_secret_key)) {
             throw new Exception("Payment gateway is not configured for this SACCO.");

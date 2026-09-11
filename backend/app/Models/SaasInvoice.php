@@ -25,6 +25,9 @@ class SaasInvoice extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Sacco, covariant self>
+     */
     public function sacco(): BelongsTo
     {
         return $this->belongsTo(Sacco::class);
