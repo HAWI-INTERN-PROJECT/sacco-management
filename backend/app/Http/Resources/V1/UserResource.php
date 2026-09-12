@@ -60,6 +60,7 @@ class UserResource extends JsonResource
             'region' => $this->region,
             'zone' => $this->zone,
             'town' => $this->town,
+            'profile_photo_url' => $this->profile_photo_path ? asset('storage/' . $this->profile_photo_path) : null,
             'num_shares' => (int) ($this->num_shares ?? 0),
             'savings_balance' => (float) ($this->savings_balance ?? 0),
             'is_active' => (bool) ($this->is_active ?? true),
