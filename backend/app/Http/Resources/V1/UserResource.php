@@ -23,6 +23,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read bool $is_active
  * @property-read string|null $national_id
  * @property-read string|null $region
+ * @property-read string|null $profile_photo_path
  * @property-read string|null $zone
  * @property-read string|null $town
  * @property-read bool $must_change_password
