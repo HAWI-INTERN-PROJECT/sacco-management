@@ -14,6 +14,7 @@ export interface User {
   sacco_status?: string | null
   sacco?: Sacco | null
   national_id?: string
+  profile_photo_url?: string | null
   region?: string
   zone?: string
   town?: string
@@ -83,6 +84,8 @@ export interface Sacco {
   contact_email?: string | null
   contact_phone?: string | null
   min_shares?: number
+  chapa_public_key?: string | null
+  chapa_secret_key?: string | null
   members_count?: number
   created_at: string
   updated_at: string
@@ -323,6 +326,7 @@ export interface PlatformSetting {
   auto_approve_saccos: boolean
   require_registration_verification: boolean
   max_saccos_allowed: number | null
+  saas_rent_percentage: number
   default_interest_rate: number
   default_share_value: number
   default_loan_to_savings_ratio: number
