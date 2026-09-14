@@ -152,36 +152,40 @@ const MemberLayoutInner: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F4F6F9] dark:bg-slate-950 flex flex-col md:flex-row font-sans text-slate-900 dark:text-slate-100">
       {/* Mobile Top Header */}
-      <div className="md:hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+      <div className="md:hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
             {user?.profile_photo_url ? (
               <img src={user.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               initials
             )}
           </div>
-          <div>
-            <div className="font-bold text-sm leading-tight">
+          <div className="min-w-0">
+            <div className="font-bold text-xs sm:text-sm leading-tight truncate">
               {user?.name ?? ""}
             </div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1 truncate">
               <span>{t("member.member_id", { id: memberIdDisplay })}</span>
-              {saccoName && <span>• {saccoName}</span>}
+              {saccoName && <span className="truncate">• {saccoName}</span>}
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
-          aria-label="Toggle Navigation"
-        >
-          {mobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
-        </button>
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <ThemeToggle />
+          <LanguageSwitcher />
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 sm:p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+            aria-label="Toggle Navigation"
+          >
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            ) : (
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -322,7 +326,7 @@ const MemberLayoutInner: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
       </div>
