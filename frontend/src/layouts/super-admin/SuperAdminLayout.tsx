@@ -18,6 +18,7 @@ import { useAuthStore } from "../../stores/auth";
 import { NewSaccoModal } from "../../components/super-admin/NewSaccoModal";
 import { LogoutConfirmDialog } from "../../components/ui/LogoutConfirmDialog";
 import ThemeToggle from "../../components/ThemeToggle";
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 import { NotificationDropdown } from "../../components/admin/NotificationDropdown";
 import { SuperAdminGlobalSearch } from "../../components/super-admin/SuperAdminGlobalSearch";
 
@@ -198,8 +199,9 @@ export const SuperAdminLayout: React.FC = () => {
 
           {/* Right Header Search & Actions */}
           <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
-            {/* Theme Toggle */}
+            {/* Theme Toggle & Language */}
             <ThemeToggle />
+            <LanguageSwitcher />
 
             <SuperAdminGlobalSearch />
 
