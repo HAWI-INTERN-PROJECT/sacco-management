@@ -27,6 +27,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import ThemeToggle from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LogoutConfirmDialog } from "@/components/ui/LogoutConfirmDialog";
 import { useMemberNotifications, MemberNotificationProvider } from "../../hooks/useMemberNotifications";
 
 const MemberLayoutInner: React.FC = () => {
@@ -35,6 +36,8 @@ const MemberLayoutInner: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { unreadCount } = useMemberNotifications();
 
   // Only members should ever see this layout. Anyone else (or a
@@ -48,11 +51,16 @@ const MemberLayoutInner: React.FC = () => {
   }
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
     try {
+      setIsLoggingOut(true);
       await logout();
       navigate("/login");
     } catch {
       navigate("/login");
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
     }
   };
 
@@ -274,8 +282,8 @@ const MemberLayoutInner: React.FC = () => {
           })}
 
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-rose-600 transition-colors"
+            onClick={() => setShowLogoutConfirm(true)}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-rose-600 transition-colors cursor-pointer"
           >
             <LogOut className="w-5 h-5 text-slate-400" />
             {t("member.logout")}
@@ -324,6 +332,14 @@ const MemberLayoutInner: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        onConfirm={handleLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 };

@@ -22,6 +22,7 @@ import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { GlobalSearch } from '../../components/admin/GlobalSearch'
 import { NotificationDropdown } from '../../components/admin/NotificationDropdown'
 import { PendingSaccoPage } from '../../pages/admin/PendingSaccoPage'
+import { LogoutConfirmDialog } from '../../components/ui/LogoutConfirmDialog'
 
 export const AdminLayout: React.FC = () => {
   const location = useLocation()
@@ -29,13 +30,20 @@ export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuthStore()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const handleLogout = async () => {
+    if (isLoggingOut) return
     try {
+      setIsLoggingOut(true)
       await logout()
       navigate('/login')
     } catch {
       navigate('/login')
+    } finally {
+      setIsLoggingOut(false)
+      setShowLogoutConfirm(false)
     }
   }
 
@@ -220,8 +228,8 @@ export const AdminLayout: React.FC = () => {
               <p className="text-xs text-slate-400 truncate">Admin</p>
             </div>
             <button 
-              onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 rounded-lg transition-colors"
+              onClick={() => setShowLogoutConfirm(true)}
+              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
               title="Logout"
             >
               <LogOut className="w-5 h-5" />
@@ -283,8 +291,11 @@ export const AdminLayout: React.FC = () => {
                     Profile
                   </Link>
                   <button 
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                    onClick={() => {
+                      setProfileDropdownOpen(false)
+                      setShowLogoutConfirm(true)
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -300,6 +311,14 @@ export const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        open={showLogoutConfirm}
+        onOpenChange={setShowLogoutConfirm}
+        onConfirm={handleLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   )
 }
