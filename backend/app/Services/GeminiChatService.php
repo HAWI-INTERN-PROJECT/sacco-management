@@ -17,7 +17,7 @@ class GeminiChatService
      */
     public function generateResponse(string $prompt, string $systemInstruction = ''): string
     {
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.api_key');
         if (empty($apiKey)) {
             throw new Exception("Gemini API key is not configured.");
         }
