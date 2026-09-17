@@ -188,16 +188,16 @@ export const SuperAdminLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#F4F6F9] dark:bg-slate-950 transition-colors">
         {/* Top Bar Header */}
-        <header className="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-6 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs transition-colors">
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4 sticky top-0 z-30 shadow-2xs transition-colors">
           {/* Left Title & Badge */}
-          <div className="flex items-center gap-3 min-w-0">
-            <h1 className="text-lg font-bold text-slate-900 dark:text-white truncate">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
               Platform Admin
             </h1>
           </div>
 
           {/* Right Header Search & Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -296,7 +296,7 @@ export const SuperAdminLayout: React.FC = () => {
         </header>
 
         {/* Page Content Viewport */}
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
       </div>

@@ -239,16 +239,16 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-[#F8FAFC] dark:bg-slate-950 transition-colors">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 md:h-screen md:overflow-hidden bg-[#F8FAFC] dark:bg-slate-950 transition-colors">
         {/* Top Header Bar */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between shrink-0 z-30 transition-colors">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between shrink-0 z-30 transition-colors">
           {/* Left Title */}
-          <div>
-            <h1 className="text-xl font-bold text-[#1E293B] dark:text-white">{currentTitle}</h1>
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-xl font-bold text-[#1E293B] dark:text-white truncate">{currentTitle}</h1>
           </div>
 
           {/* Right Items */}
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-1.5 sm:gap-3 md:gap-5 shrink-0">
             <ThemeToggle />
 
             <LanguageSwitcher />
@@ -307,7 +307,7 @@ export const AdminLayout: React.FC = () => {
         </header>
 
         {/* Page Content Scrollable Area */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6">
           <Outlet />
         </main>
       </div>
