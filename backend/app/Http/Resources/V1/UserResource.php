@@ -66,6 +66,7 @@ class UserResource extends JsonResource
             'savings_balance' => (float) ($this->savings_balance ?? 0),
             'is_active' => (bool) ($this->is_active ?? true),
             'must_change_password' => (bool) $this->must_change_password,
+            'two_factor_confirmed_at' => $this->two_factor_confirmed_at?->toDateTimeString(),
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
