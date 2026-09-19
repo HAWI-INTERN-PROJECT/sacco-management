@@ -27,6 +27,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read string|null $zone
  * @property-read string|null $town
  * @property-read bool $must_change_password
+ * @property-read Carbon|null $two_factor_confirmed_at
  * @property-read Carbon|null $email_verified_at
  * @property-read Carbon|null $created_at
  * @property-read Carbon|null $updated_at
